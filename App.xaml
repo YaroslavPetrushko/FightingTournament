@@ -1,9 +1,219 @@
-﻿<Application x:Class="FightingTournament.App"
+<Application x:Class="FightingTournament.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:FightingTournament"
+             xmlns:vm="clr-namespace:FightingTournament.ViewModels"
+             xmlns:views="clr-namespace:FightingTournament.Views"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+
+        <!-- ═══════════════════════════════════════════════════════════
+             PALETTE
+        ═════════════════════════════════════════════════════════════ -->
+        <SolidColorBrush x:Key="BrushBg"          Color="#0D0D15"/>
+        <SolidColorBrush x:Key="BrushSurface"     Color="#16161F"/>
+        <SolidColorBrush x:Key="BrushSurface2"    Color="#1E1E2A"/>
+        <SolidColorBrush x:Key="BrushSurface3"    Color="#26263A"/>
+        <SolidColorBrush x:Key="BrushAccent"      Color="#E8003D"/>
+        <SolidColorBrush x:Key="BrushAccentDim"   Color="#8C0025"/>
+        <SolidColorBrush x:Key="BrushAccentHover" Color="#FF1A54"/>
+        <SolidColorBrush x:Key="BrushText"        Color="#E8E8F2"/>
+        <SolidColorBrush x:Key="BrushTextDim"     Color="#7070A0"/>
+        <SolidColorBrush x:Key="BrushBorder"      Color="#2A2A3E"/>
+        <SolidColorBrush x:Key="BrushBorderLight" Color="#3A3A52"/>
+        <SolidColorBrush x:Key="BrushWin"         Color="#00CC6A"/>
+        <SolidColorBrush x:Key="BrushLoss"        Color="#FF4444"/>
+        <SolidColorBrush x:Key="BrushCurrent"     Color="#FF9800"/>
+        <SolidColorBrush x:Key="BrushCurrentDim"  Color="#7A4800"/>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             TYPOGRAPHY
+        ═════════════════════════════════════════════════════════════ -->
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground"  Value="{StaticResource BrushText}"/>
+            <Setter Property="FontFamily"  Value="Segoe UI"/>
+        </Style>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             SCROLLBAR (slim dark)
+        ═════════════════════════════════════════════════════════════ -->
+        <Style TargetType="ScrollBar">
+            <Setter Property="Background" Value="{StaticResource BrushSurface}"/>
+            <Setter Property="Width"      Value="6"/>
+        </Style>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             BUTTON — primary (red accent)
+        ═════════════════════════════════════════════════════════════ -->
+        <Style x:Key="BtnPrimary" TargetType="Button">
+            <Setter Property="Background"   Value="{StaticResource BrushAccent}"/>
+            <Setter Property="Foreground"   Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding"      Value="20,10"/>
+            <Setter Property="FontFamily"   Value="Segoe UI"/>
+            <Setter Property="FontSize"     Value="13"/>
+            <Setter Property="FontWeight"   Value="SemiBold"/>
+            <Setter Property="Cursor"       Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Root"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="3"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="Background"
+                                        Value="{StaticResource BrushAccentHover}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Root" Property="Background"
+                                        Value="{StaticResource BrushAccentDim}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Root" Property="Background"
+                                        Value="{StaticResource BrushSurface3}"/>
+                                <Setter Property="Foreground"
+                                        Value="{StaticResource BrushTextDim}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ghost button (dim outline) -->
+        <Style x:Key="BtnGhost" TargetType="Button" BasedOn="{StaticResource BtnPrimary}">
+            <Setter Property="Background"      Value="Transparent"/>
+            <Setter Property="Foreground"      Value="{StaticResource BrushTextDim}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Root"
+                                Background="Transparent"
+                                BorderBrush="{StaticResource BrushBorderLight}"
+                                BorderThickness="1"
+                                CornerRadius="3"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="BorderBrush"
+                                        Value="{StaticResource BrushAccent}"/>
+                                <Setter Property="Foreground"
+                                        Value="{StaticResource BrushText}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- small square counter button -->
+        <Style x:Key="BtnCounter" TargetType="Button" BasedOn="{StaticResource BtnPrimary}">
+            <Setter Property="Width"   Value="32"/>
+            <Setter Property="Height"  Value="32"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="FontSize" Value="18"/>
+        </Style>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             TEXTBOX
+        ═════════════════════════════════════════════════════════════ -->
+        <Style TargetType="TextBox">
+            <Setter Property="Background"       Value="{StaticResource BrushSurface2}"/>
+            <Setter Property="Foreground"       Value="{StaticResource BrushText}"/>
+            <Setter Property="BorderBrush"      Value="{StaticResource BrushBorder}"/>
+            <Setter Property="BorderThickness"  Value="1"/>
+            <Setter Property="Padding"          Value="8,6"/>
+            <Setter Property="FontFamily"       Value="Segoe UI"/>
+            <Setter Property="FontSize"         Value="13"/>
+            <Setter Property="CaretBrush"       Value="{StaticResource BrushAccent}"/>
+            <Setter Property="SelectionBrush"   Value="{StaticResource BrushAccentDim}"/>
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="{StaticResource BrushAccent}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             COMBOBOX
+        ═════════════════════════════════════════════════════════════ -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Background"      Value="{StaticResource BrushSurface2}"/>
+            <Setter Property="Foreground"      Value="{StaticResource BrushText}"/>
+            <Setter Property="BorderBrush"     Value="{StaticResource BrushBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding"         Value="6,4"/>
+            <Setter Property="FontFamily"      Value="Segoe UI"/>
+            <Setter Property="FontSize"        Value="12"/>
+            <Setter Property="Height"          Value="30"/>
+        </Style>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             RADIOBUTTON  (custom WIN pill)
+        ═════════════════════════════════════════════════════════════ -->
+        <Style x:Key="RadioWin" TargetType="RadioButton">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="Pill"
+                                BorderBrush="{StaticResource BrushBorderLight}"
+                                BorderThickness="1"
+                                CornerRadius="3"
+                                Padding="10,4"
+                                Cursor="Hand">
+                            <TextBlock x:Name="Label"
+                                       Text="{TemplateBinding Content}"
+                                       FontFamily="Segoe UI"
+                                       FontSize="11"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource BrushTextDim}"
+                                       HorizontalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Pill"  Property="Background"
+                                        Value="{StaticResource BrushAccent}"/>
+                                <Setter TargetName="Pill"  Property="BorderBrush"
+                                        Value="{StaticResource BrushAccent}"/>
+                                <Setter TargetName="Label" Property="Foreground"
+                                        Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Pill"  Property="BorderBrush"
+                                        Value="{StaticResource BrushAccentHover}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             SEPARATOR
+        ═════════════════════════════════════════════════════════════ -->
+        <Style TargetType="Separator">
+            <Setter Property="Background"  Value="{StaticResource BrushBorder}"/>
+            <Setter Property="Height"      Value="1"/>
+            <Setter Property="Margin"      Value="0,4"/>
+        </Style>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             MVVM NAVIGATION — DataTemplates
+        ═════════════════════════════════════════════════════════════ -->
+        <DataTemplate DataType="{x:Type vm:SetupViewModel}">
+            <views:SetupView/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:TournamentViewModel}">
+            <views:TournamentView/>
+        </DataTemplate>
+
     </Application.Resources>
 </Application>

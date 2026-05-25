@@ -1,4 +1,4 @@
-﻿namespace FightingTournament.Models;
+namespace FightingTournament.Models;
 
 public class Match
 {

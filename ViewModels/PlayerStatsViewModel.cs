@@ -1,20 +1,38 @@
-﻿namespace FightingTournament.ViewModels;
+using FightingTournament.Models;
 
-/// <summary>Thin wrapper so individual name TextBoxes can participate in binding.</summary>
-public class PlayerNameEntry : BaseViewModel
+namespace FightingTournament.ViewModels;
+
+public class PlayerStatsViewModel : BaseViewModel
 {
-    private string _name;
+    private readonly Player _player;
 
-    public int    Index { get; }
-    public string Name
+    private int _rank;
+    public int Rank
     {
-        get => _name;
-        set => Set(ref _name, value);
+        get => _rank;
+        set => Set(ref _rank, value);
     }
 
-    public PlayerNameEntry(int index, string name)
+    public string Name       => _player.Name;
+    public int    Wins       => _player.TotalWins;
+    public int    Losses     => _player.TotalLosses;
+    public int    Matches    => _player.TotalMatches;
+    public string WinRate    => $"{_player.WinRate:F1}%";
+    public string MostPicked => _player.MostPickedCharacter;
+
+    public PlayerStatsViewModel(Player player, int rank = 0)
     {
-        Index = index;
-        _name = name;
+        _player = player;
+        _rank   = rank;
+    }
+
+    /// <summary>Called by TournamentViewModel after each cycle commit.</summary>
+    public void Refresh()
+    {
+        OnPropertyChanged(nameof(Wins));
+        OnPropertyChanged(nameof(Losses));
+        OnPropertyChanged(nameof(Matches));
+        OnPropertyChanged(nameof(WinRate));
+        OnPropertyChanged(nameof(MostPicked));
     }
 }
