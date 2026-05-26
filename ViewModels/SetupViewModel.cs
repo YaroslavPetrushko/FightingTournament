@@ -30,6 +30,34 @@ public class SetupViewModel : BaseViewModel
         set => Set(ref _sessionName, value);
     }
 
+    // ── Mode selection ───────────────────────────────────────────────
+
+    private TournamentMode _selectedMode = TournamentMode.Endless;
+    public TournamentMode SelectedMode
+    {
+        get => _selectedMode;
+        set
+        {
+            if (Set(ref _selectedMode, value))
+            {
+                OnPropertyChanged(nameof(IsEndlessModeSelected));
+                OnPropertyChanged(nameof(IsChampionshipModeSelected));
+            }
+        }
+    }
+
+    public bool IsEndlessModeSelected
+    {
+        get => SelectedMode == TournamentMode.Endless;
+        set { if (value) SelectedMode = TournamentMode.Endless; }
+    }
+
+    public bool IsChampionshipModeSelected
+    {
+        get => SelectedMode == TournamentMode.Championship;
+        set { if (value) SelectedMode = TournamentMode.Championship; }
+    }
+
     // ── Saved sessions ───────────────────────────────────────────────
 
     public ObservableCollection<string> SavedSessions { get; } = new();
@@ -142,7 +170,7 @@ public class SetupViewModel : BaseViewModel
             return;
         }
 
-        var tournament = TournamentEngine.Create(names);
+        var tournament = TournamentEngine.Create(names, SelectedMode);
         tournament.SelectedGame = SelectedGame;
         tournament.SessionName = session;
         TournamentStarted?.Invoke(tournament);
