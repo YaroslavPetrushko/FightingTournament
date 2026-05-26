@@ -3,6 +3,7 @@ using FightingTournament.Services;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 
 namespace FightingTournament.ViewModels;
@@ -18,21 +19,17 @@ public class TournamentViewModel : BaseViewModel
     public ObservableCollection<MatchRowViewModel>    CurrentMatches { get; } = new();
     public ObservableCollection<PlayerStatsViewModel> Standings      { get; } = new();
 
-    // ── Header state ─────────────────────────────────────────────────
+    // ── Header ───────────────────────────────────────────────────────
 
     public string CycleHeader =>
-        _tournament.IsFinished
-            ? $"Tournament Complete  •  {_tournament.Cycles.Count} cycles played"
-            : $"Cycle  {_tournament.CurrentCycleIndex + 1}  /  {_tournament.Cycles.Count}";
+        $"Cycle  {_tournament.CurrentCycleIndex + 1}   •   " +
+        $"{ActiveCount()} active players   •   " +
+        $"{_tournament.CurrentCycle?.Matches.Count ?? 0} matches";
 
-    private bool _isFinished;
-    public bool IsFinished
-    {
-        get => _isFinished;
-        private set => Set(ref _isFinished, value);
-    }
+    private int ActiveCount() =>
+        _tournament.Players.Count(p => !p.IsEliminated);
 
-    // ── Status message ───────────────────────────────────────────────
+    // ── Status ───────────────────────────────────────────────────────
 
     private string _statusMessage = string.Empty;
     public string StatusMessage
@@ -43,8 +40,8 @@ public class TournamentViewModel : BaseViewModel
 
     // ── Commands ─────────────────────────────────────────────────────
 
-    public ICommand CommitCycleCommand    { get; }
-    public ICommand NewTournamentCommand  { get; }
+    public ICommand CommitCycleCommand   { get; }
+    public ICommand NewTournamentCommand { get; }
 
     // ── Constructor ──────────────────────────────────────────────────
 
@@ -57,21 +54,21 @@ public class TournamentViewModel : BaseViewModel
         NewTournamentCommand = new RelayCommand(onNewTournament);
 
         BuildStandings();
-        BuildCycleSchedule();
+        RefreshScheduleSidebar();
         LoadCurrentCycleMatches();
     }
 
-    // ── Initialization ───────────────────────────────────────────────
+    // ── Build helpers ─────────────────────────────────────────────────
 
     private void BuildStandings()
     {
         Standings.Clear();
         int rank = 1;
         foreach (var p in _tournament.Players)
-            Standings.Add(new PlayerStatsViewModel(p, rank++));
+            Standings.Add(new PlayerStatsViewModel(p, rank++, OnEliminatePlayer));
     }
 
-    private void BuildCycleSchedule()
+    private void RefreshScheduleSidebar()
     {
         CycleSchedule.Clear();
         int current = _tournament.CurrentCycleIndex;
@@ -91,61 +88,79 @@ public class TournamentViewModel : BaseViewModel
 
         var cycle = _tournament.CurrentCycle;
         if (cycle is null) return;
-
-        foreach (var match in cycle.Matches)
-            CurrentMatches.Add(new MatchRowViewModel(match));
+        foreach (var m in cycle.Matches)
+            CurrentMatches.Add(new MatchRowViewModel(m, _tournament.SelectedGame));
     }
 
     // ── Commit ───────────────────────────────────────────────────────
 
     private void CommitCycle()
     {
-        if (_tournament.IsFinished) return;
-
         if (CurrentMatches.Any(m => !m.IsCompleted))
         {
             StatusMessage = "⚠  Fill in all match results before saving.";
             return;
         }
 
-        int completedNumber = _tournament.CurrentCycleIndex + 1;
+        int savedNumber = _tournament.CurrentCycleIndex + 1;
 
-        bool ok = TournamentEngine.CommitCurrentCycle(_tournament);
-        if (!ok)
+        if (!TournamentEngine.CommitCurrentCycle(_tournament))
         {
             StatusMessage = "⚠  Could not save cycle — check results.";
             return;
         }
 
-        // Refresh standings + re-sort by wins desc
+        // Refresh standings + re-sort
         foreach (var s in Standings) s.Refresh();
 
-        var sorted = Standings.OrderByDescending(s => s.Wins)
-                               .ThenByDescending(s => s.Matches)
-                               .ThenBy(s => s.Name)
-                               .ToList();
+        var sorted = Standings
+            .OrderByDescending(s => s.Wins)
+            .ThenByDescending(s => s.Matches)
+            .ThenBy(s => s.Name)
+            .ToList();
+
         Standings.Clear();
         int rank = 1;
         foreach (var s in sorted) { s.Rank = rank++; Standings.Add(s); }
 
-        // Refresh schedule markers
-        int newCurrent = _tournament.CurrentCycleIndex;
-        for (int i = 0; i < CycleSchedule.Count; i++)
-            CycleSchedule[i].Refresh(isCurrent: i == newCurrent, isCompleted: i < newCurrent);
+        RefreshScheduleSidebar();
+        LoadCurrentCycleMatches();
 
-        if (_tournament.IsFinished)
-        {
-            IsFinished    = true;
-            StatusMessage = $"🏆  Tournament complete!  Congratulations to {Standings.First().Name}!";
-            CurrentMatches.Clear();
-        }
-        else
-        {
-            LoadCurrentCycleMatches();
-            StatusMessage = $"✓  Cycle {completedNumber} saved.  Starting Cycle {newCurrent + 1}…";
-        }
-
+        StatusMessage = $"✓  Cycle {savedNumber} saved.  Starting Cycle {savedNumber + 1}…";
         OnPropertyChanged(nameof(CycleHeader));
-        OnPropertyChanged(nameof(IsFinished));
+    }
+
+    // ── Eliminate ────────────────────────────────────────────────────
+
+    private void OnEliminatePlayer(Player player)
+    {
+        if (ActiveCount() <= 2)
+        {
+            StatusMessage = "⚠  Cannot eliminate: at least 2 active players required.";
+            return;
+        }
+
+        var result = MessageBox.Show(
+            $"Remove \"{player.Name}\" from the tournament?\n\n" +
+            "• Completed match results are kept.\n" +
+            "• Unplayed matches in the current cycle will be removed.",
+            "Eliminate Player",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+
+        if (result != MessageBoxResult.Yes) return;
+
+        TournamentEngine.EliminatePlayer(_tournament, player);
+
+        // Refresh match list (unplayed matches removed)
+        LoadCurrentCycleMatches();
+
+        // Mark row as eliminated in standings
+        var statsVm = Standings.FirstOrDefault(s => s.PlayerModel == player);
+        if (statsVm is not null) statsVm.IsEliminated = true;
+
+        StatusMessage = $"✗  {player.Name} eliminated. " +
+                        $"{ActiveCount()} players remaining.";
+        OnPropertyChanged(nameof(CycleHeader));
     }
 }

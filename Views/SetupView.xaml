@@ -47,6 +47,17 @@
                     Padding="32,28">
                 <StackPanel>
 
+                    <!-- Game selection row -->
+                    <TextBlock Text="SELECT GAME"
+                               FontSize="10"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource BrushTextDim}"
+                               Margin="0,0,0,10"/>
+
+                    <ComboBox ItemsSource="{Binding AvailableGames}"
+                              SelectedItem="{Binding SelectedGame, Mode=TwoWay}"
+                              Margin="0,0,0,24"/>
+
                     <!-- Player count row -->
                     <TextBlock Text="NUMBER OF PLAYERS"
                                FontSize="10"

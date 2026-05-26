@@ -14,6 +14,9 @@ public class Player
     public double WinRate =>
         TotalMatches > 0 ? (double)TotalWins / TotalMatches * 100.0 : 0.0;
 
+    /// <summary>Eliminated mid-tournament. Stats are preserved; future matches are removed.</summary>
+    public bool IsEliminated { get; set; }
+
     private readonly Dictionary<string, int> _charPicks =
         new(StringComparer.OrdinalIgnoreCase);
 
@@ -39,6 +42,7 @@ public class Player
     public void Reset()
     {
         TotalWins = TotalLosses = TotalMatches = 0;
+        IsEliminated = false;
         _charPicks.Clear();
     }
 }

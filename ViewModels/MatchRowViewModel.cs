@@ -1,4 +1,4 @@
-﻿using FightingTournament.Models;
+using FightingTournament.Models;
 using System;
 using System.Collections.ObjectModel;
 
@@ -65,29 +65,19 @@ public class MatchRowViewModel : BaseViewModel
 
     // ── Character presets ────────────────────────────────────────────
 
-    public static readonly ObservableCollection<string> AvailableCharacters = new(new[]
-    {
-        // Street Fighter
-        //"Ryu", "Ken", "Chun-Li", "Guile", "Zangief", "Blanka", "Dhalsim", "Cammy", "Akuma",
-        // Mortal Kombat
-        //"Scorpion", "Sub-Zero", "Raiden", "Liu Kang", "Kitana", "Sonya", "Johnny Cage", "Shang Tsung",
-        // Tekken (8)
-        "Kazuya Mishima", "Heihachi Mishima", "Jin Kazama", "Jun Kazama", "Reina", "Paul Phoenix", "Marshall Law", "King", 
-        "Nina Williams", "Anna Williams", "Hwoarang", "Xiaoyu", "Panda", "Kuma", "Zafina", "Devil Jin", "Victor Chevalier",
-        "Lars Alexadersson", "Jack", "Leroy", "Asuka Kazama", "Lili", "Claudio", "Feng Wei", "Bryan Fury", "Raven", "Azucena",
-        "Yoshimitsu", "Steve Fox", "Leo", "Sergei Dragunov", "Shaheen", "Lee Chaolan", "Alisa Bosconovitch",
-        "Eddy Gordo", "Lidia Sobieska", "Clive Rosfield", "Fahkumram", "Armor King", "Miary Zo", "Kunimitsu",
-        // Guilty Gear (Strive)
-        "Sol Badguy", "Ky Kiske", "Millia Rage", "Faust", "May", "I-No", "Axl Low", "Chipp", "Potemkin", "Zato-1", "Ramlethal",
-        "Leo",  "Nagoriyuki", "Giovanna", "Anji", "Goldlewis", "Jack-O", "Happy Chaos", "Baiken", "Testament", "Bridget", 
-        "Sin Kiske", "Queen Dizzy","Bedman","Asuka R#", "Johnny", "Elphelt", "A.B.A.", "Slayer", "Venom", "Unika", "Lucy", "Jam",
-        // King of Fighters
-        // "Kyo Kusanagi", "Iori Yagami", "Terry Bogard", "Leona", "K'",
-        // BlazBlue
-        // "Ragna", "Jin Kisaragi", "Noel Vermillion", "Rachel Alucard",
-        // Dragon Ball FighterZ
-        // "Goku", "Vegeta", "Gohan", "Frieza", "Cell",
-    });
+    public ObservableCollection<string> AvailableCharacters { get; }
 
-    public MatchRowViewModel(Match match) => _match = match;
+    public MatchRowViewModel(Match match, string selectedGame)
+    {
+        _match = match;
+
+        if (GameDatabase.Games.TryGetValue(selectedGame, out var list))
+        {
+            AvailableCharacters = new ObservableCollection<string>(list);
+        }
+        else
+        {
+            AvailableCharacters = new ObservableCollection<string>();
+        }
+    }
 }

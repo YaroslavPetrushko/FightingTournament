@@ -7,10 +7,14 @@ public class Tournament
     public List<Player> Players { get; } = new();
     public List<Cycle>  Cycles  { get; } = new();
 
+    public string SelectedGame { get; set; } = "Tekken 8";
+
     public int CurrentCycleIndex { get; set; } = 0;
 
     public Cycle? CurrentCycle =>
         CurrentCycleIndex < Cycles.Count ? Cycles[CurrentCycleIndex] : null;
 
-    public bool IsFinished => CurrentCycleIndex >= Cycles.Count;
+    // Tournament never auto-finishes — user stops manually.
+    // IsFinished is kept for "0 active players" edge case only.
+    public bool IsFinished => Cycles.Count == 0;
 }

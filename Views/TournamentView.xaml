@@ -12,18 +12,18 @@
 
         <!-- ── Column header label style ── -->
         <Style x:Key="ColHeader" TargetType="TextBlock">
-            <Setter Property="FontSize"     Value="10"/>
-            <Setter Property="FontWeight"   Value="SemiBold"/>
-            <Setter Property="Foreground"   Value="{StaticResource BrushTextDim}"/>
-            <Setter Property="Margin"       Value="0,0,0,12"/>
+            <Setter Property="FontSize"   Value="9"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource BrushTextDim}"/>
+            <Setter Property="Margin"     Value="0,0,0,10"/>
         </Style>
 
         <!-- ── Standings cell ── -->
         <Style x:Key="StatCell" TargetType="TextBlock">
-            <Setter Property="FontFamily"         Value="Consolas"/>
-            <Setter Property="FontSize"           Value="12"/>
-            <Setter Property="Foreground"         Value="{StaticResource BrushText}"/>
-            <Setter Property="VerticalAlignment"  Value="Center"/>
+            <Setter Property="FontFamily"          Value="Consolas"/>
+            <Setter Property="FontSize"            Value="12"/>
+            <Setter Property="Foreground"          Value="{StaticResource BrushText}"/>
+            <Setter Property="VerticalAlignment"   Value="Center"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
         </Style>
 
@@ -31,15 +31,13 @@
         <Style x:Key="StatName" TargetType="TextBlock" BasedOn="{StaticResource StatCell}">
             <Setter Property="FontFamily"          Value="Segoe UI"/>
             <Setter Property="HorizontalAlignment" Value="Left"/>
-            <Setter Property="Padding"             Value="4,0"/>
+            <Setter Property="TextTrimming"        Value="CharacterEllipsis"/>
         </Style>
     </UserControl.Resources>
 
     <DockPanel>
 
-        <!-- ══════════════════════════════════════════════════════
-             TOP BAR
-        ══════════════════════════════════════════════════════════ -->
+        <!-- ══ TOP BAR ══════════════════════════════════════════════ -->
         <Border DockPanel.Dock="Top"
                 Background="{StaticResource BrushSurface}"
                 BorderBrush="{StaticResource BrushBorder}"
@@ -55,84 +53,59 @@
 
                 <!-- Title -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
-                    <TextBlock Text="⚔"
-                               FontSize="16"
-                               VerticalAlignment="Center"
-                               Margin="0,0,10,0"/>
-                    <TextBlock Text="FIGHTING TOURNAMENT"
-                               FontSize="14"
-                               FontWeight="Bold"
+                    <TextBlock Text="⚔" FontSize="16" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <TextBlock Text="FIGHTING TOURNAMENT" FontSize="14" FontWeight="Bold"
                                VerticalAlignment="Center"/>
                 </StackPanel>
 
-                <!-- Cycle header + status message -->
-                <StackPanel Grid.Column="1"
-                            HorizontalAlignment="Center"
-                            Orientation="Vertical">
+                <StackPanel Grid.Column="1" HorizontalAlignment="Center">
                     <TextBlock Text="{Binding CycleHeader}"
-                               FontSize="13"
-                               FontWeight="SemiBold"
+                               FontSize="13" FontWeight="SemiBold"
                                HorizontalAlignment="Center"
                                Foreground="{StaticResource BrushCurrent}"/>
                     <TextBlock Text="{Binding StatusMessage}"
-                               FontSize="11"
-                               HorizontalAlignment="Center"
+                               FontSize="11" HorizontalAlignment="Center"
                                Foreground="{StaticResource BrushTextDim}"
-                               Visibility="{Binding StatusMessage,
-                                            Converter={StaticResource StrVis}}"/>
+                               Visibility="{Binding StatusMessage, Converter={StaticResource StrVis}}"/>
                 </StackPanel>
 
-                <!-- New tournament button (always visible) -->
-                <Button Grid.Column="2"
-                        Content="New Tournament"
+                <Button Grid.Column="2" Content="New Tournament"
                         Style="{StaticResource BtnGhost}"
-                        Padding="12,7"
-                        FontSize="11"
-                        Margin="0,0,10,0"
+                        Padding="12,7" FontSize="11" Margin="0,0,10,0"
                         Command="{Binding NewTournamentCommand}"/>
 
-                <!-- Save & Next — hidden when finished -->
-                <Button Grid.Column="3"
-                        Content="Save &amp; Next Cycle  ►"
+                <Button Grid.Column="3" Content="Save &amp; Next Cycle  ►"
                         Style="{StaticResource BtnPrimary}"
-                        Padding="16,8"
-                        FontSize="12"
-                        Visibility="{Binding IsFinished,
-                                     Converter={StaticResource InvBoolVis}}"
+                        Padding="16,8" FontSize="12"
                         Command="{Binding CommitCycleCommand}"/>
             </Grid>
         </Border>
 
-        <!-- ══════════════════════════════════════════════════════
-             MAIN BODY  (3 columns)
-        ══════════════════════════════════════════════════════════ -->
+        <!-- ══ BODY (3 columns) ══════════════════════════════════════ -->
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200" MinWidth="160"/>
+                <ColumnDefinition Width="200" MinWidth="150"/>
                 <ColumnDefinition Width="5"/>
-                <ColumnDefinition Width="*"   MinWidth="400"/>
+                <ColumnDefinition Width="*"   MinWidth="480"/>
                 <ColumnDefinition Width="5"/>
-                <ColumnDefinition Width="280" MinWidth="230"/>
+                <ColumnDefinition Width="290" MinWidth="240"/>
             </Grid.ColumnDefinitions>
 
-            <!-- ── LEFT: Schedule ────────────────────────────── -->
+            <!-- ── LEFT: Schedule ────────────────────────────────── -->
             <Border Grid.Column="0"
                     Background="{StaticResource BrushSurface}"
                     BorderBrush="{StaticResource BrushBorder}"
                     BorderThickness="0,0,1,0"
-                    Padding="16,20">
+                    Padding="14,18">
                 <DockPanel>
-                    <TextBlock DockPanel.Dock="Top"
-                               Text="SCHEDULE"
+                    <TextBlock DockPanel.Dock="Top" Text="SCHEDULE"
                                Style="{StaticResource ColHeader}"/>
 
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <ItemsControl ItemsSource="{Binding CycleSchedule}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate DataType="{x:Type vm:CycleInfoViewModel}">
-                                    <Border Margin="0,0,0,6"
-                                            Padding="10,8"
-                                            CornerRadius="4">
+                                    <Border Margin="0,0,0,4" Padding="8,7" CornerRadius="4">
                                         <Border.Style>
                                             <Style TargetType="Border">
                                                 <Setter Property="Background" Value="Transparent"/>
@@ -145,61 +118,51 @@
                                             </Style>
                                         </Border.Style>
                                         <StackPanel>
-                                            <!-- Cycle row: glyph + label -->
-                                            <StackPanel Orientation="Horizontal"
-                                                        Margin="0,0,0,4">
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
                                                 <TextBlock Text="{Binding StatusGlyph}"
-                                                           FontSize="10"
-                                                           Width="16"
-                                                           VerticalAlignment="Center">
+                                                           FontSize="10" Width="14" VerticalAlignment="Center">
                                                     <TextBlock.Style>
                                                         <Style TargetType="TextBlock">
-                                                            <Setter Property="Foreground"
-                                                                    Value="{StaticResource BrushTextDim}"/>
+                                                            <Setter Property="Foreground" Value="{StaticResource BrushTextDim}"/>
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding IsCompleted}" Value="True">
-                                                                    <Setter Property="Foreground"
-                                                                            Value="{StaticResource BrushWin}"/>
+                                                                    <Setter Property="Foreground" Value="{StaticResource BrushWin}"/>
                                                                 </DataTrigger>
                                                                 <DataTrigger Binding="{Binding IsCurrent}" Value="True">
-                                                                    <Setter Property="Foreground"
-                                                                            Value="{StaticResource BrushCurrent}"/>
+                                                                    <Setter Property="Foreground" Value="{StaticResource BrushCurrent}"/>
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
                                                     </TextBlock.Style>
                                                 </TextBlock>
-                                                <TextBlock FontSize="12"
-                                                           FontWeight="SemiBold"
+                                                <TextBlock FontSize="12" FontWeight="SemiBold"
                                                            VerticalAlignment="Center">
                                                     <TextBlock.Text>
-                                                        <Binding Path="Number"
-                                                                 StringFormat="Cycle {0}"/>
+                                                        <Binding Path="Number" StringFormat="Cycle {0}"/>
                                                     </TextBlock.Text>
                                                     <TextBlock.Style>
                                                         <Style TargetType="TextBlock">
-                                                            <Setter Property="Foreground"
-                                                                    Value="{StaticResource BrushTextDim}"/>
+                                                            <Setter Property="Foreground" Value="{StaticResource BrushTextDim}"/>
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding IsCurrent}" Value="True">
-                                                                    <Setter Property="Foreground"
-                                                                            Value="{StaticResource BrushText}"/>
-                                                                </DataTrigger>
-                                                                <DataTrigger Binding="{Binding IsCompleted}" Value="True">
-                                                                    <Setter Property="Foreground"
-                                                                            Value="{StaticResource BrushTextDim}"/>
+                                                                    <Setter Property="Foreground" Value="{StaticResource BrushText}"/>
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
                                                     </TextBlock.Style>
                                                 </TextBlock>
+                                                <TextBlock Text="{Binding MatchCount}"
+                                                           FontSize="9" Margin="6,0,0,0"
+                                                           VerticalAlignment="Center"
+                                                           Foreground="{StaticResource BrushTextDim}"/>
                                             </StackPanel>
                                             <!-- Match list (small) -->
                                             <TextBlock Text="{Binding Matchups}"
-                                                       FontSize="10"
+                                                       FontSize="9"
                                                        Foreground="{StaticResource BrushTextDim}"
-                                                       LineHeight="16"
-                                                       Margin="16,0,0,0"/>
+                                                       LineHeight="15"
+                                                       Margin="14,0,0,0"
+                                                       TextWrapping="Wrap"/>
                                         </StackPanel>
                                     </Border>
                                 </DataTemplate>
@@ -209,139 +172,124 @@
                 </DockPanel>
             </Border>
 
-            <GridSplitter Grid.Column="1"
-                          Width="5"
-                          HorizontalAlignment="Stretch"
-                          Background="{StaticResource BrushBorder}"
-                          ShowsPreview="True"/>
+            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"
+                          Background="{StaticResource BrushBorder}" ShowsPreview="True"/>
 
-            <!-- ── CENTER: Current cycle matches ─────────────── -->
-            <Border Grid.Column="2"
-                    Padding="24,20">
+            <!-- ── CENTER: Current matches ────────────────────────── -->
+            <Border Grid.Column="2" Padding="22,18">
                 <DockPanel>
 
-                    <!-- Finished banner -->
-                    <Border DockPanel.Dock="Top"
-                            Background="{StaticResource BrushSurface2}"
-                            BorderBrush="{StaticResource BrushWin}"
-                            BorderThickness="0,0,0,3"
-                            CornerRadius="6"
-                            Padding="20,16"
-                            Margin="0,0,0,16"
-                            Visibility="{Binding IsFinished,
-                                         Converter={StaticResource BoolVis}}">
-                        <TextBlock Text="{Binding StatusMessage}"
-                                   FontSize="16"
-                                   FontWeight="Bold"
-                                   HorizontalAlignment="Center"
-                                   Foreground="{StaticResource BrushWin}"/>
-                    </Border>
-
-                    <!-- Match list header -->
-                    <Grid DockPanel.Dock="Top" Margin="0,0,0,8">
+                    <!-- Column headers -->
+                    <Grid DockPanel.Dock="Top" Margin="0,0,0,6">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="140"/>
-                            <ColumnDefinition Width="70"/>
-                            <ColumnDefinition Width="30"/>
-                            <ColumnDefinition Width="70"/>
-                            <ColumnDefinition Width="140"/>
-                            <ColumnDefinition Width="16"/>
+                            <!-- P1 name | WIN | vs | WIN | P2 name | gap | Char1 | gap | Char2 -->
+                            <ColumnDefinition Width="*"    MinWidth="80"/>
+                            <ColumnDefinition Width="54"/>
+                            <ColumnDefinition Width="26"/>
+                            <ColumnDefinition Width="54"/>
+                            <ColumnDefinition Width="*"    MinWidth="80"/>
+                            <ColumnDefinition Width="12"/>
                             <ColumnDefinition Width="140"/>
                             <ColumnDefinition Width="8"/>
                             <ColumnDefinition Width="140"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="PLAYER 1"     Style="{StaticResource ColHeader}" HorizontalAlignment="Right" Margin="0,0,8,0"/>
-                        <TextBlock Grid.Column="4" Text="PLAYER 2"     Style="{StaticResource ColHeader}" HorizontalAlignment="Left"  Margin="8,0,0,0"/>
-                        <TextBlock Grid.Column="6" Text="CHARACTER 1"  Style="{StaticResource ColHeader}" HorizontalAlignment="Center"/>
-                        <TextBlock Grid.Column="8" Text="CHARACTER 2"  Style="{StaticResource ColHeader}" HorizontalAlignment="Center"/>
+                        <TextBlock Grid.Column="0" Text="PLAYER 1"
+                                   Style="{StaticResource ColHeader}"
+                                   HorizontalAlignment="Right" Margin="0,0,6,0"/>
+                        <TextBlock Grid.Column="4" Text="PLAYER 2"
+                                   Style="{StaticResource ColHeader}"
+                                   HorizontalAlignment="Left"  Margin="6,0,0,0"/>
+                        <TextBlock Grid.Column="6" Text="CHARACTER 1"
+                                   Style="{StaticResource ColHeader}"
+                                   HorizontalAlignment="Center"/>
+                        <TextBlock Grid.Column="8" Text="CHARACTER 2"
+                                   Style="{StaticResource ColHeader}"
+                                   HorizontalAlignment="Center"/>
                     </Grid>
 
-                    <Separator DockPanel.Dock="Top" Margin="0,0,0,8"/>
+                    <Separator DockPanel.Dock="Top" Margin="0,0,0,6"/>
 
                     <!-- Match rows -->
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <ItemsControl ItemsSource="{Binding CurrentMatches}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate DataType="{x:Type vm:MatchRowViewModel}">
-                                    <Border Margin="0,0,0,6"
-                                            Padding="0,10"
+                                    <Border Margin="0,0,0,4"
+                                            Padding="0,8"
                                             BorderThickness="0,0,0,1"
                                             BorderBrush="{StaticResource BrushBorder}">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="140"/>
-                                                <ColumnDefinition Width="70"/>
-                                                <ColumnDefinition Width="30"/>
-                                                <ColumnDefinition Width="70"/>
-                                                <ColumnDefinition Width="140"/>
-                                                <ColumnDefinition Width="16"/>
+                                                <ColumnDefinition Width="*"    MinWidth="80"/>
+                                                <ColumnDefinition Width="54"/>
+                                                <ColumnDefinition Width="26"/>
+                                                <ColumnDefinition Width="54"/>
+                                                <ColumnDefinition Width="*"    MinWidth="80"/>
+                                                <ColumnDefinition Width="12"/>
                                                 <ColumnDefinition Width="140"/>
                                                 <ColumnDefinition Width="8"/>
                                                 <ColumnDefinition Width="140"/>
                                             </Grid.ColumnDefinitions>
 
-                                            <!-- P1 Name -->
+                                            <!-- P1 name -->
                                             <TextBlock Grid.Column="0"
                                                        Text="{Binding Player1Name}"
-                                                       FontSize="13"
-                                                       FontWeight="SemiBold"
+                                                       FontSize="13" FontWeight="SemiBold"
                                                        HorizontalAlignment="Right"
                                                        VerticalAlignment="Center"
-                                                       Margin="0,0,8,0"/>
+                                                       Margin="0,0,6,0"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       ToolTip="{Binding Player1Name}"/>
 
-                                            <!-- P1 WIN radio -->
+                                            <!-- P1 WIN -->
                                             <RadioButton Grid.Column="1"
                                                          Content="WIN"
                                                          Style="{StaticResource RadioWin}"
                                                          GroupName="{Binding MatchId}"
-                                                         IsChecked="{Binding Player1Won,
-                                                                     Mode=TwoWay}"
+                                                         IsChecked="{Binding Player1Won, Mode=TwoWay}"
                                                          HorizontalAlignment="Center"
                                                          VerticalAlignment="Center"/>
 
                                             <!-- vs -->
-                                            <TextBlock Grid.Column="2"
-                                                       Text="vs"
-                                                       FontSize="11"
+                                            <TextBlock Grid.Column="2" Text="vs"
+                                                       FontSize="10"
                                                        Foreground="{StaticResource BrushTextDim}"
                                                        HorizontalAlignment="Center"
                                                        VerticalAlignment="Center"/>
 
-                                            <!-- P2 WIN radio -->
+                                            <!-- P2 WIN -->
                                             <RadioButton Grid.Column="3"
                                                          Content="WIN"
                                                          Style="{StaticResource RadioWin}"
                                                          GroupName="{Binding MatchId}"
-                                                         IsChecked="{Binding Player2Won,
-                                                                     Mode=TwoWay}"
+                                                         IsChecked="{Binding Player2Won, Mode=TwoWay}"
                                                          HorizontalAlignment="Center"
                                                          VerticalAlignment="Center"/>
 
-                                            <!-- P2 Name -->
+                                            <!-- P2 name -->
                                             <TextBlock Grid.Column="4"
                                                        Text="{Binding Player2Name}"
-                                                       FontSize="13"
-                                                       FontWeight="SemiBold"
+                                                       FontSize="13" FontWeight="SemiBold"
                                                        HorizontalAlignment="Left"
                                                        VerticalAlignment="Center"
-                                                       Margin="8,0,0,0"/>
+                                                       Margin="6,0,0,0"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       ToolTip="{Binding Player2Name}"/>
 
-                                            <!-- Char 1 ComboBox -->
+                                            <!-- Char 1 -->
                                             <ComboBox Grid.Column="6"
                                                       IsEditable="True"
-                                                      ItemsSource="{x:Static vm:MatchRowViewModel.AvailableCharacters}"
-                                                      Text="{Binding Character1,
-                                                             Mode=TwoWay,
+                                                      ItemsSource="{Binding AvailableCharacters}"
+                                                      Text="{Binding Character1, Mode=TwoWay,
                                                              UpdateSourceTrigger=PropertyChanged}"
                                                       ToolTip="{Binding Player1Name}"
                                                       VerticalAlignment="Center"/>
 
-                                            <!-- Char 2 ComboBox -->
+                                            <!-- Char 2 -->
                                             <ComboBox Grid.Column="8"
                                                       IsEditable="True"
-                                                      ItemsSource="{x:Static vm:MatchRowViewModel.AvailableCharacters}"
-                                                      Text="{Binding Character2,
-                                                             Mode=TwoWay,
+                                                      ItemsSource="{Binding AvailableCharacters}"
+                                                      Text="{Binding Character2, Mode=TwoWay,
                                                              UpdateSourceTrigger=PropertyChanged}"
                                                       ToolTip="{Binding Player2Name}"
                                                       VerticalAlignment="Center"/>
@@ -354,39 +302,36 @@
                 </DockPanel>
             </Border>
 
-            <GridSplitter Grid.Column="3"
-                          Width="5"
-                          HorizontalAlignment="Stretch"
-                          Background="{StaticResource BrushBorder}"
-                          ShowsPreview="True"/>
+            <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Stretch"
+                          Background="{StaticResource BrushBorder}" ShowsPreview="True"/>
 
-            <!-- ── RIGHT: Standings ───────────────────────────── -->
+            <!-- ── RIGHT: Standings ───────────────────────────────── -->
             <Border Grid.Column="4"
                     Background="{StaticResource BrushSurface}"
                     BorderBrush="{StaticResource BrushBorder}"
                     BorderThickness="1,0,0,0"
-                    Padding="16,20">
+                    Padding="14,18">
                 <DockPanel>
-                    <TextBlock DockPanel.Dock="Top"
-                               Text="STANDINGS"
+                    <TextBlock DockPanel.Dock="Top" Text="STANDINGS"
                                Style="{StaticResource ColHeader}"/>
 
                     <!-- Header row -->
-                    <Grid DockPanel.Dock="Top" Margin="0,0,0,6">
+                    <Grid DockPanel.Dock="Top" Margin="0,0,0,4">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="24"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="28"/>
-                            <ColumnDefinition Width="28"/>
-                            <ColumnDefinition Width="42"/>
-                            <ColumnDefinition Width="56"/>
+                            <ColumnDefinition Width="22"/>   <!-- # -->
+                            <ColumnDefinition Width="*"/>    <!-- name -->
+                            <ColumnDefinition Width="26"/>   <!-- W -->
+                            <ColumnDefinition Width="26"/>   <!-- L -->
+                            <ColumnDefinition Width="44"/>   <!-- WR% -->
+                            <ColumnDefinition Width="52"/>   <!-- CHAR -->
+                            <ColumnDefinition Width="22"/>   <!-- ✕ -->
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="#"    Style="{StaticResource ColHeader}" HorizontalAlignment="Center" FontSize="9"/>
-                        <TextBlock Grid.Column="1" Text="NAME" Style="{StaticResource ColHeader}" FontSize="9"/>
-                        <TextBlock Grid.Column="2" Text="W"    Style="{StaticResource ColHeader}" HorizontalAlignment="Center" FontSize="9" Foreground="{StaticResource BrushWin}"/>
-                        <TextBlock Grid.Column="3" Text="L"    Style="{StaticResource ColHeader}" HorizontalAlignment="Center" FontSize="9" Foreground="{StaticResource BrushLoss}"/>
-                        <TextBlock Grid.Column="4" Text="WR%"  Style="{StaticResource ColHeader}" HorizontalAlignment="Center" FontSize="9"/>
-                        <TextBlock Grid.Column="5" Text="CHAR" Style="{StaticResource ColHeader}" HorizontalAlignment="Center" FontSize="9"/>
+                        <TextBlock Grid.Column="0" Text="#"    Style="{StaticResource ColHeader}" HorizontalAlignment="Center"/>
+                        <TextBlock Grid.Column="1" Text="NAME" Style="{StaticResource ColHeader}"/>
+                        <TextBlock Grid.Column="2" Text="W"    Style="{StaticResource ColHeader}" HorizontalAlignment="Center" Foreground="{StaticResource BrushWin}"/>
+                        <TextBlock Grid.Column="3" Text="L"    Style="{StaticResource ColHeader}" HorizontalAlignment="Center" Foreground="{StaticResource BrushLoss}"/>
+                        <TextBlock Grid.Column="4" Text="WR%"  Style="{StaticResource ColHeader}" HorizontalAlignment="Center"/>
+                        <TextBlock Grid.Column="5" Text="CHAR" Style="{StaticResource ColHeader}" HorizontalAlignment="Center"/>
                     </Grid>
                     <Separator DockPanel.Dock="Top" Margin="0,0,0,4"/>
 
@@ -395,56 +340,86 @@
                         <ItemsControl ItemsSource="{Binding Standings}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate DataType="{x:Type vm:PlayerStatsViewModel}">
-                                    <Grid Margin="0,0,0,2" MinHeight="28">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="24"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="28"/>
-                                            <ColumnDefinition Width="28"/>
-                                            <ColumnDefinition Width="42"/>
-                                            <ColumnDefinition Width="56"/>
-                                        </Grid.ColumnDefinitions>
+                                    <Border MinHeight="28" Padding="0,2" CornerRadius="3" Margin="0,1">
+                                        <!-- Eliminated tint -->
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsEliminated}" Value="True">
+                                                        <Setter Property="Background"
+                                                                Value="{StaticResource BrushElim}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="22"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="26"/>
+                                                <ColumnDefinition Width="26"/>
+                                                <ColumnDefinition Width="44"/>
+                                                <ColumnDefinition Width="52"/>
+                                                <ColumnDefinition Width="22"/>
+                                            </Grid.ColumnDefinitions>
 
-                                        <!-- Rank -->
-                                        <TextBlock Grid.Column="0"
-                                                   Text="{Binding Rank}"
-                                                   Style="{StaticResource StatCell}"
-                                                   FontSize="11"
-                                                   Foreground="{StaticResource BrushTextDim}"/>
+                                            <!-- Rank -->
+                                            <TextBlock Grid.Column="0" Text="{Binding Rank}"
+                                                       Style="{StaticResource StatCell}"
+                                                       FontSize="11"
+                                                       Foreground="{StaticResource BrushTextDim}"/>
 
-                                        <!-- Name -->
-                                        <TextBlock Grid.Column="1"
-                                                   Text="{Binding Name}"
-                                                   Style="{StaticResource StatName}"
-                                                   FontSize="12"/>
+                                            <!-- Name -->
+                                            <TextBlock Grid.Column="1" Text="{Binding Name}"
+                                                       FontSize="12"
+                                                       Padding="2,0"
+                                                       ToolTip="{Binding Name}">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock" BasedOn="{StaticResource StatName}">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsEliminated}" Value="True">
+                                                                <Setter Property="Foreground" Value="{StaticResource BrushTextDim}"/>
+                                                                <Setter Property="TextDecorations" Value="Strikethrough"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
 
-                                        <!-- Wins -->
-                                        <TextBlock Grid.Column="2"
-                                                   Text="{Binding Wins}"
-                                                   Style="{StaticResource StatCell}"
-                                                   Foreground="{StaticResource BrushWin}"/>
+                                            <!-- W -->
+                                            <TextBlock Grid.Column="2" Text="{Binding Wins}"
+                                                       Style="{StaticResource StatCell}"
+                                                       Foreground="{StaticResource BrushWin}"/>
 
-                                        <!-- Losses -->
-                                        <TextBlock Grid.Column="3"
-                                                   Text="{Binding Losses}"
-                                                   Style="{StaticResource StatCell}"
-                                                   Foreground="{StaticResource BrushLoss}"/>
+                                            <!-- L -->
+                                            <TextBlock Grid.Column="3" Text="{Binding Losses}"
+                                                       Style="{StaticResource StatCell}"
+                                                       Foreground="{StaticResource BrushLoss}"/>
 
-                                        <!-- WinRate -->
-                                        <TextBlock Grid.Column="4"
-                                                   Text="{Binding WinRate}"
-                                                   Style="{StaticResource StatCell}"
-                                                   FontSize="11"/>
+                                            <!-- WR% -->
+                                            <TextBlock Grid.Column="4" Text="{Binding WinRate}"
+                                                       Style="{StaticResource StatCell}"
+                                                       FontSize="11"/>
 
-                                        <!-- Most Picked -->
-                                        <TextBlock Grid.Column="5"
-                                                   Text="{Binding MostPicked}"
-                                                   Style="{StaticResource StatCell}"
-                                                   FontSize="10"
-                                                   Foreground="{StaticResource BrushTextDim}"
-                                                   TextTrimming="CharacterEllipsis"
-                                                   ToolTip="{Binding MostPicked}"/>
-                                    </Grid>
+                                            <!-- Most Picked -->
+                                            <TextBlock Grid.Column="5" Text="{Binding MostPicked}"
+                                                       Style="{StaticResource StatCell}"
+                                                       FontSize="10"
+                                                       Foreground="{StaticResource BrushTextDim}"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       ToolTip="{Binding MostPicked}"/>
+
+                                            <!-- Eliminate button -->
+                                            <Button Grid.Column="6"
+                                                    Style="{StaticResource BtnElim}"
+                                                    Command="{Binding EliminateCommand}"
+                                                    VerticalAlignment="Center"
+                                                    HorizontalAlignment="Center"
+                                                    Visibility="{Binding IsEliminated,
+                                                                 Converter={StaticResource InvBoolVis}}"/>
+                                        </Grid>
+                                    </Border>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
