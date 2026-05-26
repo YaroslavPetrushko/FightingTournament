@@ -279,7 +279,7 @@
                                             <!-- Char 1 -->
                                             <ComboBox Grid.Column="6"
                                                       IsEditable="True"
-                                                      ItemsSource="{x:Static vm:MatchRowViewModel.AvailableCharacters}"
+                                                      ItemsSource="{Binding AvailableCharacters}"
                                                       Text="{Binding Character1, Mode=TwoWay,
                                                              UpdateSourceTrigger=PropertyChanged}"
                                                       ToolTip="{Binding Player1Name}"
@@ -288,7 +288,7 @@
                                             <!-- Char 2 -->
                                             <ComboBox Grid.Column="8"
                                                       IsEditable="True"
-                                                      ItemsSource="{x:Static vm:MatchRowViewModel.AvailableCharacters}"
+                                                      ItemsSource="{Binding AvailableCharacters}"
                                                       Text="{Binding Character2, Mode=TwoWay,
                                                              UpdateSourceTrigger=PropertyChanged}"
                                                       ToolTip="{Binding Player2Name}"

@@ -7,6 +7,8 @@ public class Tournament
     public List<Player> Players { get; } = new();
     public List<Cycle>  Cycles  { get; } = new();
 
+    public string SelectedGame { get; set; } = "Tekken 8";
+
     public int CurrentCycleIndex { get; set; } = 0;
 
     public Cycle? CurrentCycle =>

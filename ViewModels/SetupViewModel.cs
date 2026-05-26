@@ -12,6 +12,17 @@ public class SetupViewModel : BaseViewModel
     // Raised when the user clicks START and validation passes.
     public event Action<Tournament>? TournamentStarted;
 
+    // ── Game selection ───────────────────────────────────────────────
+
+    public ObservableCollection<string> AvailableGames { get; } = new(GameDatabase.Games.Keys);
+
+    private string _selectedGame = "Tekken 8";
+    public string SelectedGame
+    {
+        get => _selectedGame;
+        set => Set(ref _selectedGame, value);
+    }
+
     // ── Player count ─────────────────────────────────────────────────
 
     private int _playerCount = 4;
@@ -89,6 +100,7 @@ public class SetupViewModel : BaseViewModel
         }
 
         var tournament = TournamentEngine.Create(names);
+        tournament.SelectedGame = SelectedGame;
         TournamentStarted?.Invoke(tournament);
     }
 }

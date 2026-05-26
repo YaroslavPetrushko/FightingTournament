@@ -89,7 +89,7 @@ public class TournamentViewModel : BaseViewModel
         var cycle = _tournament.CurrentCycle;
         if (cycle is null) return;
         foreach (var m in cycle.Matches)
-            CurrentMatches.Add(new MatchRowViewModel(m));
+            CurrentMatches.Add(new MatchRowViewModel(m, _tournament.SelectedGame));
     }
 
     // ── Commit ───────────────────────────────────────────────────────
