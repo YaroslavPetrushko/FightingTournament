@@ -20,10 +20,16 @@ public class SetupViewModel : BaseViewModel
     public string SelectedGame
     {
         get => _selectedGame;
-        set => Set(ref _selectedGame, value);
+        set
+        {
+            if (Set(ref _selectedGame, value))
+            {
+                UpdateDefaultSessionName();
+            }
+        }
     }
 
-    private string _sessionName = DateTime.Now.ToString("dd.MM.yyyy");
+    private string _sessionName = string.Empty;
     public string SessionName
     {
         get => _sessionName;
@@ -42,6 +48,7 @@ public class SetupViewModel : BaseViewModel
             {
                 OnPropertyChanged(nameof(IsEndlessModeSelected));
                 OnPropertyChanged(nameof(IsChampionshipModeSelected));
+                UpdateDefaultSessionName();
             }
         }
     }
@@ -125,9 +132,16 @@ public class SetupViewModel : BaseViewModel
         SyncPlayerEntries();
         RefreshSavedSessions();
         RefreshRegisteredUsers();
+        UpdateDefaultSessionName();
     }
 
     // ── Helpers ──────────────────────────────────────────────────────
+
+    private void UpdateDefaultSessionName()
+    {
+        string modeStr = SelectedMode == TournamentMode.Championship ? "Championship" : "Endless";
+        SessionName = $"{DateTime.Now:dd.MM.yyyy} - {modeStr} - {SelectedGame}";
+    }
 
     /// Keeps PlayerEntries in sync with PlayerCount without losing typed names.
     private void SyncPlayerEntries()
