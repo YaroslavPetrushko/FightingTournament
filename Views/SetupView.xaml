@@ -4,6 +4,35 @@
              xmlns:conv="clr-namespace:FightingTournament.Converters"
              Background="{StaticResource BrushBg}">
 
+    <UserControl.RenderTransform>
+        <TranslateTransform Y="20"/>
+    </UserControl.RenderTransform>
+
+    <UserControl.Style>
+        <Style TargetType="UserControl">
+            <Style.Triggers>
+                <EventTrigger RoutedEvent="UserControl.Loaded">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                             From="0" To="1" Duration="0:0:0.4">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut"/>
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation Storyboard.TargetProperty="(UserControl.RenderTransform).(TranslateTransform.Y)"
+                                             From="20" To="0" Duration="0:0:0.4">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut"/>
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Style>
+
     <UserControl.Resources>
         <conv:StringToVisibilityConverter x:Key="StrVis"/>
     </UserControl.Resources>

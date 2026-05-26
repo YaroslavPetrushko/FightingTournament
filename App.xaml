@@ -372,6 +372,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="RadioButton">
                         <Border x:Name="Pill"
+                                Background="Transparent"
                                 BorderBrush="{StaticResource BrushBorderLight}"
                                 BorderThickness="1"
                                 CornerRadius="3"
@@ -387,12 +388,36 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Pill"  Property="Background"
-                                        Value="{StaticResource BrushAccent}"/>
-                                <Setter TargetName="Pill"  Property="BorderBrush"
-                                        Value="{StaticResource BrushAccent}"/>
-                                <Setter TargetName="Label" Property="Foreground"
-                                        Value="White"/>
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Storyboard.TargetName="Pill"
+                                                            Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                            To="#E8003D" Duration="0:0:0.18"/>
+                                            <ColorAnimation Storyboard.TargetName="Pill"
+                                                            Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
+                                                            To="#E8003D" Duration="0:0:0.18"/>
+                                            <ColorAnimation Storyboard.TargetName="Label"
+                                                            Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                                            To="#FFFFFF" Duration="0:0:0.18"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Storyboard.TargetName="Pill"
+                                                            Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                            To="#00000000" Duration="0:0:0.18"/>
+                                            <ColorAnimation Storyboard.TargetName="Pill"
+                                                            Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
+                                                            To="#3A3A52" Duration="0:0:0.18"/>
+                                            <ColorAnimation Storyboard.TargetName="Label"
+                                                            Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                                            To="#7070A0" Duration="0:0:0.18"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Pill"  Property="BorderBrush"
