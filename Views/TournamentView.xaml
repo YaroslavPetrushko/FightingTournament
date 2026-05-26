@@ -74,7 +74,7 @@
                         Padding="12,7" FontSize="11" Margin="0,0,10,0"
                         Command="{Binding NewTournamentCommand}"/>
 
-                <Button Grid.Column="3" Content="Save &amp; Next Cycle  ►"
+                <Button Grid.Column="3" Content="{Binding SaveButtonText}"
                         Style="{StaticResource BtnPrimary}"
                         Padding="16,8" FontSize="12"
                         Command="{Binding CommitCycleCommand}"/>
@@ -105,7 +105,12 @@
                         <ItemsControl ItemsSource="{Binding CycleSchedule}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate DataType="{x:Type vm:CycleInfoViewModel}">
-                                    <Border Margin="0,0,0,4" Padding="8,7" CornerRadius="4">
+                                    <Border Margin="0,0,0,4" Padding="8,7" CornerRadius="4" Cursor="Hand">
+                                        <Border.InputBindings>
+                                            <MouseBinding MouseAction="LeftClick"
+                                                          Command="{Binding DataContext.SelectCycleCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                          CommandParameter="{Binding}"/>
+                                        </Border.InputBindings>
                                         <Border.Style>
                                             <Style TargetType="Border">
                                                 <Setter Property="Background" Value="Transparent"/>

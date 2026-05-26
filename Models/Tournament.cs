@@ -8,6 +8,7 @@ public class Tournament
     public List<Cycle>  Cycles  { get; } = new();
 
     public string SelectedGame { get; set; } = "Tekken 8";
+    public string SessionName  { get; set; } = string.Empty;
 
     public int CurrentCycleIndex { get; set; } = 0;
 

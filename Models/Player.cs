@@ -20,6 +20,8 @@ public class Player
     private readonly Dictionary<string, int> _charPicks =
         new(StringComparer.OrdinalIgnoreCase);
 
+    public IReadOnlyDictionary<string, int> CharacterPicks => _charPicks;
+
     public string MostPickedCharacter =>
         _charPicks.Count == 0
             ? "—"
@@ -44,5 +46,17 @@ public class Player
         TotalWins = TotalLosses = TotalMatches = 0;
         IsEliminated = false;
         _charPicks.Clear();
+    }
+
+    public void LoadPersistedStats(int wins, int losses, int matches, Dictionary<string, int> picks)
+    {
+        TotalWins = wins;
+        TotalLosses = losses;
+        TotalMatches = matches;
+        _charPicks.Clear();
+        foreach (var kv in picks)
+        {
+            _charPicks[kv.Key] = kv.Value;
+        }
     }
 }

@@ -70,6 +70,9 @@ public class MatchRowViewModel : BaseViewModel
     public MatchRowViewModel(Match match, string selectedGame)
     {
         _match = match;
+        _char1 = match.Character1;
+        _char2 = match.Character2;
+        _winnerId = match.WinnerId;
 
         if (GameDatabase.Games.TryGetValue(selectedGame, out var list))
         {

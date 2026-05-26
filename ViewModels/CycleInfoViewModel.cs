@@ -7,6 +7,8 @@ public class CycleInfoViewModel : BaseViewModel
 {
     private readonly Cycle _cycle;
 
+    public Cycle CycleModel => _cycle;
+
     public int    Number   => _cycle.Number;
     public string Matchups => string.Join("\n",
         _cycle.Matches.Select(m => $"{m.Player1.Name}  vs  {m.Player2.Name}"));

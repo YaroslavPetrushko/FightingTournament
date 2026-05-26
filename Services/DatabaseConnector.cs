@@ -1,0 +1,131 @@
+using Microsoft.Data.Sqlite;
+using System;
+using System.IO;
+
+namespace FightingTournament.Services;
+
+public class DatabaseConnector
+{
+    private static readonly Lazy<DatabaseConnector> _instance =
+        new(() => new DatabaseConnector());
+
+    public static DatabaseConnector Instance => _instance.Value;
+
+    private readonly string _dbPath;
+    private readonly string _connectionString;
+
+    private DatabaseConnector()
+    {
+        // Place FightingTournament.db in the application execution directory
+        _dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FightingTournament.db");
+        _connectionString = new SqliteConnectionStringBuilder
+        {
+            DataSource = _dbPath,
+            Mode = SqliteOpenMode.ReadWriteCreate,
+            ForeignKeys = true // Enable foreign keys constraint support!
+        }.ToString();
+    }
+
+    /// <summary>
+    /// Gets a new SQLite connection. The caller is responsible for opening and disposing it.
+    /// </summary>
+    public SqliteConnection GetConnection() => new(_connectionString);
+
+    /// <summary>
+    /// Initializes the database file and creates the schema tables if they do not exist.
+    /// </summary>
+    public void InitializeDatabase()
+    {
+        using var connection = GetConnection();
+        connection.Open();
+
+        using var transaction = connection.BeginTransaction();
+        try
+        {
+            // 0. Users table (global player catalog)
+            string createUsers = @"
+                CREATE TABLE IF NOT EXISTS Users (
+                    Nickname TEXT PRIMARY KEY
+                );";
+
+            // 1. Tournaments table
+            string createTournaments = @"
+                CREATE TABLE IF NOT EXISTS Tournaments (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    SessionName TEXT NOT NULL,
+                    SelectedGame TEXT NOT NULL,
+                    CurrentCycleIndex INTEGER NOT NULL DEFAULT 0,
+                    IsFinished INTEGER NOT NULL DEFAULT 0
+                );";
+
+            // 2. Players table
+            string createPlayers = @"
+                CREATE TABLE IF NOT EXISTS Players (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    TournamentId INTEGER NOT NULL,
+                    Name TEXT NOT NULL,
+                    IsEliminated INTEGER NOT NULL DEFAULT 0,
+                    TotalWins INTEGER NOT NULL DEFAULT 0,
+                    TotalLosses INTEGER NOT NULL DEFAULT 0,
+                    TotalMatches INTEGER NOT NULL DEFAULT 0,
+                    FOREIGN KEY(TournamentId) REFERENCES Tournaments(Id) ON DELETE CASCADE
+                );";
+
+            // 3. PlayerCharacterPicks table
+            string createCharacterPicks = @"
+                CREATE TABLE IF NOT EXISTS PlayerCharacterPicks (
+                    PlayerId INTEGER NOT NULL,
+                    CharacterName TEXT NOT NULL,
+                    PickCount INTEGER NOT NULL DEFAULT 0,
+                    PRIMARY KEY(PlayerId, CharacterName),
+                    FOREIGN KEY(PlayerId) REFERENCES Players(Id) ON DELETE CASCADE
+                );";
+
+            // 4. Cycles table
+            string createCycles = @"
+                CREATE TABLE IF NOT EXISTS Cycles (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    TournamentId INTEGER NOT NULL,
+                    Number INTEGER NOT NULL,
+                    FOREIGN KEY(TournamentId) REFERENCES Tournaments(Id) ON DELETE CASCADE
+                );";
+
+            // 5. Matches table
+            string createMatches = @"
+                CREATE TABLE IF NOT EXISTS Matches (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    CycleId INTEGER NOT NULL,
+                    Player1Id INTEGER NOT NULL,
+                    Player2Id INTEGER NOT NULL,
+                    WinnerId INTEGER, -- NULL, 1, or 2
+                    Character1 TEXT,
+                    Character2 TEXT,
+                    FOREIGN KEY(CycleId) REFERENCES Cycles(Id) ON DELETE CASCADE,
+                    FOREIGN KEY(Player1Id) REFERENCES Players(Id) ON DELETE CASCADE,
+                    FOREIGN KEY(Player2Id) REFERENCES Players(Id) ON DELETE CASCADE
+                );";
+
+            ExecuteNonQuery(createUsers, connection, transaction);
+            ExecuteNonQuery(createTournaments, connection, transaction);
+            ExecuteNonQuery(createPlayers, connection, transaction);
+            ExecuteNonQuery(createCharacterPicks, connection, transaction);
+            ExecuteNonQuery(createCycles, connection, transaction);
+            ExecuteNonQuery(createMatches, connection, transaction);
+
+            transaction.Commit();
+        }
+        catch (Exception)
+        {
+            transaction.Rollback();
+            throw;
+        }
+    }
+
+    private void ExecuteNonQuery(string commandText, SqliteConnection connection, SqliteTransaction transaction)
+    {
+        using var command = connection.CreateCommand();
+        command.CommandText = commandText;
+        command.Transaction = transaction;
+        command.ExecuteNonQuery();
+    }
+}
