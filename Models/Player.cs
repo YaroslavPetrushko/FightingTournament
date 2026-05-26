@@ -47,4 +47,16 @@ public class Player
         IsEliminated = false;
         _charPicks.Clear();
     }
+
+    public void LoadPersistedStats(int wins, int losses, int matches, Dictionary<string, int> picks)
+    {
+        TotalWins = wins;
+        TotalLosses = losses;
+        TotalMatches = matches;
+        _charPicks.Clear();
+        foreach (var kv in picks)
+        {
+            _charPicks[kv.Key] = kv.Value;
+        }
+    }
 }

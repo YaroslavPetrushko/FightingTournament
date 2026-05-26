@@ -136,4 +136,162 @@ public static class DatabaseRepository
             throw;
         }
     }
+
+    /// <summary>
+    /// Gets all unique SessionName values stored in the Tournaments table.
+    /// </summary>
+    public static List<string> GetSavedSessions()
+    {
+        var list = new List<string>();
+        using var connection = DatabaseConnector.Instance.GetConnection();
+        connection.Open();
+
+        using var command = connection.CreateCommand();
+        command.CommandText = "SELECT SessionName FROM Tournaments ORDER BY SessionName";
+
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            list.Add(reader.GetString(0));
+        }
+
+        return list;
+    }
+
+    /// <summary>
+    /// Deletes a tournament session from the database based on SessionName.
+    /// Cascades automatically delete players, character picks, cycles, and matches.
+    /// </summary>
+    public static void DeleteTournamentState(string sessionName)
+    {
+        if (string.IsNullOrWhiteSpace(sessionName)) return;
+
+        using var connection = DatabaseConnector.Instance.GetConnection();
+        connection.Open();
+
+        using var command = connection.CreateCommand();
+        command.CommandText = "DELETE FROM Tournaments WHERE SessionName = @SessionName";
+        command.Parameters.AddWithValue("@SessionName", sessionName);
+        command.ExecuteNonQuery();
+    }
+
+    /// <summary>
+    /// Loads and hydrates a complete Tournament model from the database by its SessionName.
+    /// Returns null if the session name does not exist.
+    /// </summary>
+    public static Tournament? LoadTournamentState(string sessionName)
+    {
+        using var connection = DatabaseConnector.Instance.GetConnection();
+        connection.Open();
+
+        // 1. Fetch parent tournament record
+        long tournamentId;
+        string selectedGame;
+        int currentCycleIndex;
+        using (var cmd = connection.CreateCommand())
+        {
+            cmd.CommandText = "SELECT Id, SelectedGame, CurrentCycleIndex FROM Tournaments WHERE SessionName = @SessionName";
+            cmd.Parameters.AddWithValue("@SessionName", sessionName);
+            using var reader = cmd.ExecuteReader();
+            if (!reader.Read()) return null;
+
+            tournamentId = reader.GetInt64(0);
+            selectedGame = reader.GetString(1);
+            currentCycleIndex = reader.GetInt32(2);
+        }
+
+        var tournament = new Tournament
+        {
+            SessionName = sessionName,
+            SelectedGame = selectedGame,
+            CurrentCycleIndex = currentCycleIndex
+        };
+
+        // 2. Fetch players and their character picks
+        var playerMap = new Dictionary<long, Player>();
+        using (var cmd = connection.CreateCommand())
+        {
+            cmd.CommandText = "SELECT Id, Name, IsEliminated, TotalWins, TotalLosses, TotalMatches FROM Players WHERE TournamentId = @TournamentId";
+            cmd.Parameters.AddWithValue("@TournamentId", tournamentId);
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                long playerId = reader.GetInt64(0);
+                string name = reader.GetString(1);
+                bool isEliminated = reader.GetInt32(2) == 1;
+                int wins = reader.GetInt32(3);
+                int losses = reader.GetInt32(4);
+                int matches = reader.GetInt32(5);
+
+                var player = new Player
+                {
+                    Name = name,
+                    IsEliminated = isEliminated
+                };
+
+                playerMap[playerId] = player;
+                tournament.Players.Add(player);
+
+                // Fetch character picks for this player
+                var picks = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                using (var picksCmd = connection.CreateCommand())
+                {
+                    picksCmd.CommandText = "SELECT CharacterName, PickCount FROM PlayerCharacterPicks WHERE PlayerId = @PlayerId";
+                    picksCmd.Parameters.AddWithValue("@PlayerId", playerId);
+                    using var picksReader = picksCmd.ExecuteReader();
+                    while (picksReader.Read())
+                    {
+                        picks[picksReader.GetString(0)] = picksReader.GetInt32(1);
+                    }
+                }
+
+                player.LoadPersistedStats(wins, losses, matches, picks);
+            }
+        }
+
+        // 3. Fetch Cycles and their Matches
+        using (var cmd = connection.CreateCommand())
+        {
+            cmd.CommandText = "SELECT Id, Number FROM Cycles WHERE TournamentId = @TournamentId ORDER BY Number";
+            cmd.Parameters.AddWithValue("@TournamentId", tournamentId);
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                long cycleId = reader.GetInt64(0);
+                int number = reader.GetInt32(1);
+
+                var cycle = new Cycle(number);
+                tournament.Cycles.Add(cycle);
+
+                // Fetch matches in this cycle
+                using (var matchCmd = connection.CreateCommand())
+                {
+                    matchCmd.CommandText = "SELECT Player1Id, Player2Id, WinnerId, Character1, Character2 FROM Matches WHERE CycleId = @CycleId";
+                    matchCmd.Parameters.AddWithValue("@CycleId", cycleId);
+                    using var matchReader = matchCmd.ExecuteReader();
+                    while (matchReader.Read())
+                    {
+                        long p1Id = matchReader.GetInt64(0);
+                        long p2Id = matchReader.GetInt64(1);
+                        int? winnerId = matchReader.IsDBNull(2) ? null : matchReader.GetInt32(2);
+                        string? char1 = matchReader.IsDBNull(3) ? null : matchReader.GetString(3);
+                        string? char2 = matchReader.IsDBNull(4) ? null : matchReader.GetString(4);
+
+                        if (playerMap.TryGetValue(p1Id, out var p1) && playerMap.TryGetValue(p2Id, out var p2))
+                        {
+                            var match = new Match(p1, p2)
+                            {
+                                WinnerId = winnerId,
+                                Character1 = char1,
+                                Character2 = char2
+                            };
+                            cycle.Matches.Add(match);
+                        }
+                    }
+                }
+            }
+        }
+
+        return tournament;
+    }
 }

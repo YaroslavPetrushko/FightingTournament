@@ -30,6 +30,17 @@ public class SetupViewModel : BaseViewModel
         set => Set(ref _sessionName, value);
     }
 
+    // ── Saved sessions ───────────────────────────────────────────────
+
+    public ObservableCollection<string> SavedSessions { get; } = new();
+
+    private string? _selectedSavedSession;
+    public string? SelectedSavedSession
+    {
+        get => _selectedSavedSession;
+        set => Set(ref _selectedSavedSession, value);
+    }
+
     // ── Player count ─────────────────────────────────────────────────
 
     private int _playerCount = 4;
@@ -57,17 +68,22 @@ public class SetupViewModel : BaseViewModel
 
     // ── Commands ─────────────────────────────────────────────────────
 
-    public ICommand IncrementCommand { get; }
-    public ICommand DecrementCommand { get; }
-    public ICommand StartCommand     { get; }
+    public ICommand IncrementCommand     { get; }
+    public ICommand DecrementCommand     { get; }
+    public ICommand StartCommand         { get; }
+    public ICommand ResumeCommand        { get; }
+    public ICommand DeleteSessionCommand { get; }
 
     public SetupViewModel()
     {
-        IncrementCommand = new RelayCommand(() => PlayerCount++);
-        DecrementCommand = new RelayCommand(() => PlayerCount--);
-        StartCommand     = new RelayCommand(StartTournament);
+        IncrementCommand     = new RelayCommand(() => PlayerCount++);
+        DecrementCommand     = new RelayCommand(() => PlayerCount--);
+        StartCommand         = new RelayCommand(StartTournament);
+        ResumeCommand        = new RelayCommand(ResumeTournament);
+        DeleteSessionCommand = new RelayCommand(DeleteSession);
 
         SyncPlayerEntries();
+        RefreshSavedSessions();
     }
 
     // ── Helpers ──────────────────────────────────────────────────────
@@ -117,5 +133,80 @@ public class SetupViewModel : BaseViewModel
         tournament.SelectedGame = SelectedGame;
         tournament.SessionName = session;
         TournamentStarted?.Invoke(tournament);
+    }
+
+    public void RefreshSavedSessions()
+    {
+        SavedSessions.Clear();
+        try
+        {
+            var list = DatabaseRepository.GetSavedSessions();
+            foreach (var s in list)
+            {
+                SavedSessions.Add(s);
+            }
+            if (SavedSessions.Count > 0)
+            {
+                SelectedSavedSession = SavedSessions[0];
+            }
+            else
+            {
+                SelectedSavedSession = null;
+            }
+        }
+        catch (Exception ex)
+        {
+            ValidationMessage = $"⚠  Could not query saved sessions: {ex.Message}";
+        }
+    }
+
+    private void ResumeTournament()
+    {
+        ValidationMessage = string.Empty;
+        if (string.IsNullOrWhiteSpace(SelectedSavedSession))
+        {
+            ValidationMessage = "⚠  Please select a session to resume.";
+            return;
+        }
+
+        try
+        {
+            var tournament = DatabaseRepository.LoadTournamentState(SelectedSavedSession);
+            if (tournament is null)
+            {
+                ValidationMessage = "⚠  Could not load the selected tournament session.";
+                return;
+            }
+
+            TournamentStarted?.Invoke(tournament);
+        }
+        catch (Exception ex)
+        {
+            ValidationMessage = $"⚠  Error loading session: {ex.Message}";
+        }
+    }
+
+    private void DeleteSession()
+    {
+        ValidationMessage = string.Empty;
+        if (string.IsNullOrWhiteSpace(SelectedSavedSession)) return;
+
+        var result = System.Windows.MessageBox.Show(
+            $"Are you sure you want to delete the saved session \"{SelectedSavedSession}\"?\n\nThis cannot be undone.",
+            "Delete Saved Session",
+            System.Windows.MessageBoxButton.YesNo,
+            System.Windows.MessageBoxImage.Warning);
+
+        if (result != System.Windows.MessageBoxResult.Yes) return;
+
+        try
+        {
+            DatabaseRepository.DeleteTournamentState(SelectedSavedSession);
+            RefreshSavedSessions();
+        }
+        catch (Exception ex)
+        {
+            ValidationMessage = $"⚠  Error deleting session: {ex.Message}";
+        }
     }
 }
