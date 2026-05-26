@@ -24,6 +24,7 @@
         <SolidColorBrush x:Key="BrushLoss"        Color="#FF4444"/>
         <SolidColorBrush x:Key="BrushCurrent"     Color="#FF9800"/>
         <SolidColorBrush x:Key="BrushCurrentDim"  Color="#7A4800"/>
+        <SolidColorBrush x:Key="BrushElim"        Color="#26161B"/>
 
         <!-- ═══════════════════════════════════════════════════════════
              TYPOGRAPHY
@@ -372,6 +373,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="RadioButton">
                         <Border x:Name="Pill"
+                                Background="Transparent"
                                 BorderBrush="{StaticResource BrushBorderLight}"
                                 BorderThickness="1"
                                 CornerRadius="3"
@@ -387,12 +389,9 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Pill"  Property="Background"
-                                        Value="{StaticResource BrushAccent}"/>
-                                <Setter TargetName="Pill"  Property="BorderBrush"
-                                        Value="{StaticResource BrushAccent}"/>
-                                <Setter TargetName="Label" Property="Foreground"
-                                        Value="White"/>
+                                <Setter TargetName="Pill" Property="Background" Value="{StaticResource BrushAccent}"/>
+                                <Setter TargetName="Pill" Property="BorderBrush" Value="{StaticResource BrushAccent}"/>
+                                <Setter TargetName="Label" Property="Foreground" Value="White"/>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Pill"  Property="BorderBrush"

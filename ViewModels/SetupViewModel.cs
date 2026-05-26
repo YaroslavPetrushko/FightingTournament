@@ -20,14 +20,49 @@ public class SetupViewModel : BaseViewModel
     public string SelectedGame
     {
         get => _selectedGame;
-        set => Set(ref _selectedGame, value);
+        set
+        {
+            if (Set(ref _selectedGame, value))
+            {
+                UpdateDefaultSessionName();
+            }
+        }
     }
 
-    private string _sessionName = DateTime.Now.ToString("dd.MM.yyyy");
+    private string _sessionName = string.Empty;
     public string SessionName
     {
         get => _sessionName;
         set => Set(ref _sessionName, value);
+    }
+
+    // ── Mode selection ───────────────────────────────────────────────
+
+    private TournamentMode _selectedMode = TournamentMode.Endless;
+    public TournamentMode SelectedMode
+    {
+        get => _selectedMode;
+        set
+        {
+            if (Set(ref _selectedMode, value))
+            {
+                OnPropertyChanged(nameof(IsEndlessModeSelected));
+                OnPropertyChanged(nameof(IsChampionshipModeSelected));
+                UpdateDefaultSessionName();
+            }
+        }
+    }
+
+    public bool IsEndlessModeSelected
+    {
+        get => SelectedMode == TournamentMode.Endless;
+        set { if (value) SelectedMode = TournamentMode.Endless; }
+    }
+
+    public bool IsChampionshipModeSelected
+    {
+        get => SelectedMode == TournamentMode.Championship;
+        set { if (value) SelectedMode = TournamentMode.Championship; }
     }
 
     // ── Saved sessions ───────────────────────────────────────────────
@@ -97,9 +132,16 @@ public class SetupViewModel : BaseViewModel
         SyncPlayerEntries();
         RefreshSavedSessions();
         RefreshRegisteredUsers();
+        UpdateDefaultSessionName();
     }
 
     // ── Helpers ──────────────────────────────────────────────────────
+
+    private void UpdateDefaultSessionName()
+    {
+        string modeStr = SelectedMode == TournamentMode.Championship ? "Championship" : "Endless";
+        SessionName = $"{DateTime.Now:dd.MM.yyyy} - {modeStr} - {SelectedGame}";
+    }
 
     /// Keeps PlayerEntries in sync with PlayerCount without losing typed names.
     private void SyncPlayerEntries()
@@ -142,7 +184,7 @@ public class SetupViewModel : BaseViewModel
             return;
         }
 
-        var tournament = TournamentEngine.Create(names);
+        var tournament = TournamentEngine.Create(names, SelectedMode);
         tournament.SelectedGame = SelectedGame;
         tournament.SessionName = session;
         TournamentStarted?.Invoke(tournament);

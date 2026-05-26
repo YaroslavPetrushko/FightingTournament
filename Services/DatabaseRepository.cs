@@ -38,13 +38,14 @@ public static class DatabaseRepository
             {
                 insertTournamentCmd.Transaction = transaction;
                 insertTournamentCmd.CommandText = @"
-                    INSERT INTO Tournaments (SessionName, SelectedGame, CurrentCycleIndex, IsFinished)
-                    VALUES (@SessionName, @SelectedGame, @CurrentCycleIndex, @IsFinished);
+                    INSERT INTO Tournaments (SessionName, SelectedGame, CurrentCycleIndex, IsFinished, TournamentMode)
+                    VALUES (@SessionName, @SelectedGame, @CurrentCycleIndex, @IsFinished, @TournamentMode);
                     SELECT last_insert_rowid();";
                 insertTournamentCmd.Parameters.AddWithValue("@SessionName", tournament.SessionName);
                 insertTournamentCmd.Parameters.AddWithValue("@SelectedGame", tournament.SelectedGame);
                 insertTournamentCmd.Parameters.AddWithValue("@CurrentCycleIndex", tournament.CurrentCycleIndex);
                 insertTournamentCmd.Parameters.AddWithValue("@IsFinished", tournament.IsFinished ? 1 : 0);
+                insertTournamentCmd.Parameters.AddWithValue("@TournamentMode", tournament.Mode.ToString());
 
                 tournamentId = (long)insertTournamentCmd.ExecuteScalar()!;
             }
@@ -53,13 +54,16 @@ public static class DatabaseRepository
             var playerIds = new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
             foreach (var player in tournament.Players)
             {
-                // Register in global Users directory (ignore duplicate inserts)
-                using (var insertGlobalUserCmd = connection.CreateCommand())
+                // Register in global Users directory (ignore duplicate inserts, skip virtual BYE players)
+                if (!player.Name.Equals("BYE", StringComparison.OrdinalIgnoreCase))
                 {
-                    insertGlobalUserCmd.Transaction = transaction;
-                    insertGlobalUserCmd.CommandText = "INSERT OR IGNORE INTO Users (Nickname) VALUES (@Nickname);";
-                    insertGlobalUserCmd.Parameters.AddWithValue("@Nickname", player.Name);
-                    insertGlobalUserCmd.ExecuteNonQuery();
+                    using (var insertGlobalUserCmd = connection.CreateCommand())
+                    {
+                        insertGlobalUserCmd.Transaction = transaction;
+                        insertGlobalUserCmd.CommandText = "INSERT OR IGNORE INTO Users (Nickname) VALUES (@Nickname);";
+                        insertGlobalUserCmd.Parameters.AddWithValue("@Nickname", player.Name);
+                        insertGlobalUserCmd.ExecuteNonQuery();
+                    }
                 }
 
                 long playerId;
@@ -218,9 +222,10 @@ public static class DatabaseRepository
         long tournamentId;
         string selectedGame;
         int currentCycleIndex;
+        TournamentMode tournamentMode = TournamentMode.Endless;
         using (var cmd = connection.CreateCommand())
         {
-            cmd.CommandText = "SELECT Id, SelectedGame, CurrentCycleIndex FROM Tournaments WHERE SessionName = @SessionName";
+            cmd.CommandText = "SELECT Id, SelectedGame, CurrentCycleIndex, TournamentMode FROM Tournaments WHERE SessionName = @SessionName";
             cmd.Parameters.AddWithValue("@SessionName", sessionName);
             using var reader = cmd.ExecuteReader();
             if (!reader.Read()) return null;
@@ -228,13 +233,25 @@ public static class DatabaseRepository
             tournamentId = reader.GetInt64(0);
             selectedGame = reader.GetString(1);
             currentCycleIndex = reader.GetInt32(2);
+
+            // Backward compatibility
+            string modeStr = "Endless";
+            if (reader.FieldCount > 3 && !reader.IsDBNull(3))
+            {
+                modeStr = reader.GetString(3);
+            }
+            if (Enum.TryParse<TournamentMode>(modeStr, out var parsedMode))
+            {
+                tournamentMode = parsedMode;
+            }
         }
 
         var tournament = new Tournament
         {
             SessionName = sessionName,
             SelectedGame = selectedGame,
-            CurrentCycleIndex = currentCycleIndex
+            CurrentCycleIndex = currentCycleIndex,
+            Mode = tournamentMode
         };
 
         // 2. Fetch players and their character picks

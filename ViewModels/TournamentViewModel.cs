@@ -19,6 +19,29 @@ public class TournamentViewModel : BaseViewModel
     public ObservableCollection<MatchRowViewModel>    CurrentMatches { get; } = new();
     public ObservableCollection<PlayerStatsViewModel> Standings      { get; } = new();
 
+    // ── Bracket View tracking ────────────────────────────────────────
+
+    private bool _showBracket = false;
+    public bool ShowBracket
+    {
+        get => _showBracket;
+        set => Set(ref _showBracket, value);
+    }
+
+    public bool ShowBracketToggleVisible => _tournament.Mode == TournamentMode.Championship;
+
+    public bool IsFinished => _tournament.IsFinished;
+
+    public string WinnerName
+    {
+        get
+        {
+            if (!_tournament.IsFinished) return string.Empty;
+            var winner = _tournament.Players.FirstOrDefault(p => !p.IsEliminated && !p.Name.Equals("BYE", StringComparison.OrdinalIgnoreCase));
+            return winner?.Name ?? string.Empty;
+        }
+    }
+
     // ── Selected Cycle tracking ──────────────────────────────────────
 
     private int _selectedCycleIndex = 0;
@@ -31,6 +54,8 @@ public class TournamentViewModel : BaseViewModel
             {
                 OnPropertyChanged(nameof(CycleHeader));
                 OnPropertyChanged(nameof(SaveButtonText));
+                OnPropertyChanged(nameof(IsFinished));
+                OnPropertyChanged(nameof(WinnerName));
                 RefreshScheduleSidebar();
                 LoadCurrentCycleMatches();
             }
@@ -102,12 +127,64 @@ public class TournamentViewModel : BaseViewModel
 
     // ── Build helpers ─────────────────────────────────────────────────
 
+    private int GetEliminationCycle(Player player)
+    {
+        if (player.Name.Equals("BYE", StringComparison.OrdinalIgnoreCase)) return 0;
+        if (!player.IsEliminated) return int.MaxValue; // Still active!
+
+        // Find the cycle index where they lost
+        for (int i = _tournament.Cycles.Count - 1; i >= 0; i--)
+        {
+            var cycle = _tournament.Cycles[i];
+            var lostMatch = cycle.Matches.FirstOrDefault(m => m.IsCompleted && m.WinnerId.HasValue && 
+                ((m.WinnerId == 1 && m.Player2 == player) || (m.WinnerId == 2 && m.Player1 == player)));
+            if (lostMatch != null)
+            {
+                return i + 1; // 1-based cycle index
+            }
+        }
+        return 0; // Pre-eliminated or BYE
+    }
+
+    private List<PlayerStatsViewModel> SortStandingsList(List<PlayerStatsViewModel> list)
+    {
+        if (_tournament.Mode == TournamentMode.Championship)
+        {
+            return list
+                .OrderBy(s => s.PlayerModel.IsEliminated ? 1 : 0) // Active first
+                .ThenByDescending(s => GetEliminationCycle(s.PlayerModel)) // Eliminated later = higher rank
+                .ThenByDescending(s => s.Wins)
+                .ThenByDescending(s => s.Matches)
+                .ThenBy(s => s.Name)
+                .ToList();
+        }
+        else
+        {
+            return list
+                .OrderByDescending(s => s.Wins)
+                .ThenByDescending(s => s.Matches)
+                .ThenBy(s => s.Name)
+                .ToList();
+        }
+    }
+
     private void BuildStandings()
     {
         Standings.Clear();
-        int rank = 1;
+        var list = new List<PlayerStatsViewModel>();
         foreach (var p in _tournament.Players)
-            Standings.Add(new PlayerStatsViewModel(p, rank++, OnEliminatePlayer));
+        {
+            if (p.Name.Equals("BYE", StringComparison.OrdinalIgnoreCase)) continue;
+            list.Add(new PlayerStatsViewModel(p, 1, OnEliminatePlayer));
+        }
+
+        var sorted = SortStandingsList(list);
+        int rank = 1;
+        foreach (var s in sorted)
+        {
+            s.Rank = rank++;
+            Standings.Add(s);
+        }
     }
 
     private void RefreshScheduleSidebar()
@@ -133,6 +210,12 @@ public class TournamentViewModel : BaseViewModel
             var cycle = _tournament.Cycles[SelectedCycleIndex];
             foreach (var m in cycle.Matches)
             {
+                // Skip matches where either player is a virtual BYE player
+                if (m.Player1.Name.Equals("BYE", StringComparison.OrdinalIgnoreCase) ||
+                    m.Player2.Name.Equals("BYE", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
                 CurrentMatches.Add(new MatchRowViewModel(m, _tournament.SelectedGame));
             }
         }
@@ -183,11 +266,7 @@ public class TournamentViewModel : BaseViewModel
             // 2. Refresh Standings view models + re-sort
             foreach (var s in Standings) s.Refresh();
 
-            var sorted = Standings
-                .OrderByDescending(s => s.Wins)
-                .ThenByDescending(s => s.Matches)
-                .ThenBy(s => s.Name)
-                .ToList();
+            var sorted = SortStandingsList(Standings.ToList());
 
             Standings.Clear();
             int rank = 1;
@@ -220,11 +299,7 @@ public class TournamentViewModel : BaseViewModel
         // Refresh standings + re-sort
         foreach (var s in Standings) s.Refresh();
 
-        var sortedActive = Standings
-            .OrderByDescending(s => s.Wins)
-            .ThenByDescending(s => s.Matches)
-            .ThenBy(s => s.Name)
-            .ToList();
+        var sortedActive = SortStandingsList(Standings.ToList());
 
         Standings.Clear();
         int rankActive = 1;
@@ -244,6 +319,8 @@ public class TournamentViewModel : BaseViewModel
             StatusMessage = $"⚠  Cycle {savedNumber} saved locally, but database save failed: {ex.Message}";
         }
         OnPropertyChanged(nameof(CycleHeader));
+        OnPropertyChanged(nameof(IsFinished));
+        OnPropertyChanged(nameof(WinnerName));
     }
 
     private void SelectCycle(CycleInfoViewModel cycleVm)

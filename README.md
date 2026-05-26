@@ -5,42 +5,52 @@ Built with **.NET 8 + WPF**, using pure MVVM architecture and high-fidelity cust
 
 ---
 
-## 🚀 Features (v2.0 — current state)
+## 🚀 Features (v3.0 — current state)
 
-| Feature                                          | Description                                                                                                   | Status |
-|--------------------------------------------------|---------------------------------------------------------------------------------------------------------------|:------:|
-| **Round-robin Schedule**                         | Generates pairing matching using the circle algorithm.                                                        |   ✅    |
-| **Dynamic Player Setup**                         | Custom player counts (2–16) with unique validation checks.                                                    |   ✅    |
-| **Select Game Presets**                          | Select a game at setup to populate game-specific character autocompletes.                                     |   ✅    |
-| **Rich Character Databases**                     | Predefined rosters for Tekken 8, Guilty Gear -Strive-, Street Fighter 6, Mortal Kombat 1, and Smash Ultimate. |   ✅    |
-| **Premium Dark Theme**                           | Custom dark mode styling for all inputs, buttons, sliders, text boxes, and scrollbars.                        |   ✅    |
-| **High-Legibility ToolTips**                     | Custom dark-themed popover tooltips with crisp white text.                                                    |   ✅    |
-| **Interactive ComboBox Templates**               | Completely custom-templated dropdown inputs using toggle overlays for flawless UX.                            |   ✅    |
-| **Per-match Scoring & Winner Selection**         | Tap "WIN" pills to instantly allocate scores and update rankings.                                             |   ✅    |
-| **Live Standings & Re-sorting**                  | Live leaderboard tracking W/L records, win rate percentage, and most picked character.                        |   ✅    |
-| **Mid-cycle Player Elimination**                 | Eject players mid-tournament while preserving completed matches and pruning unplayed matchups.                |   ✅    |
-| **SQLite Session Persistence**                   | Automatically persists matches, character picks, standings, and cycles to a local SQLite database file.       |   ✅    |
-| **Session Resume & Deletion**                    | Seamless dashboard to select a saved session, resume it, or delete it with a safety confirmation dialog.      |   ✅    |
-| **Global Player Directory**                      | Maintains unique player nicknames globally across tournaments to track overall player participation.         |   ✅    |
-| **Quick-Add Registered Players**                 | Click-to-add sidebar in setup: autofills generic slots or expands the roster automatically up to 16 players. |   ✅    |
-| **Edit Completed Cycles**                        | Select completed cycles in history panel to reload results for live correction; standings updates instantly.  |   ✅    |
+| Feature                                  | Description                                                                                                   | Status |
+|------------------------------------------|---------------------------------------------------------------------------------------------------------------|:------:|
+| **Tournament Modes Selection**           | Switch between Endless Round-Robin lobbies or classic Championship Single Elimination Bracket modes.          |   ✅    |
+| **Championship Bracket Engine**          | Standard SE power-of-2 visual tree seeding with auto-completed virtual `"BYE"` match-ups.                     |   ✅    |
+| **Visual Scrollable Bracket Tree**       | Horizontal dashboard column-by-column flow highlighting winners with trophies, dimming losers.                |   ✅    |
+| **Knockout Standing Analytics**          | Leaderboard ranks active survivors first, then ranks eliminated players based on the round they lost in.      |   ✅    |
+| **Winner Celebration Victory Screen**    | Centered banner celebrating the crowned champion with icons.                                                  |   ✅    |
+| **Smart Session Auto-Naming**            | Dynamically formats session names as `"Date - Mode - Game"` to prevent daily multi-game conflicts.            |   ✅    |
+| **UI Spacing & Fit Optimization**        | Single-row stylized brand headers; optimized margins ensuring the start button fits on all screen sizes.      |   ✅    |
+| **Micro-Animations (Page Transitions)**  | Soft page entry slide and fade animations when changing views for a pleasant user experience.                 |   ✅    |
+| **Round-robin Schedule**                 | Generates pairing matching using the circle algorithm.                                                        |   ✅    |
+| **Dynamic Player Setup**                 | Custom player counts (2–16) with unique validation checks.                                                    |   ✅    |
+| **Select Game Presets**                  | Select a game at setup to populate game-specific character autocompletes.                                     |   ✅    |
+| **Rich Character Databases**             | Predefined rosters for Tekken 8, Guilty Gear -Strive-, Street Fighter 6, Mortal Kombat 1, and Smash Ultimate. |   ✅    |
+| **Custom Dark Theme**                    | Custom dark mode styling for all inputs, buttons, sliders, text boxes, and scrollbars.                        |   ✅    |
+| **High-Legibility ToolTips**             | Custom dark-themed popover tooltips with crisp white text.                                                    |   ✅    |
+| **Interactive ComboBox Templates**       | Completely custom-templated dropdown inputs using toggle overlays for flawless UX.                            |   ✅    |
+| **Per-match Scoring & Winner Selection** | Tap "WIN" pills to instantly allocate scores and update rankings.                                             |   ✅    |
+| **Live Standings & Re-sorting**          | Live leaderboard tracking W/L records, win rate percentage, and most picked character.                        |   ✅    |
+| **Mid-cycle Player Elimination**         | Eject players mid-tournament while preserving completed matches and pruning unplayed matchups.                |   ✅    |
+| **SQLite Session Persistence**           | Automatically persists matches, character picks, standings, and cycles to a local SQLite database file.       |   ✅    |
+| **Session Resume & Deletion**            | Seamless dashboard to select a saved session, resume it, or delete it with a safety confirmation dialog.      |   ✅    |
+| **Global Player Directory**              | Maintains unique player nicknames globally across tournaments to track overall player participation.          |   ✅    |
+| **Quick-Add Registered Players**         | Click-to-add sidebar in setup: autofills generic slots or expands the roster automatically up to 16 players.  |   ✅    |
+| **Edit Completed Cycles**                | Select completed cycles in history panel to reload results for live correction; standings updates instantly.  |   ✅    |
 
 ---
 
 ## 🗺️ Planned Milestones
 
-### 🎨 Milestone 3: Update UI/UX & Custom Title Bar
-- **Frameless Custom Window:** Replace the standard Windows title bar with a gorgeous custom title bar matching the `#0D0D15` theme.
-- **Micro-Animations:** Add smooth transitions for window loading, button hovering, win-selection changes, and standings card sorting.
-- **Responsive Layout Enhancements:** Refined sidebars with retractable views and collapsible match categories.
+### 🎨 Milestone 3: Tournament Modes & UI/UX Aesthetics [COMPLETED]
+- **Segmented Toggle Buttons:** Custom styled left/right rounded radio button segmented groups for mode choices and views. [COMPLETED]
+- **Winner Victory Screen:** Centered banner celebrating the crowned champion with gold crowns and trophy icons.
+- **UI Spacing & Fit Optimization:** Single-row stylized brand headers; optimized margins ensuring the start button fits on all screen sizes.
+- **Micro-Animations (Page Transitions):** Soft page entry slide and fade animations when changing views.
+- **leaderboard Background Tint:** Subtle dark-red background tint (`BrushElim`) for eliminated players in the standings.
+- **Frameless Custom Window:** Replace the standard Windows title bar with a custom title bar matching the `#0D0D15` theme.
 
 ### ⚙️ Milestone 4: QOL & Custom Preset Editor
 - **Game & Character Creator:** A full in-app management interface where users can add custom games and write down their own character rosters.
 - **Save User Presets:** Save local configurations (favorite players, default games, tournament sizes) for instant tournament creation.
 - **Intelligent Autocomplete:** Hybrid suggestions that automatically combine the selected game's database with custom player-entered characters.
 
-### 📊 Milestone 5: Advanced Analytics & Tournament Formats
-- **Visual Bracket View:** Generates double/single elimination bracket visualizers in addition to the standard round-robin.
+### 📊 Milestone 5: Advanced Analytics
 - **Performance Charting:** Dynamic round-by-round statistics and charts displaying character pick-rates and tournament progress.
 - **Media Exporter:** Direct one-click screenshot/image and PDF exports of the final standings, winner podium, and matches logs.
 
@@ -76,7 +86,7 @@ FightingTournament/
 ├── Converters/
 │   ├── BoolToVisibilityConverter.cs
 │   └── StringToVisibilityConverter.cs
-├── App.xaml                    — Premium dark UI styles, custom templates & DataTemplates
+├── App.xaml                    — Custom dark UI styles, custom templates & DataTemplates
 └── MainWindow.xaml             — Main window container with shell ContentControl
 ```
 

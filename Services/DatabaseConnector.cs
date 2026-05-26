@@ -55,7 +55,8 @@ public class DatabaseConnector
                     SessionName TEXT NOT NULL,
                     SelectedGame TEXT NOT NULL,
                     CurrentCycleIndex INTEGER NOT NULL DEFAULT 0,
-                    IsFinished INTEGER NOT NULL DEFAULT 0
+                    IsFinished INTEGER NOT NULL DEFAULT 0,
+                    TournamentMode TEXT NOT NULL DEFAULT 'Endless'
                 );";
 
             // 2. Players table
@@ -111,6 +112,32 @@ public class DatabaseConnector
             ExecuteNonQuery(createCharacterPicks, connection, transaction);
             ExecuteNonQuery(createCycles, connection, transaction);
             ExecuteNonQuery(createMatches, connection, transaction);
+
+            // Backward compatibility: Alter table to add TournamentMode if missing
+            using (var checkCmd = connection.CreateCommand())
+            {
+                checkCmd.Transaction = transaction;
+                checkCmd.CommandText = "PRAGMA table_info(Tournaments);";
+                using var checkReader = checkCmd.ExecuteReader();
+                bool modeExists = false;
+                while (checkReader.Read())
+                {
+                    if (checkReader.GetString(1).Equals("TournamentMode", StringComparison.OrdinalIgnoreCase))
+                    {
+                        modeExists = true;
+                        break;
+                    }
+                }
+                if (!modeExists)
+                {
+                    using (var alterCmd = connection.CreateCommand())
+                    {
+                        alterCmd.Transaction = transaction;
+                        alterCmd.CommandText = "ALTER TABLE Tournaments ADD COLUMN TournamentMode TEXT NOT NULL DEFAULT 'Endless';";
+                        alterCmd.ExecuteNonQuery();
+                    }
+                }
+            }
 
             transaction.Commit();
         }

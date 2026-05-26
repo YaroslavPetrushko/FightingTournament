@@ -3,12 +3,43 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="clr-namespace:FightingTournament.ViewModels"
              xmlns:conv="clr-namespace:FightingTournament.Converters"
+             xmlns:models="clr-namespace:FightingTournament.Models"
              Background="{StaticResource BrushBg}">
+
+    <UserControl.RenderTransform>
+        <TranslateTransform Y="20"/>
+    </UserControl.RenderTransform>
+
+    <UserControl.Style>
+        <Style TargetType="UserControl">
+            <Style.Triggers>
+                <EventTrigger RoutedEvent="UserControl.Loaded">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                             From="0" To="1" Duration="0:0:0.4">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut"/>
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation Storyboard.TargetProperty="(UserControl.RenderTransform).(TranslateTransform.Y)"
+                                             From="20" To="0" Duration="0:0:0.4">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut"/>
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Style>
 
     <UserControl.Resources>
         <conv:BoolToVisibilityConverter x:Key="BoolVis"/>
         <conv:BoolToVisibilityConverter x:Key="InvBoolVis" Invert="True"/>
         <conv:StringToVisibilityConverter x:Key="StrVis"/>
+        <conv:InverseBooleanConverter x:Key="InvBool"/>
 
         <!-- ── Column header label style ── -->
         <Style x:Key="ColHeader" TargetType="TextBlock">
@@ -33,6 +64,76 @@
             <Setter Property="HorizontalAlignment" Value="Left"/>
             <Setter Property="TextTrimming"        Value="CharacterEllipsis"/>
         </Style>
+
+        <!-- Segmented toggle button left style -->
+        <Style x:Key="RadioToggleLeftBtn" TargetType="RadioButton">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="BtnBorder"
+                                Background="{StaticResource BrushSurface2}"
+                                BorderBrush="{StaticResource BrushBorder}"
+                                BorderThickness="1"
+                                CornerRadius="4,0,0,4"
+                                Padding="14,6"
+                                Cursor="Hand">
+                            <TextBlock x:Name="Label"
+                                       Text="{TemplateBinding Content}"
+                                       FontSize="10"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource BrushTextDim}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="BtnBorder" Property="Background" Value="{StaticResource BrushSurface3}"/>
+                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource BrushAccent}"/>
+                                <Setter TargetName="Label" Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource BrushAccentHover}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Segmented toggle button right style -->
+        <Style x:Key="RadioToggleRightBtn" TargetType="RadioButton">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="BtnBorder"
+                                Background="{StaticResource BrushSurface2}"
+                                BorderBrush="{StaticResource BrushBorder}"
+                                BorderThickness="0,1,1,1"
+                                CornerRadius="0,4,4,0"
+                                Padding="14,6"
+                                Cursor="Hand">
+                            <TextBlock x:Name="Label"
+                                       Text="{TemplateBinding Content}"
+                                       FontSize="10"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource BrushTextDim}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="BtnBorder" Property="Background" Value="{StaticResource BrushSurface3}"/>
+                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource BrushAccent}"/>
+                                <Setter TargetName="Label" Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource BrushAccentHover}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
 
     <DockPanel>
@@ -53,9 +154,9 @@
 
                 <!-- Title -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
-                    <TextBlock Text="⚔" FontSize="16" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                    <TextBlock Text="FIGHTING TOURNAMENT" FontSize="14" FontWeight="Bold"
-                               VerticalAlignment="Center"/>
+                    <TextBlock Text="" FontSize="16" VerticalAlignment="Center" Margin="0,0,50,0"/>
+                    <!-- <TextBlock Text="FIGHTING TOURNAMENT" FontSize="14" FontWeight="Bold" -->
+                    <!--            VerticalAlignment="Center"/> -->
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" HorizontalAlignment="Center">
@@ -180,130 +281,283 @@
             <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"
                           Background="{StaticResource BrushBorder}" ShowsPreview="True"/>
 
-            <!-- ── CENTER: Current matches ────────────────────────── -->
+            <!-- ── CENTER: Dashboard Panels ── -->
             <Border Grid.Column="2" Padding="22,18">
                 <DockPanel>
+                    
+                    <!-- Toggle Buttons (Only visible in Championship mode) -->
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,15"
+                                Visibility="{Binding ShowBracketToggleVisible, Converter={StaticResource BoolVis}}">
+                        <RadioButton Content="MATCH LIST" 
+                                     Style="{StaticResource RadioToggleLeftBtn}"
+                                     GroupName="ViewToggle"
+                                     IsChecked="{Binding ShowBracket, Converter={StaticResource InvBool}, Mode=TwoWay}"/>
+                        <RadioButton Content="BRACKET VIEW" 
+                                     Style="{StaticResource RadioToggleRightBtn}"
+                                     GroupName="ViewToggle"
+                                     IsChecked="{Binding ShowBracket, Mode=TwoWay}"/>
+                    </StackPanel>
 
-                    <!-- Column headers -->
-                    <Grid DockPanel.Dock="Top" Margin="0,0,0,6">
-                        <Grid.ColumnDefinitions>
-                            <!-- P1 name | WIN | vs | WIN | P2 name | gap | Char1 | gap | Char2 -->
-                            <ColumnDefinition Width="*"    MinWidth="80"/>
-                            <ColumnDefinition Width="54"/>
-                            <ColumnDefinition Width="26"/>
-                            <ColumnDefinition Width="54"/>
-                            <ColumnDefinition Width="*"    MinWidth="80"/>
-                            <ColumnDefinition Width="12"/>
-                            <ColumnDefinition Width="140"/>
-                            <ColumnDefinition Width="8"/>
-                            <ColumnDefinition Width="140"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="PLAYER 1"
-                                   Style="{StaticResource ColHeader}"
-                                   HorizontalAlignment="Right" Margin="0,0,6,0"/>
-                        <TextBlock Grid.Column="4" Text="PLAYER 2"
-                                   Style="{StaticResource ColHeader}"
-                                   HorizontalAlignment="Left"  Margin="6,0,0,0"/>
-                        <TextBlock Grid.Column="6" Text="CHARACTER 1"
-                                   Style="{StaticResource ColHeader}"
-                                   HorizontalAlignment="Center"/>
-                        <TextBlock Grid.Column="8" Text="CHARACTER 2"
-                                   Style="{StaticResource ColHeader}"
-                                   HorizontalAlignment="Center"/>
+                    <!-- MATCHES VIEW (Visible when ShowBracket is false) -->
+                    <Grid Visibility="{Binding ShowBracket, Converter={StaticResource InvBoolVis}}">
+                        <DockPanel Visibility="{Binding IsFinished, Converter={StaticResource InvBoolVis}}">
+                            <!-- Column headers -->
+                            <Grid DockPanel.Dock="Top" Margin="0,0,0,6">
+                                <Grid.ColumnDefinitions>
+                                    <!-- P1 name | WIN | vs | WIN | P2 name | gap | Char1 | gap | Char2 -->
+                                    <ColumnDefinition Width="*"    MinWidth="80"/>
+                                    <ColumnDefinition Width="54"/>
+                                    <ColumnDefinition Width="26"/>
+                                    <ColumnDefinition Width="54"/>
+                                    <ColumnDefinition Width="*"    MinWidth="80"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="140"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="PLAYER 1"
+                                           Style="{StaticResource ColHeader}"
+                                           HorizontalAlignment="Right" Margin="0,0,6,0"/>
+                                <TextBlock Grid.Column="4" Text="PLAYER 2"
+                                           Style="{StaticResource ColHeader}"
+                                           HorizontalAlignment="Left"  Margin="6,0,0,0"/>
+                                <TextBlock Grid.Column="6" Text="CHARACTER 1"
+                                           Style="{StaticResource ColHeader}"
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock Grid.Column="8" Text="CHARACTER 2"
+                                           Style="{StaticResource ColHeader}"
+                                           HorizontalAlignment="Center"/>
+                            </Grid>
+
+                            <Separator DockPanel.Dock="Top" Margin="0,0,0,6"/>
+
+                            <!-- Match rows -->
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <ItemsControl ItemsSource="{Binding CurrentMatches}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="{x:Type vm:MatchRowViewModel}">
+                                            <Border Margin="0,0,0,4"
+                                                    Padding="0,8"
+                                                    BorderThickness="0,0,0,1"
+                                                    BorderBrush="{StaticResource BrushBorder}">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"    MinWidth="80"/>
+                                                        <ColumnDefinition Width="54"/>
+                                                        <ColumnDefinition Width="26"/>
+                                                        <ColumnDefinition Width="54"/>
+                                                        <ColumnDefinition Width="*"    MinWidth="80"/>
+                                                        <ColumnDefinition Width="12"/>
+                                                        <ColumnDefinition Width="140"/>
+                                                        <ColumnDefinition Width="8"/>
+                                                        <ColumnDefinition Width="140"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!-- P1 name -->
+                                                    <TextBlock Grid.Column="0"
+                                                               Text="{Binding Player1Name}"
+                                                               FontSize="13" FontWeight="SemiBold"
+                                                               HorizontalAlignment="Right"
+                                                               VerticalAlignment="Center"
+                                                               Margin="0,0,6,0"
+                                                               TextTrimming="CharacterEllipsis"
+                                                               ToolTip="{Binding Player1Name}"/>
+
+                                                    <!-- P1 WIN -->
+                                                    <RadioButton Grid.Column="1"
+                                                                 Content="WIN"
+                                                                 Style="{StaticResource RadioWin}"
+                                                                 GroupName="{Binding MatchId}"
+                                                                 IsChecked="{Binding Player1Won, Mode=TwoWay}"
+                                                                 HorizontalAlignment="Center"
+                                                                 VerticalAlignment="Center"/>
+
+                                                    <!-- vs -->
+                                                    <TextBlock Grid.Column="2" Text="vs"
+                                                               FontSize="10"
+                                                               Foreground="{StaticResource BrushTextDim}"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center"/>
+
+                                                    <!-- P2 WIN -->
+                                                    <RadioButton Grid.Column="3"
+                                                                 Content="WIN"
+                                                                 Style="{StaticResource RadioWin}"
+                                                                 GroupName="{Binding MatchId}"
+                                                                 IsChecked="{Binding Player2Won, Mode=TwoWay}"
+                                                                 HorizontalAlignment="Center"
+                                                                 VerticalAlignment="Center"/>
+
+                                                    <!-- P2 name -->
+                                                    <TextBlock Grid.Column="4"
+                                                               Text="{Binding Player2Name}"
+                                                               FontSize="13" FontWeight="SemiBold"
+                                                               HorizontalAlignment="Left"
+                                                               VerticalAlignment="Center"
+                                                               Margin="6,0,0,0"
+                                                               TextTrimming="CharacterEllipsis"
+                                                               ToolTip="{Binding Player2Name}"/>
+
+                                                    <!-- Char 1 -->
+                                                    <ComboBox Grid.Column="6"
+                                                              IsEditable="True"
+                                                              ItemsSource="{Binding AvailableCharacters}"
+                                                              Text="{Binding Character1, Mode=TwoWay,
+                                                                     UpdateSourceTrigger=PropertyChanged}"
+                                                              ToolTip="{Binding Player1Name}"
+                                                              VerticalAlignment="Center"/>
+
+                                                    <!-- Char 2 -->
+                                                    <ComboBox Grid.Column="8"
+                                                              IsEditable="True"
+                                                              ItemsSource="{Binding AvailableCharacters}"
+                                                              Text="{Binding Character2, Mode=TwoWay,
+                                                                     UpdateSourceTrigger=PropertyChanged}"
+                                                              ToolTip="{Binding Player2Name}"
+                                                              VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </DockPanel>
+
+                        <!-- Winner Celebration Card (Visible when tournament is finished) -->
+                        <Border Visibility="{Binding IsFinished, Converter={StaticResource BoolVis}}"
+                                Background="{StaticResource BrushSurface}"
+                                BorderBrush="{StaticResource BrushAccent}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="40,30"
+                                Margin="0,20,0,0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                MaxWidth="500">
+                            <StackPanel HorizontalAlignment="Center">
+                                <TextBlock Text="👑"
+                                           FontSize="50"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,0,0,15"/>
+                                <TextBlock Text="THE CHAMPION HAS BEEN CROWNED!"
+                                           FontSize="18"
+                                           FontWeight="ExtraBold"
+                                           Foreground="{StaticResource BrushAccent}"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,0,0,10"
+                                           TextAlignment="Center"/>
+                                <TextBlock Text="{Binding WinnerName, StringFormat='Congratulations, {0}! 🏆'}"
+                                           FontSize="15"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource BrushText}"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,0,0,15"
+                                           TextAlignment="Center"/>
+                                <TextBlock Text="You have conquered the tournament bracket and claimed ultimate victory!"
+                                           FontSize="11"
+                                           Foreground="{StaticResource BrushTextDim}"
+                                           HorizontalAlignment="Center"
+                                           TextAlignment="Center"
+                                           TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
                     </Grid>
 
-                    <Separator DockPanel.Dock="Top" Margin="0,0,0,6"/>
-
-                    <!-- Match rows -->
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <ItemsControl ItemsSource="{Binding CurrentMatches}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate DataType="{x:Type vm:MatchRowViewModel}">
-                                    <Border Margin="0,0,0,4"
-                                            Padding="0,8"
-                                            BorderThickness="0,0,0,1"
-                                            BorderBrush="{StaticResource BrushBorder}">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"    MinWidth="80"/>
-                                                <ColumnDefinition Width="54"/>
-                                                <ColumnDefinition Width="26"/>
-                                                <ColumnDefinition Width="54"/>
-                                                <ColumnDefinition Width="*"    MinWidth="80"/>
-                                                <ColumnDefinition Width="12"/>
-                                                <ColumnDefinition Width="140"/>
-                                                <ColumnDefinition Width="8"/>
-                                                <ColumnDefinition Width="140"/>
-                                            </Grid.ColumnDefinitions>
-
-                                            <!-- P1 name -->
-                                            <TextBlock Grid.Column="0"
-                                                       Text="{Binding Player1Name}"
-                                                       FontSize="13" FontWeight="SemiBold"
-                                                       HorizontalAlignment="Right"
-                                                       VerticalAlignment="Center"
-                                                       Margin="0,0,6,0"
-                                                       TextTrimming="CharacterEllipsis"
-                                                       ToolTip="{Binding Player1Name}"/>
-
-                                            <!-- P1 WIN -->
-                                            <RadioButton Grid.Column="1"
-                                                         Content="WIN"
-                                                         Style="{StaticResource RadioWin}"
-                                                         GroupName="{Binding MatchId}"
-                                                         IsChecked="{Binding Player1Won, Mode=TwoWay}"
-                                                         HorizontalAlignment="Center"
-                                                         VerticalAlignment="Center"/>
-
-                                            <!-- vs -->
-                                            <TextBlock Grid.Column="2" Text="vs"
-                                                       FontSize="10"
-                                                       Foreground="{StaticResource BrushTextDim}"
-                                                       HorizontalAlignment="Center"
-                                                       VerticalAlignment="Center"/>
-
-                                            <!-- P2 WIN -->
-                                            <RadioButton Grid.Column="3"
-                                                         Content="WIN"
-                                                         Style="{StaticResource RadioWin}"
-                                                         GroupName="{Binding MatchId}"
-                                                         IsChecked="{Binding Player2Won, Mode=TwoWay}"
-                                                         HorizontalAlignment="Center"
-                                                         VerticalAlignment="Center"/>
-
-                                            <!-- P2 name -->
-                                            <TextBlock Grid.Column="4"
-                                                       Text="{Binding Player2Name}"
-                                                       FontSize="13" FontWeight="SemiBold"
-                                                       HorizontalAlignment="Left"
-                                                       VerticalAlignment="Center"
-                                                       Margin="6,0,0,0"
-                                                       TextTrimming="CharacterEllipsis"
-                                                       ToolTip="{Binding Player2Name}"/>
-
-                                            <!-- Char 1 -->
-                                            <ComboBox Grid.Column="6"
-                                                      IsEditable="True"
-                                                      ItemsSource="{Binding AvailableCharacters}"
-                                                      Text="{Binding Character1, Mode=TwoWay,
-                                                             UpdateSourceTrigger=PropertyChanged}"
-                                                      ToolTip="{Binding Player1Name}"
-                                                      VerticalAlignment="Center"/>
-
-                                            <!-- Char 2 -->
-                                            <ComboBox Grid.Column="8"
-                                                      IsEditable="True"
-                                                      ItemsSource="{Binding AvailableCharacters}"
-                                                      Text="{Binding Character2, Mode=TwoWay,
-                                                             UpdateSourceTrigger=PropertyChanged}"
-                                                      ToolTip="{Binding Player2Name}"
-                                                      VerticalAlignment="Center"/>
-                                        </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </ScrollViewer>
+                    <!-- BRACKET VIEW (Visible when ShowBracket is true) -->
+                    <Grid Visibility="{Binding ShowBracket, Converter={StaticResource BoolVis}}">
+                        <DockPanel>
+                            <!-- Horizontal stack of rounds/cycles -->
+                            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                                <ItemsControl ItemsSource="{Binding CycleSchedule}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" Margin="10,0"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="{x:Type vm:CycleInfoViewModel}">
+                                            <!-- One Round Column -->
+                                            <StackPanel Margin="15,0" Width="190" VerticalAlignment="Center">
+                                                <Border Background="{StaticResource BrushSurface}" 
+                                                        BorderBrush="{StaticResource BrushBorder}" 
+                                                        BorderThickness="1" 
+                                                        CornerRadius="4" 
+                                                        Padding="10,8" 
+                                                        Margin="0,0,0,15">
+                                                    <TextBlock FontSize="10" FontWeight="Bold" Foreground="{StaticResource BrushAccent}" HorizontalAlignment="Center">
+                                                        <TextBlock.Text>
+                                                            <Binding Path="Number" StringFormat="ROUND {0}"/>
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
+                                                </Border>
+                                                
+                                                <!-- Vertically distributed list of matches in this cycle -->
+                                                <ItemsControl ItemsSource="{Binding CycleModel.Matches}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate DataType="{x:Type models:Match}">
+                                                            <Border x:Name="CardBorder" Background="{StaticResource BrushSurface2}" BorderBrush="{StaticResource BrushBorder}" BorderThickness="1" CornerRadius="5" Margin="0,10" Padding="12,10" Width="190">
+                                                                <Grid>
+                                                                    <Grid.RowDefinitions>
+                                                                        <RowDefinition Height="Auto"/>
+                                                                        <RowDefinition Height="Auto"/>
+                                                                    </Grid.RowDefinitions>
+                                                                    
+                                                                    <!-- Player 1 row -->
+                                                                    <Grid Grid.Row="0" Margin="0,0,0,6">
+                                                                        <Grid.ColumnDefinitions>
+                                                                            <ColumnDefinition Width="*"/>
+                                                                            <ColumnDefinition Width="Auto"/>
+                                                                        </Grid.ColumnDefinitions>
+                                                                        <TextBlock x:Name="TxtP1" Text="{Binding Player1.Name}" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource BrushText}" TextTrimming="CharacterEllipsis"/>
+                                                                        <TextBlock x:Name="GlyphP1" Grid.Column="1" Text="🏆" FontSize="11" Foreground="{StaticResource BrushWin}" Margin="5,0,0,0" Visibility="Collapsed"/>
+                                                                    </Grid>
+                                                                    
+                                                                    <!-- Player 2 row -->
+                                                                    <Grid Grid.Row="1">
+                                                                        <Grid.ColumnDefinitions>
+                                                                            <ColumnDefinition Width="*"/>
+                                                                            <ColumnDefinition Width="Auto"/>
+                                                                        </Grid.ColumnDefinitions>
+                                                                        <TextBlock x:Name="TxtP2" Text="{Binding Player2.Name}" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource BrushText}" TextTrimming="CharacterEllipsis"/>
+                                                                        <TextBlock x:Name="GlyphP2" Grid.Column="1" Text="🏆" FontSize="11" Foreground="{StaticResource BrushWin}" Margin="5,0,0,0" Visibility="Collapsed"/>
+                                                                    </Grid>
+                                                                </Grid>
+                                                            </Border>
+                                                            
+                                                            <DataTemplate.Triggers>
+                                                                <!-- Dim out BYE slots -->
+                                                                <DataTrigger Binding="{Binding Player1.Name}" Value="BYE">
+                                                                    <Setter TargetName="TxtP1" Property="Foreground" Value="{StaticResource BrushTextDim}"/>
+                                                                    <Setter TargetName="TxtP1" Property="FontStyle" Value="Italic"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Player2.Name}" Value="BYE">
+                                                                    <Setter TargetName="TxtP2" Property="Foreground" Value="{StaticResource BrushTextDim}"/>
+                                                                    <Setter TargetName="TxtP2" Property="FontStyle" Value="Italic"/>
+                                                                </DataTrigger>
+                                                                
+                                                                <!-- Winner 1 highlights -->
+                                                                <DataTrigger Binding="{Binding WinnerId}" Value="1">
+                                                                    <Setter TargetName="TxtP1" Property="Foreground" Value="{StaticResource BrushWin}"/>
+                                                                    <Setter TargetName="TxtP2" Property="Foreground" Value="{StaticResource BrushTextDim}"/>
+                                                                    <Setter TargetName="GlyphP1" Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                                <!-- Winner 2 highlights -->
+                                                                <DataTrigger Binding="{Binding WinnerId}" Value="2">
+                                                                    <Setter TargetName="TxtP2" Property="Foreground" Value="{StaticResource BrushWin}"/>
+                                                                    <Setter TargetName="TxtP1" Property="Foreground" Value="{StaticResource BrushTextDim}"/>
+                                                                    <Setter TargetName="GlyphP2" Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                            </DataTemplate.Triggers>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </DockPanel>
+                    </Grid>
                 </DockPanel>
             </Border>
 

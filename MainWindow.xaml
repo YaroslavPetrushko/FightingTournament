@@ -8,13 +8,189 @@
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource BrushBg}"
         Foreground="{StaticResource BrushText}"
-        WindowStyle="SingleBorderWindow">
+        WindowStyle="None">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="40"
+                      ResizeBorderThickness="6"
+                      GlassFrameThickness="0"
+                      CornerRadius="0"
+                      UseAeroCaptionButtons="False"/>
+    </WindowChrome.WindowChrome>
+
+    <Window.Style>
+        <Style TargetType="Window">
+            <Style.Triggers>
+                <Trigger Property="WindowState" Value="Maximized">
+                    <!-- Prevent window from spilling over taskbar and screen boundary when maximized -->
+                    <Setter Property="Padding" Value="7"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Style>
+
+    <Window.Resources>
+        <!-- Title bar base button style -->
+        <Style x:Key="TitleBarBtn" TargetType="Button">
+            <Setter Property="Width" Value="46"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bg" Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource BrushSurface2}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource BrushSurface3}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Resources>
+                <!-- Automatic hover colors for Path inside the content -->
+                <Style TargetType="Path">
+                    <Setter Property="Stroke" Value="{StaticResource BrushTextDim}"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
+                            <Setter Property="Stroke" Value="{StaticResource BrushText}"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Style.Resources>
+        </Style>
+
+        <!-- Close button (vivid red on hover) -->
+        <Style x:Key="TitleBarCloseBtn" TargetType="Button" BasedOn="{StaticResource TitleBarBtn}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bg" Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="#E81123"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="#F1707A"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Resources>
+                <Style TargetType="Path">
+                    <Setter Property="Stroke" Value="{StaticResource BrushTextDim}"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
+                            <Setter Property="Stroke" Value="White"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Style.Resources>
+        </Style>
+    </Window.Resources>
 
     <Window.DataContext>
         <vm:MainViewModel/>
     </Window.DataContext>
 
-    <!-- The ContentControl resolves DataTemplates from App.xaml -->
-    <ContentControl Content="{Binding CurrentView}"
-                    Focusable="False"/>
+    <!-- Main Outer Container using Margin bound to Padding when maximized -->
+    <Grid Margin="{Binding Padding, RelativeSource={RelativeSource AncestorType=Window}}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Title Bar -->
+            <RowDefinition Height="*"/>    <!-- Main Content -->
+        </Grid.RowDefinitions>
+
+        <!-- ── Custom Title Bar ── -->
+        <Grid Grid.Row="0" Height="40" Background="{StaticResource BrushSurface}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/> <!-- Icon/Title -->
+                <ColumnDefinition Width="*"/>    <!-- Drag Area Spacer -->
+                <ColumnDefinition Width="Auto"/> <!-- Action Buttons -->
+            </Grid.ColumnDefinitions>
+
+            <!-- Left: App Icon & Title -->
+            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0,0,0">
+                <TextBlock Text="⚔" FontSize="18" Foreground="{StaticResource BrushAccent}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                <TextBlock Text="FIGHTING TOURNAMENT TRACKER" FontSize="11" FontWeight="Bold" Foreground="{StaticResource BrushText}" VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <!-- Right: Action Buttons -->
+            <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Stretch" WindowChrome.IsHitTestVisibleInChrome="True">
+                <!-- Minimize Button -->
+                <Button Style="{StaticResource TitleBarBtn}" Click="MinimizeButton_Click" ToolTip="Minimize">
+                    <Path Data="M0,6 H8" StrokeThickness="1.5" Width="8" Height="8"/>
+                </Button>
+                
+                <!-- Maximize / Restore Button -->
+                <Button Style="{StaticResource TitleBarBtn}" Click="MaximizeButton_Click" ToolTip="Maximize">
+                    <Grid>
+                        <!-- Maximize Icon (Box) -->
+                        <Path x:Name="MaximizeIcon" Data="M0.5,0.5 H8.5 V8.5 H0.5 Z" StrokeThickness="1.5" Width="9" Height="9">
+                            <Path.Style>
+                                <Style TargetType="Path">
+                                    <Setter Property="Stroke" Value="{StaticResource BrushTextDim}"/>
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
+                                            <Setter Property="Stroke" Value="{StaticResource BrushText}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Path.Style>
+                        </Path>
+
+                        <!-- Restore Icon (Overlapping Boxes) -->
+                        <Path x:Name="RestoreIcon" Data="M2.5,0.5 H8.5 V6.5 H2.5 Z M0.5,2.5 H6.5 V8.5 H0.5 Z" StrokeThickness="1.5" Width="9" Height="9">
+                            <Path.Style>
+                                <Style TargetType="Path">
+                                    <Setter Property="Stroke" Value="{StaticResource BrushTextDim}"/>
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
+                                            <Setter Property="Stroke" Value="{StaticResource BrushText}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Path.Style>
+                        </Path>
+                    </Grid>
+                </Button>
+                
+                <!-- Close Button -->
+                <Button Style="{StaticResource TitleBarCloseBtn}" Click="CloseButton_Click" ToolTip="Close">
+                    <Path Data="M0,0 L8,8 M0,8 L8,0" StrokeThickness="1.5" Width="8" Height="8"/>
+                </Button>
+            </StackPanel>
+
+            <!-- ── Stylized Black-Red-Black Gradient Line ── -->
+            <Border Height="2" VerticalAlignment="Top" Grid.ColumnSpan="3">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#0D0D15" Offset="0.0"/>
+                        <GradientStop Color="#E8003D" Offset="0.7"/>
+                        <GradientStop Color="#0D0D15" Offset="1.0"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
+        </Grid>
+
+        <!-- ── Main Content Area ── -->
+        <ContentControl Grid.Row="1" Content="{Binding CurrentView}" Focusable="False"/>
+    </Grid>
 </Window>

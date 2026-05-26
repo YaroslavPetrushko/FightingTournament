@@ -4,8 +4,107 @@
              xmlns:conv="clr-namespace:FightingTournament.Converters"
              Background="{StaticResource BrushBg}">
 
+    <UserControl.RenderTransform>
+        <TranslateTransform Y="20"/>
+    </UserControl.RenderTransform>
+
+    <UserControl.Style>
+        <Style TargetType="UserControl">
+            <Style.Triggers>
+                <EventTrigger RoutedEvent="UserControl.Loaded">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                             From="0" To="1" Duration="0:0:0.4">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut"/>
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation Storyboard.TargetProperty="(UserControl.RenderTransform).(TranslateTransform.Y)"
+                                             From="20" To="0" Duration="0:0:0.4">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut"/>
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Style>
+
     <UserControl.Resources>
         <conv:StringToVisibilityConverter x:Key="StrVis"/>
+
+        <!-- Segmented button left style -->
+        <Style x:Key="RadioModeLeftBtn" TargetType="RadioButton">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="BtnBorder"
+                                Background="{StaticResource BrushSurface2}"
+                                BorderBrush="{StaticResource BrushBorder}"
+                                BorderThickness="1"
+                                CornerRadius="4,0,0,4"
+                                Padding="10,8"
+                                Cursor="Hand">
+                            <TextBlock x:Name="Label"
+                                       Text="{TemplateBinding Content}"
+                                       FontSize="10"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource BrushTextDim}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="BtnBorder" Property="Background" Value="{StaticResource BrushAccentDim}"/>
+                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource BrushAccent}"/>
+                                <Setter TargetName="Label" Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource BrushAccentHover}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Segmented button right style -->
+        <Style x:Key="RadioModeRightBtn" TargetType="RadioButton">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="BtnBorder"
+                                Background="{StaticResource BrushSurface2}"
+                                BorderBrush="{StaticResource BrushBorder}"
+                                BorderThickness="0,1,1,1"
+                                CornerRadius="0,4,4,0"
+                                Padding="10,8"
+                                Cursor="Hand">
+                            <TextBlock x:Name="Label"
+                                       Text="{TemplateBinding Content}"
+                                       FontSize="10"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource BrushTextDim}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="BtnBorder" Property="Background" Value="{StaticResource BrushAccentDim}"/>
+                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource BrushAccent}"/>
+                                <Setter TargetName="Label" Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource BrushAccentHover}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
 
     <Grid>
@@ -16,23 +115,15 @@
         </Grid.RowDefinitions>
 
         <!-- ── Row 0: Title & Validation ── -->
-        <StackPanel Grid.Row="0" Margin="0,35,0,15">
-            <TextBlock Text="⚔"
-                       FontSize="38"
-                       HorizontalAlignment="Center"
-                       Margin="0,0,0,4"/>
-            <TextBlock Text="FIGHTING TOURNAMENT"
-                       FontSize="24"
+        <StackPanel Grid.Row="0" Margin="0,22,0,8">
+            <TextBlock FontSize="18"
                        FontWeight="Bold"
                        FontFamily="Segoe UI"
                        HorizontalAlignment="Center"
-                       Foreground="{StaticResource BrushText}"/>
-            <TextBlock Text="TRACKER"
-                       FontSize="13"
-                       FontFamily="Segoe UI"
-                       HorizontalAlignment="Center"
-                       Foreground="{StaticResource BrushAccent}"
-                       Margin="0,2,0,0"/>
+                       VerticalAlignment="Center">
+                <Run Text="⚔  FIGHTING TOURNAMENT " Foreground="{StaticResource BrushText}"/>
+                <Run Text="TRACKER" Foreground="{StaticResource BrushAccent}"/>
+            </TextBlock>
 
             <!-- Global Validation Message -->
             <TextBlock Text="{Binding ValidationMessage}"
@@ -93,6 +184,29 @@
                               SelectedItem="{Binding SelectedGame, Mode=TwoWay}"
                               Margin="0,0,0,18"/>
 
+                    <!-- Tournament Mode Row -->
+                    <TextBlock Text="TOURNAMENT MODE"
+                               FontSize="9"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource BrushTextDim}"
+                               Margin="0,0,0,8"/>
+                    <Grid Margin="0,0,0,18" Height="34">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <RadioButton Grid.Column="0"
+                                     Content="ENDLESS RUN"
+                                     Style="{StaticResource RadioModeLeftBtn}"
+                                     GroupName="ModeGroup"
+                                     IsChecked="{Binding IsEndlessModeSelected, Mode=TwoWay}"/>
+                        <RadioButton Grid.Column="1"
+                                     Content="CHAMPIONSHIP"
+                                     Style="{StaticResource RadioModeRightBtn}"
+                                     GroupName="ModeGroup"
+                                     IsChecked="{Binding IsChampionshipModeSelected, Mode=TwoWay}"/>
+                    </Grid>
+
                     <!-- Player count row -->
                     <TextBlock Text="NUMBER OF PLAYERS"
                                FontSize="9"
@@ -130,7 +244,7 @@
                                FontWeight="SemiBold"
                                Foreground="{StaticResource BrushTextDim}"
                                Margin="0,0,0,8"/>
-                    <ScrollViewer MaxHeight="145"
+                    <ScrollViewer MaxHeight="155"
                                   VerticalScrollBarVisibility="Auto"
                                   HorizontalScrollBarVisibility="Disabled"
                                   Margin="0,0,0,20">
@@ -230,7 +344,7 @@
                                HorizontalAlignment="Center"/>
 
                     <!-- Scrollable List of players -->
-                    <ScrollViewer MaxHeight="245"
+                    <ScrollViewer MaxHeight="265"
                                   VerticalScrollBarVisibility="Auto"
                                   HorizontalScrollBarVisibility="Disabled"
                                   Margin="0,0,0,0">
