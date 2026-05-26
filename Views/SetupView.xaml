@@ -407,9 +407,8 @@
             </Border>
         </Grid>
 
-        <!-- ── Row 2: Footer ── -->
         <TextBlock Grid.Row="2"
-                   Text="Round-robin · all vs all · circle algorithm"
+                   Text="Round-robin  ·  all-pairs per cycle  ·  endless or championship"
                    FontSize="11"
                    HorizontalAlignment="Center"
                    Foreground="{StaticResource BrushTextDim}"

@@ -306,8 +306,6 @@ public class TournamentViewModel : BaseViewModel
         foreach (var s in sortedActive) { s.Rank = rankActive++; Standings.Add(s); }
 
         SelectedCycleIndex = _tournament.CurrentCycleIndex; // Keep synced
-        RefreshScheduleSidebar();
-        LoadCurrentCycleMatches();
 
         try
         {
@@ -328,6 +326,14 @@ public class TournamentViewModel : BaseViewModel
         if (cycleVm is null) return;
 
         int index = _tournament.Cycles.IndexOf(cycleVm.CycleModel);
+
+        // Championship bracket cannot be safely re-edited — structure depends on prior winners
+        if (_tournament.Mode == TournamentMode.Championship && index < _tournament.CurrentCycleIndex)
+        {
+            StatusMessage = "⚠  Historical edits are not supported in Championship mode.";
+            return;
+        }
+
         if (index >= 0 && index <= _tournament.CurrentCycleIndex)
         {
             SelectedCycleIndex = index;
@@ -374,5 +380,7 @@ public class TournamentViewModel : BaseViewModel
             StatusMessage = $"✗  {player.Name} eliminated locally, but database update failed: {ex.Message}";
         }
         OnPropertyChanged(nameof(CycleHeader));
+        OnPropertyChanged(nameof(IsFinished));
+        OnPropertyChanged(nameof(WinnerName));
     }
 }

@@ -74,7 +74,7 @@ public class MatchRowViewModel : BaseViewModel
         _char2 = match.Character2;
         _winnerId = match.WinnerId;
 
-        if (GameDatabase.Games.TryGetValue(selectedGame, out var list))
+        if (!string.IsNullOrWhiteSpace(selectedGame) && GameDatabase.Games.TryGetValue(selectedGame, out var list))
         {
             AvailableCharacters = new ObservableCollection<string>(list);
         }

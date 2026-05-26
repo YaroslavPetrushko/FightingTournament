@@ -146,20 +146,12 @@
                 Padding="20,12">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-
-                <!-- Title -->
-                <StackPanel Grid.Column="0" Orientation="Horizontal">
-                    <TextBlock Text="" FontSize="16" VerticalAlignment="Center" Margin="0,0,50,0"/>
-                    <!-- <TextBlock Text="FIGHTING TOURNAMENT" FontSize="14" FontWeight="Bold" -->
-                    <!--            VerticalAlignment="Center"/> -->
-                </StackPanel>
-
-                <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                
+                <StackPanel Grid.Column="0" HorizontalAlignment="Center">
                     <TextBlock Text="{Binding CycleHeader}"
                                FontSize="13" FontWeight="SemiBold"
                                HorizontalAlignment="Center"
@@ -170,12 +162,12 @@
                                Visibility="{Binding StatusMessage, Converter={StaticResource StrVis}}"/>
                 </StackPanel>
 
-                <Button Grid.Column="2" Content="New Tournament"
+                <Button Grid.Column="1" Content="New Tournament"
                         Style="{StaticResource BtnGhost}"
                         Padding="12,7" FontSize="11" Margin="0,0,10,0"
                         Command="{Binding NewTournamentCommand}"/>
 
-                <Button Grid.Column="3" Content="{Binding SaveButtonText}"
+                <Button Grid.Column="2" Content="{Binding SaveButtonText}"
                         Style="{StaticResource BtnPrimary}"
                         Padding="16,8" FontSize="12"
                         Command="{Binding CommitCycleCommand}"/>
