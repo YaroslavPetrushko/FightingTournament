@@ -1,85 +1,113 @@
 # ⚔ Fighting Tournament Tracker
 
-A WPF desktop application for running and scoring local fighting-game tournaments.  
-Built with **.NET 8 + WPF**, pure MVVM, zero external dependencies.
+A WPF desktop application for running and scoring local fighting game tournaments.  
+Built with **.NET 8 + WPF**, using pure MVVM architecture and high-fidelity custom design systems.
 
 ---
 
-## Features (v1 — base logic)
+## 🚀 Features (v1.3 — current state)
 
-| Feature                                       | Status |
-|-----------------------------------------------|--------|
-| Round-robin schedule (circle algorithm)       | ✅      |
-| Dynamic player count (2–16)                   | ✅      |
-| Per-match winner selection (WIN pills)        | ✅      |
-| Per-match character picker (preset + custom)  | ✅      |
-| Live standings (W / L / WR% / Most Picked)    | ✅      |
-| Cycle-by-cycle commit with result validation  | ✅      |
-| Tournament complete detection + winner banner | ✅      |
-| New Tournament reset flow                     | ✅      |
-
-## Planned (later milestones)
-
-- [ ] SQLite session save / restore
-- [ ] Early player elimination mid-cycles
-- [ ] Screenshot / image export
-- [ ] More character presets per game
+| Feature                                          | Description                                                                                                   | Status |
+|--------------------------------------------------|---------------------------------------------------------------------------------------------------------------|:------:|
+| **Round-robin Schedule**                         | Generates pairing matching using the circle algorithm.                                                        |   ✅    |
+| **Dynamic Player Setup**                         | Custom player counts (2–16) with unique validation checks.                                                    |   ✅    |
+| **Select Game Presets**                          | Select a game at setup to populate game-specific character autocompletes.                                     |   ✅    |
+| **Rich Character Databases**                     | Predefined rosters for Tekken 8, Guilty Gear -Strive-, Street Fighter 6, Mortal Kombat 1, and Smash Ultimate. |   ✅    |
+| **Premium Dark Theme**                           | Custom dark mode styling for all inputs, buttons, sliders, text boxes, and scrollbars.                        |   ✅    |
+| **High-Legibility ToolTips**                     | Custom dark-themed popover tooltips with crisp white text.                                                    |   ✅    |
+| **Interactive ComboBox Templates**               | Completely custom-templated dropdown inputs using toggle overlays for flawless UX.                            |   ✅    |
+| **Per-match Scoring & Winner Selection**         | Tap "WIN" pills to instantly allocate scores and update rankings.                                             |   ✅    |
+| **Live Standings & Re-sorting**                  | Live leaderboard tracking W/L records, win rate percentage, and most picked character.                        |   ✅    |
+| **Mid-cycle Player Elimination**                 | Eject players mid-tournament while preserving completed matches and pruning unplayed matchups.                |   ✅    |
 
 ---
 
-## Project structure
+## 🗺️ Planned Milestones
+
+### 📅 Milestone 2: Database & Session Persistence
+- **SQLite DB Connection:** Migrate from in-memory to local SQLite database to persist:
+  - Full tournament histories, past matches, and detailed cycle scores.
+  - Global player profiles accumulating stats (overall wins, win rates, historical character picks) over multiple tournaments.
+- **Session Save & Resume:** Auto-saves the current tournament state so users can resume an active cycle after closing the app.
+
+### 🎨 Milestone 3: Update UI/UX & Custom Title Bar
+- **Frameless Custom Window:** Replace the standard Windows title bar with a gorgeous custom title bar matching the `#0D0D15` theme.
+- **Micro-Animations:** Add smooth transitions for window loading, button hovering, win-selection changes, and standings card sorting.
+- **Responsive Layout Enhancements:** Refined sidebars with retractable views and collapsible match categories.
+
+### ⚙️ Milestone 4: QOL & Custom Preset Editor
+- **Game & Character Creator:** A full in-app management interface where users can add custom games and write down their own character rosters.
+- **Save User Presets:** Save local configurations (favorite players, default games, tournament sizes) for instant tournament creation.
+- **Intelligent Autocomplete:** Hybrid suggestions that automatically combine the selected game's database with custom player-entered characters.
+
+### 📊 Milestone 5: Advanced Analytics & Tournament Formats
+- **Visual Bracket View:** Generates double/single elimination bracket visualizers in addition to the standard round-robin.
+- **Performance Charting:** Dynamic round-by-round statistics and charts displaying character pick-rates and tournament progress.
+- **Media Exporter:** Direct one-click screenshot/image and PDF exports of the final standings, winner podium, and matches logs.
+
+---
+
+## 📁 Project Structure
 
 ```
 FightingTournament/
 ├── Models/
-│   ├── Player.cs          — stats accumulation
-│   ├── Match.cs           — single bout
-│   ├── Cycle.cs           — round of matches
-│   └── Tournament.cs      — top-level container
+│   ├── Player.cs           — Stats accumulation
+│   ├── Match.cs            — Single bout representation
+│   ├── Cycle.cs            — Round of matches
+│   ├── Tournament.cs       — Top-level tournament state
+│   └── GameDatabase.cs     — PRESET game rosters (Tekken 8, SF6, GGST, MK1, Smash) [NEW]
 ├── Services/
-│   └── TournamentEngine.cs — schedule builder + cycle commit
+│   └── TournamentEngine.cs — Schedule builder + cycle commit logic
 ├── ViewModels/
 │   ├── BaseViewModel.cs
 │   ├── RelayCommand.cs
-│   ├── MainViewModel.cs       — navigation root
-│   ├── SetupViewModel.cs      — setup screen logic
-│   ├── TournamentViewModel.cs — main game screen logic
-│   ├── MatchRowViewModel.cs   — one match row (characters + winner)
-│   ├── PlayerStatsViewModel.cs
-│   ├── CycleInfoViewModel.cs  — left-panel schedule item
-│   └── PlayerNameEntry.cs
+│   ├── MainViewModel.cs        — Navigation root
+│   ├── SetupViewModel.cs       — Setup screen logic & game choice selection
+│   ├── TournamentViewModel.cs  — Main tournament screen logic
+│   ├── MatchRowViewModel.cs    — One match row (dynamic character lists + winner)
+│   ├── PlayerStatsViewModel.cs — Leaderboard rows
+│   ├── CycleInfoViewModel.cs   — Left-panel schedule item
+│   └── PlayerNameEntry.cs      — Setup list entry
 ├── Views/
-│   ├── SetupView.xaml         — player count + names
-│   └── TournamentView.xaml    — schedule | matches | standings
+│   ├── SetupView.xaml          — Player count & select game input screen
+│   └── TournamentView.xaml     — Schedule | matches | standings main dashboard
 ├── Converters/
 │   ├── BoolToVisibilityConverter.cs
 │   └── StringToVisibilityConverter.cs
-├── App.xaml                   — global styles + DataTemplates
-└── MainWindow.xaml            — thin shell ContentControl
+├── App.xaml                    — Premium dark UI styles, custom templates & DataTemplates
+└── MainWindow.xaml             — Main window container with shell ContentControl
 ```
 
 ---
 
-## Build & run
+## 🚀 Build & Run
 
+### Prerequisites
+* Windows OS
+* [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
+
+### Run from Command Line
 ```bash
-# Requires .NET 8 SDK + Windows
+# Clone the repository and navigate to root
 cd FightingTournament
+
+# Build and run the project
 dotnet run
 ```
 
-Or open `FightingTournament.sln` (once created) in Visual Studio 2022+.
+Alternatively, open `FightingTournament.sln` inside Visual Studio 2022+ or JetBrains Rider for full IDE support.
 
 ---
 
-## Schedule algorithm
+## 🧮 Circle Algorithm (Round-Robin)
 
-Uses the **circle (polygon) method** for round-robin:
+The round-robin pairings are generated using the **circle (polygon) rotation method**:
+* `N` players → `N - 1` cycles (if `N` is even) or `N` cycles with one player receiving a `BYE` per round (if `N` is odd).
+* Each cycle contains `⌊N / 2⌋` active matchups.
+* One player remains fixed at position 0, while all other players rotate clockwise each round to guarantee unique pairings.
+* `BYE` matches are automatically skipped and pruned from the visual schedule dashboard.
 
-- `N` players → `N−1` cycles (N even) or `N` cycles with one BYE per round (N odd)  
-- Each cycle has `⌊N/2⌋` real matches  
-- One player is fixed (index 0); the rest rotate clockwise each round  
-- BYE pairings are silently skipped from the UI
+---
 
-
-#### This project is developed with the assistance of Claude Sonnet 4.6 (Anthropic).
+#### Developed in collaboration with Antigravity AI (Google DeepMind).
