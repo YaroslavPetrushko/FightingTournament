@@ -46,13 +46,15 @@
                                     Converter={StaticResource StrVis}}"/>
         </StackPanel>
 
-        <!-- ── Row 1: Side-by-Side Cards ── -->
+        <!-- ── Row 1: Dashboard Panels ── -->
         <Grid Grid.Row="1" VerticalAlignment="Center" Margin="0,10,0,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="400"/> <!-- Left: Create -->
-                <ColumnDefinition Width="40"/>  <!-- Gap -->
-                <ColumnDefinition Width="400"/> <!-- Right: Resume -->
+                <ColumnDefinition Width="30"/>  <!-- Gap 1 -->
+                <ColumnDefinition Width="320"/> <!-- Center: Resume -->
+                <ColumnDefinition Width="30"/>  <!-- Gap 2 -->
+                <ColumnDefinition Width="260"/> <!-- Right: Registered Players -->
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
@@ -162,13 +164,13 @@
                 </StackPanel>
             </Border>
 
-            <!-- ── RIGHT CARD: Resume Saved Session ── -->
+            <!-- ── CENTER CARD: Resume Saved Session ── -->
             <Border Grid.Column="3"
                     Background="{StaticResource BrushSurface}"
                     BorderBrush="{StaticResource BrushBorder}"
                     BorderThickness="1"
                     CornerRadius="6"
-                    Padding="28,24"
+                    Padding="24,24"
                     VerticalAlignment="Center">
                 <StackPanel>
                     <TextBlock Text="RESUME SAVED SESSION"
@@ -201,6 +203,92 @@
                             FontSize="11"
                             Padding="0,9"
                             Command="{Binding DeleteSessionCommand}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- ── RIGHT SIDEBAR: Registered Players ── -->
+            <Border Grid.Column="5"
+                    Background="{StaticResource BrushSurface}"
+                    BorderBrush="{StaticResource BrushBorder}"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="20,24"
+                    VerticalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Text="REGISTERED PLAYERS"
+                               FontSize="11"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource BrushAccent}"
+                               Margin="0,0,0,4"
+                               HorizontalAlignment="Center"/>
+
+                    <TextBlock Text="CLICK TO QUICK-ADD TO SETUP"
+                               FontSize="9"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource BrushTextDim}"
+                               Margin="0,0,0,16"
+                               HorizontalAlignment="Center"/>
+
+                    <!-- Scrollable List of players -->
+                    <ScrollViewer MaxHeight="245"
+                                  VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled"
+                                  Margin="0,0,0,0">
+                        <ItemsControl ItemsSource="{Binding RegisteredUsers}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Command="{Binding DataContext.AddPlayerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"
+                                            Margin="0,0,0,6"
+                                            Padding="10,8"
+                                            HorizontalContentAlignment="Left"
+                                            Cursor="Hand">
+                                        <Button.Template>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="BtnBorder"
+                                                        Background="{StaticResource BrushSurface2}"
+                                                        BorderBrush="{StaticResource BrushBorder}"
+                                                        BorderThickness="1"
+                                                        CornerRadius="4"
+                                                        Padding="{TemplateBinding Padding}">
+                                                    <TextBlock Text="{Binding}"
+                                                               FontSize="12"
+                                                               FontWeight="Medium"
+                                                               Foreground="{StaticResource BrushText}"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="BtnBorder" Property="Background" Value="{StaticResource BrushSurface3}"/>
+                                                        <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource BrushAccent}"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <!-- Placeholder text when empty using standard WPF logic -->
+                    <TextBlock Text="No players registered yet. They will appear here after starting your first tournament."
+                               FontSize="11"
+                               Foreground="{StaticResource BrushTextDim}"
+                               TextWrapping="Wrap"
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"
+                               Margin="0,15,0,5">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding RegisteredUsers.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
                 </StackPanel>
             </Border>
         </Grid>

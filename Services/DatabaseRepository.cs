@@ -53,6 +53,15 @@ public static class DatabaseRepository
             var playerIds = new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
             foreach (var player in tournament.Players)
             {
+                // Register in global Users directory (ignore duplicate inserts)
+                using (var insertGlobalUserCmd = connection.CreateCommand())
+                {
+                    insertGlobalUserCmd.Transaction = transaction;
+                    insertGlobalUserCmd.CommandText = "INSERT OR IGNORE INTO Users (Nickname) VALUES (@Nickname);";
+                    insertGlobalUserCmd.Parameters.AddWithValue("@Nickname", player.Name);
+                    insertGlobalUserCmd.ExecuteNonQuery();
+                }
+
                 long playerId;
                 using (var insertPlayerCmd = connection.CreateCommand())
                 {
@@ -135,6 +144,27 @@ public static class DatabaseRepository
             transaction.Rollback();
             throw;
         }
+    }
+
+    /// <summary>
+    /// Gets all unique registered player nicknames in alphabetical order.
+    /// </summary>
+    public static List<string> GetRegisteredUsers()
+    {
+        var list = new List<string>();
+        using var connection = DatabaseConnector.Instance.GetConnection();
+        connection.Open();
+
+        using var command = connection.CreateCommand();
+        command.CommandText = "SELECT Nickname FROM Users ORDER BY Nickname";
+
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            list.Add(reader.GetString(0));
+        }
+
+        return list;
     }
 
     /// <summary>

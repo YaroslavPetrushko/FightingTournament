@@ -41,6 +41,10 @@ public class SetupViewModel : BaseViewModel
         set => Set(ref _selectedSavedSession, value);
     }
 
+    // ── Registered players ───────────────────────────────────────────
+
+    public ObservableCollection<string> RegisteredUsers { get; } = new();
+
     // ── Player count ─────────────────────────────────────────────────
 
     private int _playerCount = 4;
@@ -73,6 +77,7 @@ public class SetupViewModel : BaseViewModel
     public ICommand StartCommand         { get; }
     public ICommand ResumeCommand        { get; }
     public ICommand DeleteSessionCommand { get; }
+    public ICommand AddPlayerCommand     { get; }
 
     public SetupViewModel()
     {
@@ -81,9 +86,17 @@ public class SetupViewModel : BaseViewModel
         StartCommand         = new RelayCommand(StartTournament);
         ResumeCommand        = new RelayCommand(ResumeTournament);
         DeleteSessionCommand = new RelayCommand(DeleteSession);
+        AddPlayerCommand     = new RelayCommand(p =>
+        {
+            if (p is string nickname)
+            {
+                AddPlayer(nickname);
+            }
+        });
 
         SyncPlayerEntries();
         RefreshSavedSessions();
+        RefreshRegisteredUsers();
     }
 
     // ── Helpers ──────────────────────────────────────────────────────
@@ -157,6 +170,64 @@ public class SetupViewModel : BaseViewModel
         catch (Exception ex)
         {
             ValidationMessage = $"⚠  Could not query saved sessions: {ex.Message}";
+        }
+    }
+
+    public void RefreshRegisteredUsers()
+    {
+        RegisteredUsers.Clear();
+        try
+        {
+            var list = DatabaseRepository.GetRegisteredUsers();
+            foreach (var u in list)
+            {
+                RegisteredUsers.Add(u);
+            }
+        }
+        catch (Exception ex)
+        {
+            ValidationMessage = $"⚠  Could not query registered players: {ex.Message}";
+        }
+    }
+
+    private bool IsDefaultOrEmpty(string name)
+    {
+        name = name.Trim();
+        if (string.IsNullOrWhiteSpace(name))
+            return true;
+
+        if (name.StartsWith("Player ", StringComparison.OrdinalIgnoreCase))
+        {
+            string suffix = name.Substring(7);
+            if (int.TryParse(suffix, out _))
+                return true;
+        }
+        return false;
+    }
+
+    private void AddPlayer(string nickname)
+    {
+        if (string.IsNullOrWhiteSpace(nickname)) return;
+
+        bool alreadyExists = PlayerEntries.Any(e => string.Equals(e.Name.Trim(), nickname.Trim(), StringComparison.OrdinalIgnoreCase));
+        if (alreadyExists) return;
+
+        var firstDefaultEntry = PlayerEntries.FirstOrDefault(e => IsDefaultOrEmpty(e.Name));
+        if (firstDefaultEntry != null)
+        {
+            firstDefaultEntry.Name = nickname.Trim();
+        }
+        else
+        {
+            if (PlayerCount < 16)
+            {
+                PlayerCount++;
+                var newEntry = PlayerEntries.LastOrDefault();
+                if (newEntry != null)
+                {
+                    newEntry.Name = nickname.Trim();
+                }
+            }
         }
     }
 

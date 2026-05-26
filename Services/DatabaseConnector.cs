@@ -42,6 +42,12 @@ public class DatabaseConnector
         using var transaction = connection.BeginTransaction();
         try
         {
+            // 0. Users table (global player catalog)
+            string createUsers = @"
+                CREATE TABLE IF NOT EXISTS Users (
+                    Nickname TEXT PRIMARY KEY
+                );";
+
             // 1. Tournaments table
             string createTournaments = @"
                 CREATE TABLE IF NOT EXISTS Tournaments (
@@ -99,6 +105,7 @@ public class DatabaseConnector
                     FOREIGN KEY(Player2Id) REFERENCES Players(Id) ON DELETE CASCADE
                 );";
 
+            ExecuteNonQuery(createUsers, connection, transaction);
             ExecuteNonQuery(createTournaments, connection, transaction);
             ExecuteNonQuery(createPlayers, connection, transaction);
             ExecuteNonQuery(createCharacterPicks, connection, transaction);
