@@ -30,6 +30,18 @@ public class TournamentViewModel : BaseViewModel
 
     public bool ShowBracketToggleVisible => _tournament.Mode == TournamentMode.Championship;
 
+    public bool IsFinished => _tournament.IsFinished;
+
+    public string WinnerName
+    {
+        get
+        {
+            if (!_tournament.IsFinished) return string.Empty;
+            var winner = _tournament.Players.FirstOrDefault(p => !p.IsEliminated && !p.Name.Equals("BYE", StringComparison.OrdinalIgnoreCase));
+            return winner?.Name ?? string.Empty;
+        }
+    }
+
     // ── Selected Cycle tracking ──────────────────────────────────────
 
     private int _selectedCycleIndex = 0;
@@ -42,6 +54,8 @@ public class TournamentViewModel : BaseViewModel
             {
                 OnPropertyChanged(nameof(CycleHeader));
                 OnPropertyChanged(nameof(SaveButtonText));
+                OnPropertyChanged(nameof(IsFinished));
+                OnPropertyChanged(nameof(WinnerName));
                 RefreshScheduleSidebar();
                 LoadCurrentCycleMatches();
             }
@@ -305,6 +319,8 @@ public class TournamentViewModel : BaseViewModel
             StatusMessage = $"⚠  Cycle {savedNumber} saved locally, but database save failed: {ex.Message}";
         }
         OnPropertyChanged(nameof(CycleHeader));
+        OnPropertyChanged(nameof(IsFinished));
+        OnPropertyChanged(nameof(WinnerName));
     }
 
     private void SelectCycle(CycleInfoViewModel cycleVm)

@@ -300,7 +300,7 @@
 
                     <!-- MATCHES VIEW (Visible when ShowBracket is false) -->
                     <Grid Visibility="{Binding ShowBracket, Converter={StaticResource InvBoolVis}}">
-                        <DockPanel>
+                        <DockPanel Visibility="{Binding IsFinished, Converter={StaticResource InvBoolVis}}">
                             <!-- Column headers -->
                             <Grid DockPanel.Dock="Top" Margin="0,0,0,6">
                                 <Grid.ColumnDefinitions>
@@ -422,6 +422,45 @@
                                 </ItemsControl>
                             </ScrollViewer>
                         </DockPanel>
+
+                        <!-- Winner Celebration Card (Visible when tournament is finished) -->
+                        <Border Visibility="{Binding IsFinished, Converter={StaticResource BoolVis}}"
+                                Background="{StaticResource BrushSurface}"
+                                BorderBrush="{StaticResource BrushAccent}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="40,30"
+                                Margin="0,20,0,0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                MaxWidth="500">
+                            <StackPanel HorizontalAlignment="Center">
+                                <TextBlock Text="👑"
+                                           FontSize="50"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,0,0,15"/>
+                                <TextBlock Text="THE CHAMPION HAS BEEN CROWNED!"
+                                           FontSize="18"
+                                           FontWeight="ExtraBold"
+                                           Foreground="{StaticResource BrushAccent}"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,0,0,10"
+                                           TextAlignment="Center"/>
+                                <TextBlock Text="{Binding WinnerName, StringFormat='Congratulations, {0}! 🏆'}"
+                                           FontSize="15"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource BrushText}"
+                                           HorizontalAlignment="Center"
+                                           Margin="0,0,0,15"
+                                           TextAlignment="Center"/>
+                                <TextBlock Text="You have conquered the tournament bracket and claimed ultimate victory!"
+                                           FontSize="11"
+                                           Foreground="{StaticResource BrushTextDim}"
+                                           HorizontalAlignment="Center"
+                                           TextAlignment="Center"
+                                           TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
                     </Grid>
 
                     <!-- BRACKET VIEW (Visible when ShowBracket is true) -->
