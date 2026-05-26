@@ -5,7 +5,7 @@ Built with **.NET 8 + WPF**, using pure MVVM architecture and high-fidelity cust
 
 ---
 
-## 🚀 Features (v1.3 — current state)
+## 🚀 Features (v2.0 — current state)
 
 | Feature                                          | Description                                                                                                   | Status |
 |--------------------------------------------------|---------------------------------------------------------------------------------------------------------------|:------:|
@@ -19,16 +19,15 @@ Built with **.NET 8 + WPF**, using pure MVVM architecture and high-fidelity cust
 | **Per-match Scoring & Winner Selection**         | Tap "WIN" pills to instantly allocate scores and update rankings.                                             |   ✅    |
 | **Live Standings & Re-sorting**                  | Live leaderboard tracking W/L records, win rate percentage, and most picked character.                        |   ✅    |
 | **Mid-cycle Player Elimination**                 | Eject players mid-tournament while preserving completed matches and pruning unplayed matchups.                |   ✅    |
+| **SQLite Session Persistence**                   | Automatically persists matches, character picks, standings, and cycles to a local SQLite database file.       |   ✅    |
+| **Session Resume & Deletion**                    | Seamless dashboard to select a saved session, resume it, or delete it with a safety confirmation dialog.      |   ✅    |
+| **Global Player Directory**                      | Maintains unique player nicknames globally across tournaments to track overall player participation.         |   ✅    |
+| **Quick-Add Registered Players**                 | Click-to-add sidebar in setup: autofills generic slots or expands the roster automatically up to 16 players. |   ✅    |
+| **Edit Completed Cycles**                        | Select completed cycles in history panel to reload results for live correction; standings updates instantly.  |   ✅    |
 
 ---
 
 ## 🗺️ Planned Milestones
-
-### 📅 Milestone 2: Database & Session Persistence
-- **SQLite DB Connection:** Migrate from in-memory to local SQLite database to persist:
-  - Full tournament histories, past matches, and detailed cycle scores.
-  - Global player profiles accumulating stats (overall wins, win rates, historical character picks) over multiple tournaments.
-- **Session Save & Resume:** Auto-saves the current tournament state so users can resume an active cycle after closing the app.
 
 ### 🎨 Milestone 3: Update UI/UX & Custom Title Bar
 - **Frameless Custom Window:** Replace the standard Windows title bar with a gorgeous custom title bar matching the `#0D0D15` theme.
@@ -56,9 +55,11 @@ FightingTournament/
 │   ├── Match.cs            — Single bout representation
 │   ├── Cycle.cs            — Round of matches
 │   ├── Tournament.cs       — Top-level tournament state
-│   └── GameDatabase.cs     — PRESET game rosters (Tekken 8, SF6, GGST, MK1, Smash) [NEW]
+│   └── GameDatabase.cs     — PRESET game rosters (Tekken 8, SF6, GGST, MK1, Smash)
 ├── Services/
-│   └── TournamentEngine.cs — Schedule builder + cycle commit logic
+│   ├── DatabaseConnector.cs  — Singleton connector to SQLite database [NEW]
+│   ├── DatabaseRepository.cs — Session state loading, saving, and player indexing [NEW]
+│   └── TournamentEngine.cs   — Schedule builder + cycle commit logic
 ├── ViewModels/
 │   ├── BaseViewModel.cs
 │   ├── RelayCommand.cs
