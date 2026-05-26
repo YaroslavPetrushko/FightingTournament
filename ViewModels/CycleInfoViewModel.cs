@@ -11,7 +11,8 @@ public class CycleInfoViewModel : BaseViewModel
     public string Matchups => string.Join("\n",
         _cycle.Matches.Select(m => $"{m.Player1.Name}  vs  {m.Player2.Name}"));
 
-    // ── Status ───────────────────────────────────────────────────────
+    public string MatchCount =>
+        $"{_cycle.Matches.Count} match{(_cycle.Matches.Count == 1 ? "" : "es")}";
 
     private bool _isCurrent;
     public bool IsCurrent
@@ -34,8 +35,8 @@ public class CycleInfoViewModel : BaseViewModel
 
     public CycleInfoViewModel(Cycle cycle, bool isCurrent, bool isCompleted)
     {
-        _cycle      = cycle;
-        _isCurrent  = isCurrent;
+        _cycle       = cycle;
+        _isCurrent   = isCurrent;
         _isCompleted = isCompleted;
     }
 
@@ -44,5 +45,7 @@ public class CycleInfoViewModel : BaseViewModel
         IsCurrent   = isCurrent;
         IsCompleted = isCompleted;
         OnPropertyChanged(nameof(StatusGlyph));
+        OnPropertyChanged(nameof(Matchups));
+        OnPropertyChanged(nameof(MatchCount));
     }
 }

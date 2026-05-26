@@ -1,4 +1,4 @@
-﻿using FightingTournament.Models;
+using FightingTournament.Models;
 using System;
 using System.Collections.ObjectModel;
 

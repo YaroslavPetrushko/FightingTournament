@@ -12,5 +12,7 @@ public class Tournament
     public Cycle? CurrentCycle =>
         CurrentCycleIndex < Cycles.Count ? Cycles[CurrentCycleIndex] : null;
 
-    public bool IsFinished => CurrentCycleIndex >= Cycles.Count;
+    // Tournament never auto-finishes — user stops manually.
+    // IsFinished is kept for "0 active players" edge case only.
+    public bool IsFinished => Cycles.Count == 0;
 }
