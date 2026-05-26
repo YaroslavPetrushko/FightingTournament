@@ -47,6 +47,16 @@
                     Padding="32,28">
                 <StackPanel>
 
+                    <!-- Session Name row -->
+                    <TextBlock Text="SESSION NAME"
+                               FontSize="10"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource BrushTextDim}"
+                               Margin="0,0,0,10"/>
+
+                    <TextBox Text="{Binding SessionName, UpdateSourceTrigger=PropertyChanged}"
+                             Margin="0,0,0,24"/>
+
                     <!-- Game selection row -->
                     <TextBlock Text="SELECT GAME"
                                FontSize="10"

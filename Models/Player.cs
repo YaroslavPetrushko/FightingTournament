@@ -20,6 +20,8 @@ public class Player
     private readonly Dictionary<string, int> _charPicks =
         new(StringComparer.OrdinalIgnoreCase);
 
+    public IReadOnlyDictionary<string, int> CharacterPicks => _charPicks;
+
     public string MostPickedCharacter =>
         _charPicks.Count == 0
             ? "—"

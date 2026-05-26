@@ -56,6 +56,15 @@ public class TournamentViewModel : BaseViewModel
         BuildStandings();
         RefreshScheduleSidebar();
         LoadCurrentCycleMatches();
+
+        try
+        {
+            DatabaseRepository.SaveTournamentState(_tournament);
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"⚠  Could not save tournament to database: {ex.Message}";
+        }
     }
 
     // ── Build helpers ─────────────────────────────────────────────────
@@ -126,7 +135,15 @@ public class TournamentViewModel : BaseViewModel
         RefreshScheduleSidebar();
         LoadCurrentCycleMatches();
 
-        StatusMessage = $"✓  Cycle {savedNumber} saved.  Starting Cycle {savedNumber + 1}…";
+        try
+        {
+            DatabaseRepository.SaveTournamentState(_tournament);
+            StatusMessage = $"✓  Cycle {savedNumber} saved to database. Starting Cycle {savedNumber + 1}…";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"⚠  Cycle {savedNumber} saved locally, but database save failed: {ex.Message}";
+        }
         OnPropertyChanged(nameof(CycleHeader));
     }
 
@@ -159,8 +176,15 @@ public class TournamentViewModel : BaseViewModel
         var statsVm = Standings.FirstOrDefault(s => s.PlayerModel == player);
         if (statsVm is not null) statsVm.IsEliminated = true;
 
-        StatusMessage = $"✗  {player.Name} eliminated. " +
-                        $"{ActiveCount()} players remaining.";
+        try
+        {
+            DatabaseRepository.SaveTournamentState(_tournament);
+            StatusMessage = $"✗  {player.Name} eliminated and database updated. {ActiveCount()} players remaining.";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"✗  {player.Name} eliminated locally, but database update failed: {ex.Message}";
+        }
         OnPropertyChanged(nameof(CycleHeader));
     }
 }

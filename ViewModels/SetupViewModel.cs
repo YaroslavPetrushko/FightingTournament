@@ -23,6 +23,13 @@ public class SetupViewModel : BaseViewModel
         set => Set(ref _selectedGame, value);
     }
 
+    private string _sessionName = DateTime.Now.ToString("dd.MM.yyyy");
+    public string SessionName
+    {
+        get => _sessionName;
+        set => Set(ref _sessionName, value);
+    }
+
     // ── Player count ─────────────────────────────────────────────────
 
     private int _playerCount = 4;
@@ -99,8 +106,16 @@ public class SetupViewModel : BaseViewModel
             return;
         }
 
+        string session = SessionName.Trim();
+        if (string.IsNullOrWhiteSpace(session))
+        {
+            ValidationMessage = "⚠  Session name cannot be empty.";
+            return;
+        }
+
         var tournament = TournamentEngine.Create(names);
         tournament.SelectedGame = SelectedGame;
+        tournament.SessionName = session;
         TournamentStarted?.Invoke(tournament);
     }
 }
