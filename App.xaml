@@ -149,6 +149,41 @@
             <Setter Property="FontSize" Value="18"/>
         </Style>
 
+        <!-- tiny eliminate × -->
+        <Style x:Key="BtnElim" TargetType="Button" BasedOn="{StaticResource BtnPrimary}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{StaticResource BrushTextDim}"/>
+            <Setter Property="Width"      Value="20"/>
+            <Setter Property="Height"     Value="20"/>
+            <Setter Property="Padding"    Value="0"/>
+            <Setter Property="FontSize"   Value="11"/>
+            <Setter Property="ToolTip"    Value="Eliminate player"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Root" Background="Transparent"
+                                CornerRadius="2" Padding="0">
+                            <TextBlock x:Name="Lbl" Text="✕"
+                                       FontSize="11"
+                                       Foreground="{StaticResource BrushTextDim}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Lbl" Property="Foreground"
+                                        Value="{StaticResource BrushLoss}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Lbl" Property="Foreground"
+                                        Value="{StaticResource BrushSurface3}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <!-- ═══════════════════════════════════════════════════════════
              TEXTBOX
         ═════════════════════════════════════════════════════════════ -->
@@ -172,15 +207,161 @@
         <!-- ═══════════════════════════════════════════════════════════
              COMBOBOX
         ═════════════════════════════════════════════════════════════ -->
+        <!-- Item inside the drop-down popup -->
+        <Style x:Key="ComboItemStyle" TargetType="ComboBoxItem">
+            <Setter Property="Background"  Value="{StaticResource BrushSurface2}"/>
+            <Setter Property="Foreground"  Value="{StaticResource BrushText}"/>
+            <Setter Property="Padding"     Value="10,6"/>
+            <Setter Property="FontFamily"  Value="Segoe UI"/>
+            <Setter Property="FontSize"    Value="12"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="Bg"
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="Bg" Property="Background"
+                                        Value="{StaticResource BrushSurface3}"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bg" Property="Background"
+                                        Value="{StaticResource BrushAccentDim}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ToggleButton inside ComboBox template -->
+        <Style x:Key="ComboBoxToggleButton" TargetType="ToggleButton">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="Border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="3">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="22"/>
+                                </Grid.ColumnDefinitions>
+                                <!-- Arrow -->
+                                <Border Grid.Column="1" Background="Transparent" VerticalAlignment="Stretch">
+                                    <TextBlock Text="▾"
+                                               FontSize="10"
+                                               Foreground="{StaticResource BrushTextDim}"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Border>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource BrushAccentHover}"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource BrushAccent}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style TargetType="ComboBox">
-            <Setter Property="Background"      Value="{StaticResource BrushSurface2}"/>
-            <Setter Property="Foreground"      Value="{StaticResource BrushText}"/>
-            <Setter Property="BorderBrush"     Value="{StaticResource BrushBorder}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding"         Value="6,4"/>
-            <Setter Property="FontFamily"      Value="Segoe UI"/>
-            <Setter Property="FontSize"        Value="12"/>
-            <Setter Property="Height"          Value="30"/>
+            <Setter Property="Background"         Value="{StaticResource BrushSurface2}"/>
+            <Setter Property="Foreground"         Value="{StaticResource BrushText}"/>
+            <Setter Property="BorderBrush"        Value="{StaticResource BrushBorder}"/>
+            <Setter Property="BorderThickness"    Value="1"/>
+            <Setter Property="FontFamily"         Value="Segoe UI"/>
+            <Setter Property="FontSize"           Value="12"/>
+            <Setter Property="Height"             Value="30"/>
+            <Setter Property="ItemContainerStyle" Value="{StaticResource ComboItemStyle}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <!-- The ToggleButton background -->
+                            <ToggleButton x:Name="ToggleButton"
+                                          Style="{StaticResource ComboBoxToggleButton}"
+                                          Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                          BorderThickness="{TemplateBinding BorderThickness}"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          Focusable="False"
+                                          ClickMode="Press"/>
+
+                            <!-- Main content area -->
+                            <Grid Margin="1,1,23,1">
+                                <!-- Editable TextBox -->
+                                <TextBox x:Name="PART_EditableTextBox"
+                                         VerticalAlignment="Center"
+                                         Background="Transparent"
+                                         Foreground="{StaticResource BrushText}"
+                                         BorderThickness="0"
+                                         Padding="6,0,0,0"
+                                         CaretBrush="{StaticResource BrushAccent}"
+                                         SelectionBrush="{StaticResource BrushAccentDim}"
+                                         FontFamily="Segoe UI"
+                                         FontSize="12"
+                                         IsReadOnly="{TemplateBinding IsReadOnly}"
+                                         Visibility="Collapsed"/>
+
+                                <!-- Read-only content site -->
+                                <ContentPresenter x:Name="ContentSite"
+                                                  Margin="8,0,0,0"
+                                                  VerticalAlignment="Center"
+                                                  Content="{TemplateBinding SelectionBoxItem}"
+                                                  ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                  ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
+                                                  IsHitTestVisible="False"/>
+                            </Grid>
+
+                            <!-- Popup -->
+                            <Popup x:Name="PART_Popup"
+                                   Placement="Bottom"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   AllowsTransparency="True"
+                                   Focusable="False"
+                                   PopupAnimation="Slide">
+                                <Border Background="{StaticResource BrushSurface2}"
+                                        BorderBrush="{StaticResource BrushBorderLight}"
+                                        BorderThickness="1"
+                                        CornerRadius="3"
+                                        MinWidth="{TemplateBinding ActualWidth}"
+                                        MaxHeight="220"
+                                        SnapsToDevicePixels="True">
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                        <StackPanel IsItemsHost="True"
+                                                    KeyboardNavigation.DirectionalNavigation="Contained"/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <!-- Switch to editable mode -->
+                            <Trigger Property="IsEditable" Value="True">
+                                <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="ContentSite"          Property="Visibility" Value="Collapsed"/>
+                                <Setter Property="IsTabStop" Value="False"/>
+                            </Trigger>
+                            <!-- Focus ring -->
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="ToggleButton" Property="BorderBrush"
+                                        Value="{StaticResource BrushAccent}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <!-- ═══════════════════════════════════════════════════════════
