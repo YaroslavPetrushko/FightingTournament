@@ -24,6 +24,7 @@
         <SolidColorBrush x:Key="BrushLoss"        Color="#FF4444"/>
         <SolidColorBrush x:Key="BrushCurrent"     Color="#FF9800"/>
         <SolidColorBrush x:Key="BrushCurrentDim"  Color="#7A4800"/>
+        <SolidColorBrush x:Key="BrushElim"        Color="#26161B"/>
 
         <!-- ═══════════════════════════════════════════════════════════
              TYPOGRAPHY
@@ -388,36 +389,9 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
-                                <Trigger.EnterActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <ColorAnimation Storyboard.TargetName="Pill"
-                                                            Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
-                                                            To="#E8003D" Duration="0:0:0.18"/>
-                                            <ColorAnimation Storyboard.TargetName="Pill"
-                                                            Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
-                                                            To="#E8003D" Duration="0:0:0.18"/>
-                                            <ColorAnimation Storyboard.TargetName="Label"
-                                                            Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
-                                                            To="#FFFFFF" Duration="0:0:0.18"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </Trigger.EnterActions>
-                                <Trigger.ExitActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <ColorAnimation Storyboard.TargetName="Pill"
-                                                            Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
-                                                            To="#00000000" Duration="0:0:0.18"/>
-                                            <ColorAnimation Storyboard.TargetName="Pill"
-                                                            Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
-                                                            To="#3A3A52" Duration="0:0:0.18"/>
-                                            <ColorAnimation Storyboard.TargetName="Label"
-                                                            Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
-                                                            To="#7070A0" Duration="0:0:0.18"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </Trigger.ExitActions>
+                                <Setter TargetName="Pill" Property="Background" Value="{StaticResource BrushAccent}"/>
+                                <Setter TargetName="Pill" Property="BorderBrush" Value="{StaticResource BrushAccent}"/>
+                                <Setter TargetName="Label" Property="Foreground" Value="White"/>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Pill"  Property="BorderBrush"

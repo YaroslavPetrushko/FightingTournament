@@ -196,6 +196,12 @@ public class TournamentViewModel : BaseViewModel
             var cycle = _tournament.Cycles[SelectedCycleIndex];
             foreach (var m in cycle.Matches)
             {
+                // Skip matches where either player is a virtual BYE player
+                if (m.Player1.Name.Equals("BYE", StringComparison.OrdinalIgnoreCase) ||
+                    m.Player2.Name.Equals("BYE", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
                 CurrentMatches.Add(new MatchRowViewModel(m, _tournament.SelectedGame));
             }
         }

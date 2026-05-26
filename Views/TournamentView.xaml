@@ -39,6 +39,7 @@
         <conv:BoolToVisibilityConverter x:Key="BoolVis"/>
         <conv:BoolToVisibilityConverter x:Key="InvBoolVis" Invert="True"/>
         <conv:StringToVisibilityConverter x:Key="StrVis"/>
+        <conv:InverseBooleanConverter x:Key="InvBool"/>
 
         <!-- ── Column header label style ── -->
         <Style x:Key="ColHeader" TargetType="TextBlock">
@@ -290,7 +291,7 @@
                         <RadioButton Content="MATCH LIST" 
                                      Style="{StaticResource RadioToggleLeftBtn}"
                                      GroupName="ViewToggle"
-                                     IsChecked="{Binding ShowBracket, Converter={StaticResource InvBoolVis}, Mode=TwoWay}"/>
+                                     IsChecked="{Binding ShowBracket, Converter={StaticResource InvBool}, Mode=TwoWay}"/>
                         <RadioButton Content="BRACKET VIEW" 
                                      Style="{StaticResource RadioToggleRightBtn}"
                                      GroupName="ViewToggle"
