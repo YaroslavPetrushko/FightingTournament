@@ -4,7 +4,7 @@
              xmlns:vm="clr-namespace:FightingTournament.ViewModels"
              xmlns:conv="clr-namespace:FightingTournament.Converters"
              xmlns:models="clr-namespace:FightingTournament.Models"
-             Background="{StaticResource BrushBg}">
+             Background="Transparent">
 
     <UserControl.RenderTransform>
         <TranslateTransform Y="20"/>
@@ -491,7 +491,7 @@
 
                             <!-- Horizontal stack of rounds/cycles inside export border inside scroll viewer -->
                             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                                <Border x:Name="BracketExportContainer" Background="{StaticResource BrushBg}" Padding="20,25,20,25">
+                                <Border x:Name="BracketExportContainer" Background="{StaticResource BrushBg}" Padding="20,25,20,25" HorizontalAlignment="Left" VerticalAlignment="Top">
                                     <StackPanel>
                                         <TextBlock Text="TOURNAMENT BRACKET" 
                                                    FontSize="15" 
@@ -698,7 +698,7 @@
 
                     <!-- Player rows ScrollViewer wrapping isolated Export Container -->
                     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                        <Border x:Name="StandingsExportContainer" Background="{StaticResource BrushSurface}" Padding="10,15,10,15">
+                        <Border x:Name="StandingsExportContainer" Background="{StaticResource BrushSurface}" Padding="10,15,10,15" VerticalAlignment="Top">
                             <StackPanel>
                                 <TextBlock Text="TOURNAMENT LEADERBOARD"
                                            FontSize="13"

@@ -4,22 +4,23 @@
         Title="About Tracker"
         Height="400" Width="500"
         WindowStartupLocation="CenterOwner"
-        Background="{StaticResource BrushBg}"
+        Background="Transparent"
+        AllowsTransparency="True"
         Foreground="{StaticResource BrushText}"
         ResizeMode="NoResize"
         WindowStyle="None">
 
-    <Window.Style>
-        <Style TargetType="Window">
-            <Setter Property="BorderBrush" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Style.Triggers>
-                <Trigger Property="IsActive" Value="True">
-                    <Setter Property="BorderBrush" Value="{StaticResource BrushAccent}"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-    </Window.Style>
+    <Border CornerRadius="8" BorderThickness="1" Background="{StaticResource BrushBg}">
+        <Border.Style>
+            <Style TargetType="Border">
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsActive, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                        <Setter Property="BorderBrush" Value="{StaticResource BrushAccentDim}"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -75,4 +76,5 @@
                 HorizontalAlignment="Center"
                 Click="CloseButton_Click"/>
     </Grid>
+    </Border>
 </Window>

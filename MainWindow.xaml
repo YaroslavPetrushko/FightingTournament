@@ -4,9 +4,10 @@
         xmlns:vm="clr-namespace:FightingTournament.ViewModels"
         Title="Fighting Tournament Tracker"
         Height="800" Width="1280"
-        MinHeight="600" MinWidth="900"
+        MinHeight="600" MinWidth="1200"
         WindowStartupLocation="CenterScreen"
-        Background="{StaticResource BrushBg}"
+        Background="Transparent"
+        AllowsTransparency="True"
         Foreground="{StaticResource BrushText}"
         WindowStyle="None">
 
@@ -103,19 +104,24 @@
         <vm:MainViewModel/>
     </Window.DataContext>
 
-    <!-- Outer Border to provide Active/Inactive Crimson Accent Line -->
-    <Border BorderThickness="1">
+    <!-- Outer Border to provide Active/Inactive Crimson Accent Line & Rounded Corners -->
+    <Border BorderThickness="1" Background="{StaticResource BrushBg}">
         <Border.Style>
             <Style TargetType="Border">
                 <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="CornerRadius" Value="8"/>
+                <Setter Property="Padding" Value="2"/>
                 <Style.Triggers>
-                    <!-- Thin red outline when window is active -->
+                    <!-- Thin red outline when window is active (dimmed subtle crimson) -->
                     <DataTrigger Binding="{Binding IsActive, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
-                        <Setter Property="BorderBrush" Value="{StaticResource BrushAccent}"/>
+                        <Setter Property="BorderBrush" Value="{StaticResource BrushAccentDim}"/>
                     </DataTrigger>
-                    <!-- No border outline when window is maximized to avoid screen clipping -->
+                    
+                    <!-- Hide outline and corner radius when window is maximized to avoid screen clipping -->
                     <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
                         <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="CornerRadius" Value="0"/>
+                        <Setter Property="Padding" Value="0"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
@@ -129,85 +135,99 @@
             <RowDefinition Height="*"/>    <!-- Main Content -->
         </Grid.RowDefinitions>
 
-        <!-- ── Custom Title Bar ── -->
-        <Grid Grid.Row="0" Height="40" Background="{StaticResource BrushSurface}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/> <!-- Icon/Title -->
-                <ColumnDefinition Width="*"/>    <!-- Drag Area Spacer -->
-                <ColumnDefinition Width="Auto"/> <!-- Action Buttons -->
-            </Grid.ColumnDefinitions>
+        <!-- ── Custom Title Bar Border Wrapper ── -->
+        <Border Grid.Row="0" Height="40" Background="{StaticResource BrushSurface}">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="7,7,0,0"/>
+                    <Style.Triggers>
+                        <!-- Reset corners when maximized -->
+                        <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
+                            <Setter Property="CornerRadius" Value="0"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/> <!-- Icon/Title -->
+                    <ColumnDefinition Width="*"/>    <!-- Drag Area Spacer -->
+                    <ColumnDefinition Width="Auto"/> <!-- Action Buttons -->
+                </Grid.ColumnDefinitions>
 
-            <!-- Left: App Icon & Title -->
-            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0,0,0">
-                <TextBlock Text="⚔" FontSize="18" Foreground="{StaticResource BrushAccent}" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                <TextBlock Text="FIGHTING TOURNAMENT TRACKER" FontSize="11" FontWeight="Bold" Foreground="{StaticResource BrushText}" VerticalAlignment="Center"/>
-            </StackPanel>
+                <!-- Left: App Icon & Title -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0,0,0">
+                    <TextBlock Text="⚔" FontSize="18" Foreground="{StaticResource BrushAccent}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                    <TextBlock Text="FIGHTING TOURNAMENT TRACKER" FontSize="11" FontWeight="Bold" Foreground="{StaticResource BrushText}" VerticalAlignment="Center"/>
+                </StackPanel>
 
-            <!-- Right: Action Buttons -->
-            <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Stretch" WindowChrome.IsHitTestVisibleInChrome="True">
-                <!-- Minimize Button -->
-                <Button Style="{StaticResource TitleBarBtn}" Click="MinimizeButton_Click" ToolTip="Minimize">
-                    <Path Data="M0,6 H8" StrokeThickness="1.5" Width="8" Height="8"/>
-                </Button>
-                
-                <!-- Maximize / Restore Button -->
-                <Button Style="{StaticResource TitleBarBtn}" Click="MaximizeButton_Click" ToolTip="Maximize">
-                    <Grid>
-                        <!-- Maximize Icon (Box) -->
-                        <Path x:Name="MaximizeIcon" Data="M0.5,0.5 H8.5 V8.5 H0.5 Z" StrokeThickness="1.5" Width="9" Height="9">
-                            <Path.Style>
-                                <Style TargetType="Path">
-                                    <Setter Property="Stroke" Value="{StaticResource BrushTextDim}"/>
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
-                                            <Setter Property="Stroke" Value="{StaticResource BrushText}"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Path.Style>
-                        </Path>
+                <!-- Right: Action Buttons -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Stretch" WindowChrome.IsHitTestVisibleInChrome="True">
+                    <!-- Minimize Button -->
+                    <Button Style="{StaticResource TitleBarBtn}" Click="MinimizeButton_Click" ToolTip="Minimize">
+                        <Path Data="M0,6 H8" StrokeThickness="1.5" Width="8" Height="8"/>
+                    </Button>
+                    
+                    <!-- Maximize / Restore Button -->
+                    <Button Style="{StaticResource TitleBarBtn}" Click="MaximizeButton_Click" ToolTip="Maximize">
+                        <Grid>
+                            <!-- Maximize Icon (Box) -->
+                            <Path x:Name="MaximizeIcon" Data="M0.5,0.5 H8.5 V8.5 H0.5 Z" StrokeThickness="1.5" Width="9" Height="9">
+                                <Path.Style>
+                                    <Style TargetType="Path">
+                                        <Setter Property="Stroke" Value="{StaticResource BrushTextDim}"/>
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
+                                                <Setter Property="Stroke" Value="{StaticResource BrushText}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Path.Style>
+                            </Path>
 
-                        <!-- Restore Icon (Overlapping Boxes) -->
-                        <Path x:Name="RestoreIcon" Data="M2.5,0.5 H8.5 V6.5 H2.5 Z M0.5,2.5 H6.5 V8.5 H0.5 Z" StrokeThickness="1.5" Width="9" Height="9">
-                            <Path.Style>
-                                <Style TargetType="Path">
-                                    <Setter Property="Stroke" Value="{StaticResource BrushTextDim}"/>
-                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
-                                            <Setter Property="Stroke" Value="{StaticResource BrushText}"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Path.Style>
-                        </Path>
-                    </Grid>
-                </Button>
-                
-                <!-- Close Button -->
-                <Button Style="{StaticResource TitleBarCloseBtn}" Click="CloseButton_Click" ToolTip="Close">
-                    <Path Data="M0,0 L8,8 M0,8 L8,0" StrokeThickness="1.5" Width="8" Height="8"/>
-                </Button>
-            </StackPanel>
+                            <!-- Restore Icon (Overlapping Boxes) -->
+                            <Path x:Name="RestoreIcon" Data="M2.5,0.5 H8.5 V6.5 H2.5 Z M0.5,2.5 H6.5 V8.5 H0.5 Z" StrokeThickness="1.5" Width="9" Height="9">
+                                <Path.Style>
+                                    <Style TargetType="Path">
+                                        <Setter Property="Stroke" Value="{StaticResource BrushTextDim}"/>
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
+                                                <Setter Property="Stroke" Value="{StaticResource BrushText}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Path.Style>
+                            </Path>
+                        </Grid>
+                    </Button>
+                    
+                    <!-- Close Button -->
+                    <Button Style="{StaticResource TitleBarCloseBtn}" Click="CloseButton_Click" ToolTip="Close">
+                        <Path Data="M0,0 L8,8 M0,8 L8,0" StrokeThickness="1.5" Width="8" Height="8"/>
+                    </Button>
+                </StackPanel>
 
-            <!-- ── Stylized Black-Red-Black Gradient Line ── -->
-            <Border Height="2" VerticalAlignment="Top" Grid.ColumnSpan="3">
-                <Border.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                        <GradientStop Color="#0D0D15" Offset="0.0"/>
-                        <GradientStop Color="#E8003D" Offset="0.7"/>
-                        <GradientStop Color="#0D0D15" Offset="1.0"/>
-                    </LinearGradientBrush>
-                </Border.Background>
-            </Border>
-        </Grid>
+                <!-- ── Stylized Black-Red-Black Gradient Line ── -->
+                <Border Height="1" VerticalAlignment="Top" Grid.ColumnSpan="3">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="#0D0D15" Offset="0.0"/>
+                            <GradientStop Color="#E8003D" Offset="0.7"/>
+                            <GradientStop Color="#0D0D15" Offset="1.0"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+                </Border>
+            </Grid>
+        </Border>
 
         <!-- ── Custom Dark Menu Bar ── -->
         <Border Grid.Row="1" Background="{StaticResource BrushSurface}" BorderBrush="{StaticResource BrushBorder}" BorderThickness="0,0,0,1" Padding="15,2" WindowChrome.IsHitTestVisibleInChrome="True">
