@@ -56,6 +56,7 @@ public class TournamentViewModel : BaseViewModel
                 OnPropertyChanged(nameof(SaveButtonText));
                 OnPropertyChanged(nameof(IsFinished));
                 OnPropertyChanged(nameof(WinnerName));
+                OnPropertyChanged(nameof(CanAddPlayerMidTournament));
                 RefreshScheduleSidebar();
                 LoadCurrentCycleMatches();
             }
@@ -93,11 +94,32 @@ public class TournamentViewModel : BaseViewModel
         private set => Set(ref _statusMessage, value);
     }
 
+    // ── Mid-Tournament Add Player ──────────────────────────────────────
+
+    private bool _isAddingPlayer = false;
+    public bool IsAddingPlayer
+    {
+        get => _isAddingPlayer;
+        set => Set(ref _isAddingPlayer, value);
+    }
+
+    private string _newPlayerName = string.Empty;
+    public string NewPlayerName
+    {
+        get => _newPlayerName;
+        set => Set(ref _newPlayerName, value);
+    }
+
+    public bool CanAddPlayerMidTournament => _tournament.Mode == TournamentMode.Endless && !_tournament.IsFinished;
+
     // ── Commands ─────────────────────────────────────────────────────
 
     public ICommand CommitCycleCommand   { get; }
     public ICommand NewTournamentCommand { get; }
     public ICommand SelectCycleCommand   { get; }
+    public ICommand ShowAddPlayerCommand  { get; }
+    public ICommand SaveNewPlayerCommand  { get; }
+    public ICommand CancelAddPlayerCommand { get; }
 
     // ── Constructor ──────────────────────────────────────────────────
 
@@ -110,6 +132,9 @@ public class TournamentViewModel : BaseViewModel
         CommitCycleCommand   = new RelayCommand(CommitCycle);
         NewTournamentCommand = new RelayCommand(onNewTournament);
         SelectCycleCommand   = new RelayCommand(p => SelectCycle((CycleInfoViewModel)p!));
+        ShowAddPlayerCommand = new RelayCommand(ShowAddPlayer);
+        SaveNewPlayerCommand = new RelayCommand(SaveNewPlayer);
+        CancelAddPlayerCommand = new RelayCommand(CancelAddPlayer);
 
         BuildStandings();
         RefreshScheduleSidebar();
@@ -319,6 +344,7 @@ public class TournamentViewModel : BaseViewModel
         OnPropertyChanged(nameof(CycleHeader));
         OnPropertyChanged(nameof(IsFinished));
         OnPropertyChanged(nameof(WinnerName));
+        OnPropertyChanged(nameof(CanAddPlayerMidTournament));
     }
 
     private void SelectCycle(CycleInfoViewModel cycleVm)
@@ -382,5 +408,66 @@ public class TournamentViewModel : BaseViewModel
         OnPropertyChanged(nameof(CycleHeader));
         OnPropertyChanged(nameof(IsFinished));
         OnPropertyChanged(nameof(WinnerName));
+        OnPropertyChanged(nameof(CanAddPlayerMidTournament));
+    }
+
+    // ── Add Player Mid-Tournament Handlers ───────────────────────────
+
+    private void ShowAddPlayer()
+    {
+        NewPlayerName = string.Empty;
+        IsAddingPlayer = true;
+    }
+
+    private void CancelAddPlayer()
+    {
+        NewPlayerName = string.Empty;
+        IsAddingPlayer = false;
+    }
+
+    private void SaveNewPlayer()
+    {
+        string name = NewPlayerName.Trim();
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            StatusMessage = "⚠  Player name cannot be empty.";
+            return;
+        }
+
+        if (name.Equals("BYE", StringComparison.OrdinalIgnoreCase))
+        {
+            StatusMessage = "⚠  'BYE' is a reserved keyword.";
+            return;
+        }
+
+        // Check if player with the same name already exists
+        if (_tournament.Players.Any(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
+        {
+            StatusMessage = $"⚠  Player \"{name}\" is already registered.";
+            return;
+        }
+
+        // Add player to the tournament
+        var newPlayer = new Player { Name = name };
+        _tournament.Players.Add(newPlayer);
+
+        // Rebuild standings and refresh notifications
+        BuildStandings();
+        OnPropertyChanged(nameof(CycleHeader));
+        OnPropertyChanged(nameof(IsFinished));
+        OnPropertyChanged(nameof(WinnerName));
+
+        try
+        {
+            DatabaseRepository.SaveTournamentState(_tournament);
+            StatusMessage = $"✓  Added new player: \"{name}\". They will enter the schedule in the next cycle.";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"⚠  Added \"{name}\" locally, but database save failed: {ex.Message}";
+        }
+
+        IsAddingPlayer = false;
+        NewPlayerName = string.Empty;
     }
 }
