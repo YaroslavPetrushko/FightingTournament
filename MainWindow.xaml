@@ -103,8 +103,26 @@
         <vm:MainViewModel/>
     </Window.DataContext>
 
-    <!-- Main Outer Container using Margin bound to Padding when maximized -->
-    <Grid Margin="{Binding Padding, RelativeSource={RelativeSource AncestorType=Window}}">
+    <!-- Outer Border to provide Active/Inactive Crimson Accent Line -->
+    <Border BorderThickness="1">
+        <Border.Style>
+            <Style TargetType="Border">
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Style.Triggers>
+                    <!-- Thin red outline when window is active -->
+                    <DataTrigger Binding="{Binding IsActive, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                        <Setter Property="BorderBrush" Value="{StaticResource BrushAccent}"/>
+                    </DataTrigger>
+                    <!-- No border outline when window is maximized to avoid screen clipping -->
+                    <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
+                        <Setter Property="BorderThickness" Value="0"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
+
+        <!-- Main Outer Container using Margin bound to Padding when maximized -->
+        <Grid Margin="{Binding Padding, RelativeSource={RelativeSource AncestorType=Window}}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/> <!-- Title Bar -->
             <RowDefinition Height="Auto"/> <!-- Menu Bar -->
@@ -212,4 +230,5 @@
         <!-- ── Main Content Area ── -->
         <ContentControl Grid.Row="2" Content="{Binding CurrentView}" Focusable="False"/>
     </Grid>
+    </Border>
 </Window>
