@@ -20,6 +20,7 @@ public class Tournament
 
     public int CurrentCycleIndex { get; set; } = 0;
     public TournamentMode Mode   { get; set; } = TournamentMode.Endless;
+    public int DefaultRounds     { get; set; } = 3;
 
     public Cycle? CurrentCycle =>
         CurrentCycleIndex < Cycles.Count ? Cycles[CurrentCycleIndex] : null;

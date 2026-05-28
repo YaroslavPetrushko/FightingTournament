@@ -241,12 +241,41 @@ public class TournamentViewModel : BaseViewModel
                 {
                     continue;
                 }
-                CurrentMatches.Add(new MatchRowViewModel(m, _tournament.SelectedGame));
+                CurrentMatches.Add(new MatchRowViewModel(m, _tournament.SelectedGame, _tournament.Mode));
             }
         }
     }
 
     // ── Commit ───────────────────────────────────────────────────────
+
+    private void LearnCharactersFromCycle(Cycle cycle)
+    {
+        if (cycle == null) return;
+        string game = _tournament.SelectedGame;
+        var predefined = GameDatabase.Games.TryGetValue(game, out var list)
+            ? new HashSet<string>(list, StringComparer.OrdinalIgnoreCase)
+            : new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var m in cycle.Matches)
+        {
+            if (!string.IsNullOrWhiteSpace(m.Character1))
+            {
+                string c1 = m.Character1.Trim();
+                if (!predefined.Contains(c1))
+                {
+                    try { DatabaseRepository.SaveCustomCharacter(game, c1); } catch { }
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(m.Character2))
+            {
+                string c2 = m.Character2.Trim();
+                if (!predefined.Contains(c2))
+                {
+                    try { DatabaseRepository.SaveCustomCharacter(game, c2); } catch { }
+                }
+            }
+        }
+    }
 
     private void CommitCycle()
     {
@@ -288,6 +317,9 @@ public class TournamentViewModel : BaseViewModel
                 }
             }
 
+            // Learn custom characters from the edited cycle
+            LearnCharactersFromCycle(_tournament.Cycles[SelectedCycleIndex]);
+
             // 2. Refresh Standings view models + re-sort
             foreach (var s in Standings) s.Refresh();
 
@@ -314,6 +346,13 @@ public class TournamentViewModel : BaseViewModel
 
         // Standard active cycle commit flow
         int savedNumber = _tournament.CurrentCycleIndex + 1;
+
+        // Learn custom characters from the active cycle before committing it
+        var activeCycle = _tournament.CurrentCycle;
+        if (activeCycle != null)
+        {
+            LearnCharactersFromCycle(activeCycle);
+        }
 
         if (!TournamentEngine.CommitCurrentCycle(_tournament))
         {

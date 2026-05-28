@@ -1,4 +1,5 @@
 using FightingTournament.Models;
+using FightingTournament.Services;
 using System;
 using System.Collections.ObjectModel;
 
@@ -63,24 +64,59 @@ public class MatchRowViewModel : BaseViewModel
 
     public bool IsCompleted => WinnerId.HasValue;
 
+    public int Rounds
+    {
+        get => _match.Rounds;
+        set
+        {
+            if (_match.Rounds != value)
+            {
+                _match.Rounds = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public bool CanEditRounds { get; }
+    public ObservableCollection<int> AvailableRounds { get; } = new() { 2, 3, 4, 5 };
+
     // ── Character presets ────────────────────────────────────────────
 
     public ObservableCollection<string> AvailableCharacters { get; }
 
-    public MatchRowViewModel(Match match, string selectedGame)
+    public MatchRowViewModel(Match match, string selectedGame, TournamentMode mode)
     {
         _match = match;
         _char1 = match.Character1;
         _char2 = match.Character2;
         _winnerId = match.WinnerId;
+        CanEditRounds = mode == TournamentMode.Endless;
 
+        var allChars = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        // 1. Add static presets
         if (!string.IsNullOrWhiteSpace(selectedGame) && GameDatabase.Games.TryGetValue(selectedGame, out var list))
         {
-            AvailableCharacters = new ObservableCollection<string>(list);
+            foreach (var c in list)
+            {
+                allChars.Add(c);
+            }
         }
-        else
+
+        // 2. Add dynamically learned characters
+        try
         {
-            AvailableCharacters = new ObservableCollection<string>();
+            var customChars = DatabaseRepository.GetCustomCharacters(selectedGame);
+            foreach (var c in customChars)
+            {
+                allChars.Add(c);
+            }
         }
+        catch
+        {
+            // Ignore database errors during initialization
+        }
+
+        AvailableCharacters = new ObservableCollection<string>(allChars);
     }
 }

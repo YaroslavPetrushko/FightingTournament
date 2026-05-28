@@ -296,12 +296,14 @@
                             <!-- Column headers -->
                             <Grid DockPanel.Dock="Top" Margin="0,0,0,6">
                                 <Grid.ColumnDefinitions>
-                                    <!-- P1 name | WIN | vs | WIN | P2 name | gap | Char1 | gap | Char2 -->
+                                    <!-- P1 name | WIN | vs | WIN | P2 name | gap | Rounds | gap | Char1 | gap | Char2 -->
                                     <ColumnDefinition Width="*"    MinWidth="80"/>
                                     <ColumnDefinition Width="54"/>
                                     <ColumnDefinition Width="26"/>
                                     <ColumnDefinition Width="54"/>
                                     <ColumnDefinition Width="*"    MinWidth="80"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="64"/>
                                     <ColumnDefinition Width="12"/>
                                     <ColumnDefinition Width="140"/>
                                     <ColumnDefinition Width="8"/>
@@ -313,10 +315,13 @@
                                 <TextBlock Grid.Column="4" Text="PLAYER 2"
                                            Style="{StaticResource ColHeader}"
                                            HorizontalAlignment="Left"  Margin="6,0,0,0"/>
-                                <TextBlock Grid.Column="6" Text="CHARACTER 1"
+                                <TextBlock Grid.Column="6" Text="ROUNDS"
                                            Style="{StaticResource ColHeader}"
                                            HorizontalAlignment="Center"/>
-                                <TextBlock Grid.Column="8" Text="CHARACTER 2"
+                                <TextBlock Grid.Column="8" Text="CHARACTER 1"
+                                           Style="{StaticResource ColHeader}"
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock Grid.Column="10" Text="CHARACTER 2"
                                            Style="{StaticResource ColHeader}"
                                            HorizontalAlignment="Center"/>
                             </Grid>
@@ -339,6 +344,8 @@
                                                         <ColumnDefinition Width="26"/>
                                                         <ColumnDefinition Width="54"/>
                                                         <ColumnDefinition Width="*"    MinWidth="80"/>
+                                                        <ColumnDefinition Width="12"/>
+                                                        <ColumnDefinition Width="64"/>
                                                         <ColumnDefinition Width="12"/>
                                                         <ColumnDefinition Width="140"/>
                                                         <ColumnDefinition Width="8"/>
@@ -390,8 +397,16 @@
                                                                TextTrimming="CharacterEllipsis"
                                                                ToolTip="{Binding Player2Name}"/>
 
-                                                    <!-- Char 1 -->
+                                                    <!-- Rounds -->
                                                     <ComboBox Grid.Column="6"
+                                                              ItemsSource="{Binding AvailableRounds}"
+                                                              SelectedItem="{Binding Rounds, Mode=TwoWay}"
+                                                              IsEnabled="{Binding CanEditRounds}"
+                                                              HorizontalContentAlignment="Center"
+                                                              VerticalAlignment="Center"/>
+
+                                                    <!-- Char 1 -->
+                                                    <ComboBox Grid.Column="8"
                                                               IsEditable="True"
                                                               ItemsSource="{Binding AvailableCharacters}"
                                                               Text="{Binding Character1, Mode=TwoWay,
@@ -400,7 +415,7 @@
                                                               VerticalAlignment="Center"/>
 
                                                     <!-- Char 2 -->
-                                                    <ComboBox Grid.Column="8"
+                                                    <ComboBox Grid.Column="10"
                                                               IsEditable="True"
                                                               ItemsSource="{Binding AvailableCharacters}"
                                                               Text="{Binding Character2, Mode=TwoWay,

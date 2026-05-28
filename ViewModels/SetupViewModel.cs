@@ -14,7 +14,7 @@ public class SetupViewModel : BaseViewModel
 
     // ── Game selection ───────────────────────────────────────────────
 
-    public ObservableCollection<string> AvailableGames { get; } = new(GameDatabase.Games.Keys);
+    public ObservableCollection<string> AvailableGames { get; } = new();
 
     private string _selectedGame = "Tekken 8";
     public string SelectedGame
@@ -65,6 +65,44 @@ public class SetupViewModel : BaseViewModel
         set { if (value) SelectedMode = TournamentMode.Championship; }
     }
 
+    // ── Default Rounds ───────────────────────────────────────────────
+
+    public ObservableCollection<int> AvailableRoundsList { get; } = new() { 2, 3, 4, 5 };
+
+    private int _selectedRounds = 3;
+    public int SelectedRounds
+    {
+        get => _selectedRounds;
+        set => Set(ref _selectedRounds, value);
+    }
+
+    // ── User Presets ──────────────────────────────────────────────────
+
+    public ObservableCollection<UserPreset> UserPresets { get; } = new();
+
+    private UserPreset? _selectedUserPreset;
+    public UserPreset? SelectedUserPreset
+    {
+        get => _selectedUserPreset;
+        set
+        {
+            if (Set(ref _selectedUserPreset, value))
+            {
+                if (value != null)
+                {
+                    LoadPreset(value);
+                }
+            }
+        }
+    }
+
+    private string _newPresetName = string.Empty;
+    public string NewPresetName
+    {
+        get => _newPresetName;
+        set => Set(ref _newPresetName, value);
+    }
+
     // ── Saved sessions ───────────────────────────────────────────────
 
     public ObservableCollection<string> SavedSessions { get; } = new();
@@ -113,6 +151,8 @@ public class SetupViewModel : BaseViewModel
     public ICommand ResumeCommand        { get; }
     public ICommand DeleteSessionCommand { get; }
     public ICommand AddPlayerCommand     { get; }
+    public ICommand SavePresetCommand    { get; }
+    public ICommand DeletePresetCommand  { get; }
 
     public SetupViewModel()
     {
@@ -128,14 +168,153 @@ public class SetupViewModel : BaseViewModel
                 AddPlayer(nickname);
             }
         });
+        SavePresetCommand    = new RelayCommand(SavePreset);
+        DeletePresetCommand  = new RelayCommand(DeletePreset);
 
         SyncPlayerEntries();
         RefreshSavedSessions();
         RefreshRegisteredUsers();
+        RefreshAvailableGames();
+        RefreshUserPresets();
         UpdateDefaultSessionName();
     }
 
     // ── Helpers ──────────────────────────────────────────────────────
+
+    private void RefreshAvailableGames()
+    {
+        AvailableGames.Clear();
+        var games = new SortedSet<string>(GameDatabase.Games.Keys, StringComparer.OrdinalIgnoreCase);
+        try
+        {
+            var customGames = DatabaseRepository.GetCustomGames();
+            foreach (var g in customGames)
+            {
+                games.Add(g);
+            }
+        }
+        catch {}
+
+        foreach (var g in games)
+        {
+            AvailableGames.Add(g);
+        }
+    }
+
+    public void RefreshUserPresets()
+    {
+        UserPresets.Clear();
+        try
+        {
+            var presets = DatabaseRepository.GetUserPresets();
+            foreach (var p in presets)
+            {
+                UserPresets.Add(p);
+            }
+        }
+        catch (Exception ex)
+        {
+            ValidationMessage = $"⚠  Could not query presets: {ex.Message}";
+        }
+    }
+
+    private void SavePreset()
+    {
+        if (string.IsNullOrWhiteSpace(NewPresetName))
+        {
+            ValidationMessage = "⚠  Please enter a name for the new preset.";
+            return;
+        }
+
+        var preset = new UserPreset
+        {
+            PresetName = NewPresetName.Trim(),
+            DefaultGame = SelectedGame,
+            DefaultMode = SelectedMode.ToString(),
+            DefaultRounds = SelectedRounds,
+            PlayerCount = PlayerCount,
+            PlayerNames = string.Join(",", PlayerEntries.Select(e => e.Name.Trim()))
+        };
+
+        try
+        {
+            DatabaseRepository.SaveUserPreset(preset);
+            NewPresetName = string.Empty;
+            RefreshUserPresets();
+            ValidationMessage = $"✓  Preset '{preset.PresetName}' saved.";
+        }
+        catch (Exception ex)
+        {
+            ValidationMessage = $"⚠  Could not save preset: {ex.Message}";
+        }
+    }
+
+    private void DeletePreset()
+    {
+        if (SelectedUserPreset == null) return;
+
+        var result = System.Windows.MessageBox.Show(
+            $"Are you sure you want to delete the preset \"{SelectedUserPreset.PresetName}\"?",
+            "Delete Preset",
+            System.Windows.MessageBoxButton.YesNo,
+            System.Windows.MessageBoxImage.Question);
+
+        if (result != System.Windows.MessageBoxResult.Yes) return;
+
+        try
+        {
+            DatabaseRepository.DeleteUserPreset(SelectedUserPreset.PresetName);
+            RefreshUserPresets();
+            SelectedUserPreset = null;
+            ValidationMessage = "✓  Preset deleted successfully.";
+        }
+        catch (Exception ex)
+        {
+            ValidationMessage = $"⚠  Could not delete preset: {ex.Message}";
+        }
+    }
+
+    private void LoadPreset(UserPreset preset)
+    {
+        if (preset == null) return;
+
+        // Set SelectedGame
+        if (!string.IsNullOrWhiteSpace(preset.DefaultGame))
+        {
+            if (!AvailableGames.Contains(preset.DefaultGame))
+            {
+                AvailableGames.Add(preset.DefaultGame);
+            }
+            SelectedGame = preset.DefaultGame;
+        }
+
+        // Set SelectedMode
+        if (!string.IsNullOrWhiteSpace(preset.DefaultMode) && Enum.TryParse<TournamentMode>(preset.DefaultMode, out var mode))
+        {
+            SelectedMode = mode;
+        }
+
+        // Set DefaultRounds
+        SelectedRounds = preset.DefaultRounds;
+
+        // Set PlayerCount and PlayerEntries
+        if (preset.PlayerCount >= 2 && preset.PlayerCount <= 16)
+        {
+            PlayerCount = preset.PlayerCount;
+        }
+
+        if (!string.IsNullOrWhiteSpace(preset.PlayerNames))
+        {
+            var names = preset.PlayerNames.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            for (int i = 0; i < PlayerEntries.Count; i++)
+            {
+                if (i < names.Length)
+                {
+                    PlayerEntries[i].Name = names[i].Trim();
+                }
+            }
+        }
+    }
 
     private void UpdateDefaultSessionName()
     {
@@ -184,7 +363,17 @@ public class SetupViewModel : BaseViewModel
             return;
         }
 
-        var tournament = TournamentEngine.Create(names, SelectedMode);
+        // Save typed game to CustomGames if it is new
+        if (!string.IsNullOrWhiteSpace(SelectedGame))
+        {
+            try
+            {
+                DatabaseRepository.SaveCustomGame(SelectedGame);
+            }
+            catch {}
+        }
+
+        var tournament = TournamentEngine.Create(names, SelectedMode, SelectedRounds);
         tournament.SelectedGame = SelectedGame;
         tournament.SessionName = session;
         TournamentStarted?.Invoke(tournament);

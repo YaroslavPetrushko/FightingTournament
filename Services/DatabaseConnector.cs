@@ -56,7 +56,8 @@ public class DatabaseConnector
                     SelectedGame TEXT NOT NULL,
                     CurrentCycleIndex INTEGER NOT NULL DEFAULT 0,
                     IsFinished INTEGER NOT NULL DEFAULT 0,
-                    TournamentMode TEXT NOT NULL DEFAULT 'Endless'
+                    TournamentMode TEXT NOT NULL DEFAULT 'Endless',
+                    DefaultRounds INTEGER NOT NULL DEFAULT 3
                 );";
 
             // 2. Players table
@@ -101,9 +102,37 @@ public class DatabaseConnector
                     WinnerId INTEGER, -- NULL, 1, or 2
                     Character1 TEXT,
                     Character2 TEXT,
+                    Rounds INTEGER NOT NULL DEFAULT 3,
                     FOREIGN KEY(CycleId) REFERENCES Cycles(Id) ON DELETE CASCADE,
                     FOREIGN KEY(Player1Id) REFERENCES Players(Id) ON DELETE CASCADE,
                     FOREIGN KEY(Player2Id) REFERENCES Players(Id) ON DELETE CASCADE
+                );";
+
+            // 6. CustomGames table
+            string createCustomGames = @"
+                CREATE TABLE IF NOT EXISTS CustomGames (
+                    Name TEXT PRIMARY KEY
+                );";
+
+            // 7. CustomCharacters table
+            string createCustomCharacters = @"
+                CREATE TABLE IF NOT EXISTS CustomCharacters (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    GameName TEXT NOT NULL,
+                    Name TEXT NOT NULL,
+                    UNIQUE(GameName, Name)
+                );";
+
+            // 8. UserPresets table
+            string createUserPresets = @"
+                CREATE TABLE IF NOT EXISTS UserPresets (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    PresetName TEXT UNIQUE NOT NULL,
+                    DefaultGame TEXT,
+                    DefaultMode TEXT,
+                    DefaultRounds INTEGER NOT NULL DEFAULT 3,
+                    PlayerCount INTEGER,
+                    PlayerNames TEXT
                 );";
 
             ExecuteNonQuery(createUsers, connection, transaction);
@@ -112,21 +141,25 @@ public class DatabaseConnector
             ExecuteNonQuery(createCharacterPicks, connection, transaction);
             ExecuteNonQuery(createCycles, connection, transaction);
             ExecuteNonQuery(createMatches, connection, transaction);
+            ExecuteNonQuery(createCustomGames, connection, transaction);
+            ExecuteNonQuery(createCustomCharacters, connection, transaction);
+            ExecuteNonQuery(createUserPresets, connection, transaction);
 
-            // Backward compatibility: Alter table to add TournamentMode if missing
+            // Backward compatibility: Alter table to add TournamentMode and DefaultRounds if missing
             using (var checkCmd = connection.CreateCommand())
             {
                 checkCmd.Transaction = transaction;
                 checkCmd.CommandText = "PRAGMA table_info(Tournaments);";
                 using var checkReader = checkCmd.ExecuteReader();
                 bool modeExists = false;
+                bool defaultRoundsExists = false;
                 while (checkReader.Read())
                 {
-                    if (checkReader.GetString(1).Equals("TournamentMode", StringComparison.OrdinalIgnoreCase))
-                    {
+                    string colName = checkReader.GetString(1);
+                    if (colName.Equals("TournamentMode", StringComparison.OrdinalIgnoreCase))
                         modeExists = true;
-                        break;
-                    }
+                    if (colName.Equals("DefaultRounds", StringComparison.OrdinalIgnoreCase))
+                        defaultRoundsExists = true;
                 }
                 if (!modeExists)
                 {
@@ -134,6 +167,41 @@ public class DatabaseConnector
                     {
                         alterCmd.Transaction = transaction;
                         alterCmd.CommandText = "ALTER TABLE Tournaments ADD COLUMN TournamentMode TEXT NOT NULL DEFAULT 'Endless';";
+                        alterCmd.ExecuteNonQuery();
+                    }
+                }
+                if (!defaultRoundsExists)
+                {
+                    using (var alterCmd = connection.CreateCommand())
+                    {
+                        alterCmd.Transaction = transaction;
+                        alterCmd.CommandText = "ALTER TABLE Tournaments ADD COLUMN DefaultRounds INTEGER NOT NULL DEFAULT 3;";
+                        alterCmd.ExecuteNonQuery();
+                    }
+                }
+            }
+
+            // Backward compatibility: Alter Matches to add Rounds if missing
+            using (var checkCmd = connection.CreateCommand())
+            {
+                checkCmd.Transaction = transaction;
+                checkCmd.CommandText = "PRAGMA table_info(Matches);";
+                using var checkReader = checkCmd.ExecuteReader();
+                bool roundsExists = false;
+                while (checkReader.Read())
+                {
+                    if (checkReader.GetString(1).Equals("Rounds", StringComparison.OrdinalIgnoreCase))
+                    {
+                        roundsExists = true;
+                        break;
+                    }
+                }
+                if (!roundsExists)
+                {
+                    using (var alterCmd = connection.CreateCommand())
+                    {
+                        alterCmd.Transaction = transaction;
+                        alterCmd.CommandText = "ALTER TABLE Matches ADD COLUMN Rounds INTEGER NOT NULL DEFAULT 3;";
                         alterCmd.ExecuteNonQuery();
                     }
                 }

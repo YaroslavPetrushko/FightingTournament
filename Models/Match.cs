@@ -11,6 +11,8 @@ public class Match
     /// <summary>1 = Player1 wins, 2 = Player2 wins, null = not played yet.</summary>
     public int? WinnerId { get; set; }
 
+    public int Rounds { get; set; } = 3;
+
     public bool IsCompleted => WinnerId.HasValue;
 
     public Match(Player p1, Player p2)

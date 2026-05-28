@@ -196,6 +196,17 @@
                                        Margin="0,0,0,8"/>
                             <ComboBox ItemsSource="{Binding AvailableGames}"
                                       SelectedItem="{Binding SelectedGame, Mode=TwoWay}"
+                                      IsEditable="True"
+                                      Margin="0,0,0,18"/>
+
+                            <!-- Default Rounds row -->
+                            <TextBlock Text="DEFAULT ROUNDS"
+                                       FontSize="9"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource BrushTextDim}"
+                                       Margin="0,0,0,8"/>
+                            <ComboBox ItemsSource="{Binding AvailableRoundsList}"
+                                      SelectedItem="{Binding SelectedRounds, Mode=TwoWay}"
                                       Margin="0,0,0,18"/>
 
                             <!-- Tournament Mode Row -->
@@ -282,47 +293,109 @@
                 </DockPanel>
             </Border>
 
-            <!-- ── CENTER CARD: Resume Saved Session ── -->
-            <Border Grid.Column="3"
-                    Background="{StaticResource BrushSurface}"
-                    BorderBrush="{StaticResource BrushBorder}"
-                    BorderThickness="1"
-                    CornerRadius="6"
-                    Padding="24,24"
-                    VerticalAlignment="Center">
-                <StackPanel>
-                    <TextBlock Text="RESUME SAVED SESSION"
-                               FontSize="11"
-                               FontWeight="Bold"
-                               Foreground="{StaticResource BrushAccent}"
-                               Margin="0,0,0,20"
-                               HorizontalAlignment="Center"/>
+            <!-- ── CENTER CARD: Resume Saved Session & Presets ── -->
+            <StackPanel Grid.Column="3" VerticalAlignment="Center">
+                <!-- Resume Card -->
+                <Border Background="{StaticResource BrushSurface}"
+                        BorderBrush="{StaticResource BrushBorder}"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        Padding="24,24"
+                        Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock Text="RESUME SAVED SESSION"
+                                   FontSize="11"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource BrushAccent}"
+                                   Margin="0,0,0,20"
+                                   HorizontalAlignment="Center"/>
 
-                    <!-- Saved Sessions Dropdown -->
-                    <TextBlock Text="SELECT SAVED SESSION"
-                               FontSize="9"
-                               FontWeight="SemiBold"
-                               Foreground="{StaticResource BrushTextDim}"
-                               Margin="0,0,0,8"/>
-                    <ComboBox ItemsSource="{Binding SavedSessions}"
-                              SelectedItem="{Binding SelectedSavedSession, Mode=TwoWay}"
-                              Margin="0,0,0,24"/>
+                        <!-- Saved Sessions Dropdown -->
+                        <TextBlock Text="SELECT SAVED SESSION"
+                                   FontSize="9"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource BrushTextDim}"
+                                   Margin="0,0,0,8"/>
+                        <ComboBox ItemsSource="{Binding SavedSessions}"
+                                  SelectedItem="{Binding SelectedSavedSession, Mode=TwoWay}"
+                                  Margin="0,0,0,24"/>
 
-                    <!-- Action buttons -->
-                    <Button Content="RESUME TOURNAMENT  ►"
-                            Style="{StaticResource BtnPrimary}"
-                            FontSize="13"
-                            Padding="0,11"
-                            Margin="0,0,0,12"
-                            Command="{Binding ResumeCommand}"/>
+                        <!-- Action buttons -->
+                        <Button Content="RESUME TOURNAMENT  ►"
+                                Style="{StaticResource BtnPrimary}"
+                                FontSize="13"
+                                Padding="0,11"
+                                Margin="0,0,0,12"
+                                Command="{Binding ResumeCommand}"/>
 
-                    <Button Content="DELETE SESSION  ✗"
-                            Style="{StaticResource BtnGhost}"
-                            FontSize="11"
-                            Padding="0,9"
-                            Command="{Binding DeleteSessionCommand}"/>
-                </StackPanel>
-            </Border>
+                        <Button Content="DELETE SESSION  ✗"
+                                Style="{StaticResource BtnGhost}"
+                                FontSize="11"
+                                Padding="0,9"
+                                Command="{Binding DeleteSessionCommand}"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Presets Card -->
+                <Border Background="{StaticResource BrushSurface}"
+                        BorderBrush="{StaticResource BrushBorder}"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        Padding="24,24">
+                    <StackPanel>
+                        <TextBlock Text="SAVED PRESETS"
+                                   FontSize="11"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource BrushAccent}"
+                                   Margin="0,0,0,20"
+                                   HorizontalAlignment="Center"/>
+
+                        <TextBlock Text="LOAD SAVED PRESET"
+                                   FontSize="9"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource BrushTextDim}"
+                                   Margin="0,0,0,8"/>
+                        <Grid Margin="0,0,0,18">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <ComboBox ItemsSource="{Binding UserPresets}"
+                                      SelectedItem="{Binding SelectedUserPreset, Mode=TwoWay}"
+                                      DisplayMemberPath="PresetName"
+                                      VerticalAlignment="Center"/>
+                            <Button Grid.Column="1"
+                                    Content="Delete"
+                                    Style="{StaticResource BtnGhost}"
+                                    Width="60"
+                                    Margin="8,0,0,0"
+                                    Padding="0,6"
+                                    Command="{Binding DeletePresetCommand}"/>
+                        </Grid>
+
+                        <TextBlock Text="SAVE CURRENT SETUP AS PRESET"
+                                   FontSize="9"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource BrushTextDim}"
+                                   Margin="0,0,0,8"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Text="{Binding NewPresetName, UpdateSourceTrigger=PropertyChanged}"
+                                     VerticalAlignment="Center"/>
+                            <Button Grid.Column="1"
+                                    Content="Save"
+                                    Style="{StaticResource BtnGhost}"
+                                    Width="60"
+                                    Margin="8,0,0,0"
+                                    Padding="0,6"
+                                    Command="{Binding SavePresetCommand}"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
 
             <!-- ── RIGHT SIDEBAR: Registered Players ── -->
             <Border Grid.Column="5"
