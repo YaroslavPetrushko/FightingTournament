@@ -413,7 +413,7 @@
                                Margin="0,0,0,4"
                                HorizontalAlignment="Center"/>
 
-                    <TextBlock Text="CLICK TO QUICK-ADD TO SETUP"
+                    <TextBlock Text="L-CLICK TO ADD | R-CLICK TO DELETE"
                                FontSize="9"
                                FontWeight="SemiBold"
                                Foreground="{StaticResource BrushTextDim}"
@@ -434,6 +434,11 @@
                                             Padding="10,8"
                                             HorizontalContentAlignment="Left"
                                             Cursor="Hand">
+                                        <Button.InputBindings>
+                                            <MouseBinding Gesture="RightClick"
+                                                          Command="{Binding DataContext.DeleteRegisteredPlayerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                          CommandParameter="{Binding}"/>
+                                        </Button.InputBindings>
                                         <Button.Template>
                                             <ControlTemplate TargetType="Button">
                                                 <Border x:Name="BtnBorder"

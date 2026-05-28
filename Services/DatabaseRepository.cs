@@ -174,6 +174,20 @@ public static class DatabaseRepository
     }
 
     /// <summary>
+    /// Deletes a registered user from the global Users table.
+    /// </summary>
+    public static void DeleteRegisteredUser(string nickname)
+    {
+        using var connection = DatabaseConnector.Instance.GetConnection();
+        connection.Open();
+
+        using var command = connection.CreateCommand();
+        command.CommandText = "DELETE FROM Users WHERE Nickname = @Nickname";
+        command.Parameters.AddWithValue("@Nickname", nickname);
+        command.ExecuteNonQuery();
+    }
+
+    /// <summary>
     /// Gets all unique SessionName values stored in the Tournaments table.
     /// </summary>
     public static List<string> GetSavedSessions()

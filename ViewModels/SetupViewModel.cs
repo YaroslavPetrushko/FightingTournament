@@ -153,6 +153,7 @@ public class SetupViewModel : BaseViewModel
     public ICommand AddPlayerCommand     { get; }
     public ICommand SavePresetCommand    { get; }
     public ICommand DeletePresetCommand  { get; }
+    public ICommand DeleteRegisteredPlayerCommand { get; }
 
     public SetupViewModel()
     {
@@ -170,6 +171,13 @@ public class SetupViewModel : BaseViewModel
         });
         SavePresetCommand    = new RelayCommand(SavePreset);
         DeletePresetCommand  = new RelayCommand(DeletePreset);
+        DeleteRegisteredPlayerCommand = new RelayCommand(p =>
+        {
+            if (p is string nickname)
+            {
+                DeleteRegisteredPlayer(nickname);
+            }
+        });
 
         SyncPlayerEntries();
         RefreshSavedSessions();
@@ -418,6 +426,27 @@ public class SetupViewModel : BaseViewModel
         catch (Exception ex)
         {
             ValidationMessage = $"⚠  Could not query registered players: {ex.Message}";
+        }
+    }
+
+    private void DeleteRegisteredPlayer(string nickname)
+    {
+        if (string.IsNullOrWhiteSpace(nickname)) return;
+
+        var result = System.Windows.MessageBox.Show($"Are you sure you want to delete \"{nickname}\" from the registered players list?", 
+            "Confirm Delete", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Warning);
+        
+        if (result == System.Windows.MessageBoxResult.Yes)
+        {
+            try
+            {
+                DatabaseRepository.DeleteRegisteredUser(nickname);
+                RefreshRegisteredUsers();
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show($"Could not delete player:\n{ex.Message}", "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+            }
         }
     }
 
