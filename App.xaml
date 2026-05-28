@@ -23,7 +23,6 @@
         <SolidColorBrush x:Key="BrushWin"         Color="#00CC6A"/>
         <SolidColorBrush x:Key="BrushLoss"        Color="#FF4444"/>
         <SolidColorBrush x:Key="BrushCurrent"     Color="#FF9800"/>
-        <SolidColorBrush x:Key="BrushCurrentDim"  Color="#7A4800"/>
         <SolidColorBrush x:Key="BrushElim"        Color="#26161B"/>
 
         <!-- ═══════════════════════════════════════════════════════════

@@ -56,6 +56,7 @@ public class TournamentViewModel : BaseViewModel
                 OnPropertyChanged(nameof(SaveButtonText));
                 OnPropertyChanged(nameof(IsFinished));
                 OnPropertyChanged(nameof(WinnerName));
+                OnPropertyChanged(nameof(CanAddPlayerMidTournament));
                 RefreshScheduleSidebar();
                 LoadCurrentCycleMatches();
             }
@@ -93,11 +94,32 @@ public class TournamentViewModel : BaseViewModel
         private set => Set(ref _statusMessage, value);
     }
 
+    // ── Mid-Tournament Add Player ──────────────────────────────────────
+
+    private bool _isAddingPlayer = false;
+    public bool IsAddingPlayer
+    {
+        get => _isAddingPlayer;
+        set => Set(ref _isAddingPlayer, value);
+    }
+
+    private string _newPlayerName = string.Empty;
+    public string NewPlayerName
+    {
+        get => _newPlayerName;
+        set => Set(ref _newPlayerName, value);
+    }
+
+    public bool CanAddPlayerMidTournament => _tournament.Mode == TournamentMode.Endless && !_tournament.IsFinished;
+
     // ── Commands ─────────────────────────────────────────────────────
 
     public ICommand CommitCycleCommand   { get; }
     public ICommand NewTournamentCommand { get; }
     public ICommand SelectCycleCommand   { get; }
+    public ICommand ShowAddPlayerCommand  { get; }
+    public ICommand SaveNewPlayerCommand  { get; }
+    public ICommand CancelAddPlayerCommand { get; }
 
     // ── Constructor ──────────────────────────────────────────────────
 
@@ -110,6 +132,9 @@ public class TournamentViewModel : BaseViewModel
         CommitCycleCommand   = new RelayCommand(CommitCycle);
         NewTournamentCommand = new RelayCommand(onNewTournament);
         SelectCycleCommand   = new RelayCommand(p => SelectCycle((CycleInfoViewModel)p!));
+        ShowAddPlayerCommand = new RelayCommand(ShowAddPlayer);
+        SaveNewPlayerCommand = new RelayCommand(SaveNewPlayer);
+        CancelAddPlayerCommand = new RelayCommand(CancelAddPlayer);
 
         BuildStandings();
         RefreshScheduleSidebar();
@@ -216,12 +241,41 @@ public class TournamentViewModel : BaseViewModel
                 {
                     continue;
                 }
-                CurrentMatches.Add(new MatchRowViewModel(m, _tournament.SelectedGame));
+                CurrentMatches.Add(new MatchRowViewModel(m, _tournament.SelectedGame, _tournament.Mode));
             }
         }
     }
 
     // ── Commit ───────────────────────────────────────────────────────
+
+    private void LearnCharactersFromCycle(Cycle cycle)
+    {
+        if (cycle == null) return;
+        string game = _tournament.SelectedGame;
+        var predefined = GameDatabase.Games.TryGetValue(game, out var list)
+            ? new HashSet<string>(list, StringComparer.OrdinalIgnoreCase)
+            : new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var m in cycle.Matches)
+        {
+            if (!string.IsNullOrWhiteSpace(m.Character1))
+            {
+                string c1 = m.Character1.Trim();
+                if (!predefined.Contains(c1))
+                {
+                    try { DatabaseRepository.SaveCustomCharacter(game, c1); } catch { }
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(m.Character2))
+            {
+                string c2 = m.Character2.Trim();
+                if (!predefined.Contains(c2))
+                {
+                    try { DatabaseRepository.SaveCustomCharacter(game, c2); } catch { }
+                }
+            }
+        }
+    }
 
     private void CommitCycle()
     {
@@ -263,6 +317,9 @@ public class TournamentViewModel : BaseViewModel
                 }
             }
 
+            // Learn custom characters from the edited cycle
+            LearnCharactersFromCycle(_tournament.Cycles[SelectedCycleIndex]);
+
             // 2. Refresh Standings view models + re-sort
             foreach (var s in Standings) s.Refresh();
 
@@ -290,6 +347,13 @@ public class TournamentViewModel : BaseViewModel
         // Standard active cycle commit flow
         int savedNumber = _tournament.CurrentCycleIndex + 1;
 
+        // Learn custom characters from the active cycle before committing it
+        var activeCycle = _tournament.CurrentCycle;
+        if (activeCycle != null)
+        {
+            LearnCharactersFromCycle(activeCycle);
+        }
+
         if (!TournamentEngine.CommitCurrentCycle(_tournament))
         {
             StatusMessage = "⚠  Could not save cycle — check results.";
@@ -306,8 +370,6 @@ public class TournamentViewModel : BaseViewModel
         foreach (var s in sortedActive) { s.Rank = rankActive++; Standings.Add(s); }
 
         SelectedCycleIndex = _tournament.CurrentCycleIndex; // Keep synced
-        RefreshScheduleSidebar();
-        LoadCurrentCycleMatches();
 
         try
         {
@@ -321,6 +383,7 @@ public class TournamentViewModel : BaseViewModel
         OnPropertyChanged(nameof(CycleHeader));
         OnPropertyChanged(nameof(IsFinished));
         OnPropertyChanged(nameof(WinnerName));
+        OnPropertyChanged(nameof(CanAddPlayerMidTournament));
     }
 
     private void SelectCycle(CycleInfoViewModel cycleVm)
@@ -328,6 +391,14 @@ public class TournamentViewModel : BaseViewModel
         if (cycleVm is null) return;
 
         int index = _tournament.Cycles.IndexOf(cycleVm.CycleModel);
+
+        // Championship bracket cannot be safely re-edited — structure depends on prior winners
+        if (_tournament.Mode == TournamentMode.Championship && index < _tournament.CurrentCycleIndex)
+        {
+            StatusMessage = "⚠  Historical edits are not supported in Championship mode.";
+            return;
+        }
+
         if (index >= 0 && index <= _tournament.CurrentCycleIndex)
         {
             SelectedCycleIndex = index;
@@ -374,5 +445,68 @@ public class TournamentViewModel : BaseViewModel
             StatusMessage = $"✗  {player.Name} eliminated locally, but database update failed: {ex.Message}";
         }
         OnPropertyChanged(nameof(CycleHeader));
+        OnPropertyChanged(nameof(IsFinished));
+        OnPropertyChanged(nameof(WinnerName));
+        OnPropertyChanged(nameof(CanAddPlayerMidTournament));
+    }
+
+    // ── Add Player Mid-Tournament Handlers ───────────────────────────
+
+    private void ShowAddPlayer()
+    {
+        NewPlayerName = string.Empty;
+        IsAddingPlayer = true;
+    }
+
+    private void CancelAddPlayer()
+    {
+        NewPlayerName = string.Empty;
+        IsAddingPlayer = false;
+    }
+
+    private void SaveNewPlayer()
+    {
+        string name = NewPlayerName.Trim();
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            StatusMessage = "⚠  Player name cannot be empty.";
+            return;
+        }
+
+        if (name.Equals("BYE", StringComparison.OrdinalIgnoreCase))
+        {
+            StatusMessage = "⚠  'BYE' is a reserved keyword.";
+            return;
+        }
+
+        // Check if player with the same name already exists
+        if (_tournament.Players.Any(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
+        {
+            StatusMessage = $"⚠  Player \"{name}\" is already registered.";
+            return;
+        }
+
+        // Add player to the tournament
+        var newPlayer = new Player { Name = name };
+        _tournament.Players.Add(newPlayer);
+
+        // Rebuild standings and refresh notifications
+        BuildStandings();
+        OnPropertyChanged(nameof(CycleHeader));
+        OnPropertyChanged(nameof(IsFinished));
+        OnPropertyChanged(nameof(WinnerName));
+
+        try
+        {
+            DatabaseRepository.SaveTournamentState(_tournament);
+            StatusMessage = $"✓  Added new player: \"{name}\". They will enter the schedule in the next cycle.";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"⚠  Added \"{name}\" locally, but database save failed: {ex.Message}";
+        }
+
+        IsAddingPlayer = false;
+        NewPlayerName = string.Empty;
     }
 }

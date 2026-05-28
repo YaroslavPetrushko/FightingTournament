@@ -8,7 +8,7 @@ public class Cycle
     public int Number { get; }
     public List<Match> Matches { get; } = new();
 
-    public bool IsCompleted => Matches.Count > 0 && Matches.All(m => m.IsCompleted);
+    public bool IsCompleted => Matches.All(m => m.IsCompleted);
 
     public Cycle(int number) => Number = number;
 }

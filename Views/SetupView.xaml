@@ -155,170 +155,247 @@
                     BorderBrush="{StaticResource BrushBorder}"
                     BorderThickness="1"
                     CornerRadius="6"
-                    Padding="28,24"
-                    VerticalAlignment="Center">
-                <StackPanel>
+                    Padding="24,20"
+                    VerticalAlignment="Stretch"
+                    MaxHeight="800">
+                <DockPanel>
                     <TextBlock Text="CREATE NEW TOURNAMENT"
                                FontSize="11"
                                FontWeight="Bold"
                                Foreground="{StaticResource BrushAccent}"
-                               Margin="0,0,0,20"
-                               HorizontalAlignment="Center"/>
+                               Margin="0,0,0,15"
+                               HorizontalAlignment="Center"
+                               DockPanel.Dock="Top"/>
 
-                    <!-- Session Name row -->
-                    <TextBlock Text="SESSION NAME"
-                               FontSize="9"
-                               FontWeight="SemiBold"
-                               Foreground="{StaticResource BrushTextDim}"
-                               Margin="0,0,0,8"/>
-                    <TextBox Text="{Binding SessionName, UpdateSourceTrigger=PropertyChanged}"
-                             Margin="0,0,0,18"/>
-
-                    <!-- Game selection row -->
-                    <TextBlock Text="SELECT GAME"
-                               FontSize="9"
-                               FontWeight="SemiBold"
-                               Foreground="{StaticResource BrushTextDim}"
-                               Margin="0,0,0,8"/>
-                    <ComboBox ItemsSource="{Binding AvailableGames}"
-                              SelectedItem="{Binding SelectedGame, Mode=TwoWay}"
-                              Margin="0,0,0,18"/>
-
-                    <!-- Tournament Mode Row -->
-                    <TextBlock Text="TOURNAMENT MODE"
-                               FontSize="9"
-                               FontWeight="SemiBold"
-                               Foreground="{StaticResource BrushTextDim}"
-                               Margin="0,0,0,8"/>
-                    <Grid Margin="0,0,0,18" Height="34">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <RadioButton Grid.Column="0"
-                                     Content="ENDLESS RUN"
-                                     Style="{StaticResource RadioModeLeftBtn}"
-                                     GroupName="ModeGroup"
-                                     IsChecked="{Binding IsEndlessModeSelected, Mode=TwoWay}"/>
-                        <RadioButton Grid.Column="1"
-                                     Content="CHAMPIONSHIP"
-                                     Style="{StaticResource RadioModeRightBtn}"
-                                     GroupName="ModeGroup"
-                                     IsChecked="{Binding IsChampionshipModeSelected, Mode=TwoWay}"/>
-                    </Grid>
-
-                    <!-- Player count row -->
-                    <TextBlock Text="NUMBER OF PLAYERS"
-                               FontSize="9"
-                               FontWeight="SemiBold"
-                               Foreground="{StaticResource BrushTextDim}"
-                               Margin="0,0,0,8"/>
-                    <Grid Margin="0,0,0,18">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="56"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Button Grid.Column="1"
-                                Content="−"
-                                Style="{StaticResource BtnCounter}"
-                                Command="{Binding DecrementCommand}"/>
-                        <TextBlock Grid.Column="2"
-                                   Text="{Binding PlayerCount}"
-                                   FontSize="24"
-                                   FontWeight="Bold"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"
-                                   Foreground="{StaticResource BrushText}"/>
-                        <Button Grid.Column="3"
-                                Content="+"
-                                Style="{StaticResource BtnCounter}"
-                                Command="{Binding IncrementCommand}"/>
-                    </Grid>
-
-                    <!-- Player names label -->
-                    <TextBlock Text="PLAYER NAMES"
-                               FontSize="9"
-                               FontWeight="SemiBold"
-                               Foreground="{StaticResource BrushTextDim}"
-                               Margin="0,0,0,8"/>
-                    <ScrollViewer MaxHeight="155"
-                                  VerticalScrollBarVisibility="Auto"
-                                  HorizontalScrollBarVisibility="Disabled"
-                                  Margin="0,0,0,20">
-                        <ItemsControl ItemsSource="{Binding PlayerEntries}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid Margin="0,0,0,6">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="24"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0"
-                                                   Text="{Binding Index}"
-                                                   VerticalAlignment="Center"
-                                                   FontSize="11"
-                                                   Foreground="{StaticResource BrushTextDim}"/>
-                                        <TextBox Grid.Column="1"
-                                                 Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
-                                    </Grid>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </ScrollViewer>
-
-                    <!-- Start button -->
+                    <!-- Start button pinned at the bottom -->
                     <Button Content="START TOURNAMENT"
                             Style="{StaticResource BtnPrimary}"
                             FontSize="13"
                             Padding="0,11"
-                            Command="{Binding StartCommand}"/>
-                </StackPanel>
+                            Command="{Binding StartCommand}"
+                            DockPanel.Dock="Bottom"
+                            Margin="0,10,0,0"/>
+
+                    <!-- Scrollable Inner Form -->
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel Margin="0,0,8,0">
+                            <!-- Session Name row -->
+                            <TextBlock Text="SESSION NAME"
+                                       FontSize="9"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource BrushTextDim}"
+                                       Margin="0,0,0,8"/>
+                            <TextBox Text="{Binding SessionName, UpdateSourceTrigger=PropertyChanged}"
+                                     Margin="0,0,0,18"/>
+
+                            <!-- Game selection row -->
+                            <TextBlock Text="SELECT GAME"
+                                       FontSize="9"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource BrushTextDim}"
+                                       Margin="0,0,0,8"/>
+                            <ComboBox ItemsSource="{Binding AvailableGames}"
+                                      SelectedItem="{Binding SelectedGame, Mode=TwoWay}"
+                                      IsEditable="True"
+                                      Margin="0,0,0,18"/>
+
+                            <!-- Default Rounds row -->
+                            <TextBlock Text="DEFAULT ROUNDS"
+                                       FontSize="9"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource BrushTextDim}"
+                                       Margin="0,0,0,8"/>
+                            <ComboBox ItemsSource="{Binding AvailableRoundsList}"
+                                      SelectedItem="{Binding SelectedRounds, Mode=TwoWay}"
+                                      Margin="0,0,0,18"/>
+
+                            <!-- Tournament Mode Row -->
+                            <TextBlock Text="TOURNAMENT MODE"
+                                       FontSize="9"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource BrushTextDim}"
+                                       Margin="0,0,0,8"/>
+                            <Grid Margin="0,0,0,18" Height="34">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <RadioButton Grid.Column="0"
+                                             Content="ENDLESS RUN"
+                                             Style="{StaticResource RadioModeLeftBtn}"
+                                             GroupName="ModeGroup"
+                                             IsChecked="{Binding IsEndlessModeSelected, Mode=TwoWay}"/>
+                                <RadioButton Grid.Column="1"
+                                             Content="CHAMPIONSHIP"
+                                             Style="{StaticResource RadioModeRightBtn}"
+                                             GroupName="ModeGroup"
+                                             IsChecked="{Binding IsChampionshipModeSelected, Mode=TwoWay}"/>
+                            </Grid>
+
+                            <!-- Player count row -->
+                            <TextBlock Text="NUMBER OF PLAYERS"
+                                       FontSize="9"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource BrushTextDim}"
+                                       Margin="0,0,0,8"/>
+                            <Grid Margin="0,0,0,18">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="56"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Grid.Column="1"
+                                        Content="−"
+                                        Style="{StaticResource BtnCounter}"
+                                        Command="{Binding DecrementCommand}"/>
+                                <TextBlock Grid.Column="2"
+                                           Text="{Binding PlayerCount}"
+                                           FontSize="24"
+                                           FontWeight="Bold"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Foreground="{StaticResource BrushText}"/>
+                                <Button Grid.Column="3"
+                                        Content="+"
+                                        Style="{StaticResource BtnCounter}"
+                                        Command="{Binding IncrementCommand}"/>
+                            </Grid>
+
+                            <!-- Player names label -->
+                            <TextBlock Text="PLAYER NAMES"
+                                       FontSize="9"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource BrushTextDim}"
+                                       Margin="0,0,0,8"/>
+                            <ItemsControl ItemsSource="{Binding PlayerEntries}" Margin="0,0,0,10">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,0,0,6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="24"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0"
+                                                       Text="{Binding Index}"
+                                                       VerticalAlignment="Center"
+                                                       FontSize="11"
+                                                       Foreground="{StaticResource BrushTextDim}"/>
+                                            <TextBox Grid.Column="1"
+                                                     Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </ScrollViewer>
+                </DockPanel>
             </Border>
 
-            <!-- ── CENTER CARD: Resume Saved Session ── -->
-            <Border Grid.Column="3"
-                    Background="{StaticResource BrushSurface}"
-                    BorderBrush="{StaticResource BrushBorder}"
-                    BorderThickness="1"
-                    CornerRadius="6"
-                    Padding="24,24"
-                    VerticalAlignment="Center">
-                <StackPanel>
-                    <TextBlock Text="RESUME SAVED SESSION"
-                               FontSize="11"
-                               FontWeight="Bold"
-                               Foreground="{StaticResource BrushAccent}"
-                               Margin="0,0,0,20"
-                               HorizontalAlignment="Center"/>
+            <!-- ── CENTER CARD: Resume Saved Session & Presets ── -->
+            <StackPanel Grid.Column="3" VerticalAlignment="Center">
+                <!-- Resume Card -->
+                <Border Background="{StaticResource BrushSurface}"
+                        BorderBrush="{StaticResource BrushBorder}"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        Padding="24,24"
+                        Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock Text="RESUME SAVED SESSION"
+                                   FontSize="11"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource BrushAccent}"
+                                   Margin="0,0,0,20"
+                                   HorizontalAlignment="Center"/>
 
-                    <!-- Saved Sessions Dropdown -->
-                    <TextBlock Text="SELECT SAVED SESSION"
-                               FontSize="9"
-                               FontWeight="SemiBold"
-                               Foreground="{StaticResource BrushTextDim}"
-                               Margin="0,0,0,8"/>
-                    <ComboBox ItemsSource="{Binding SavedSessions}"
-                              SelectedItem="{Binding SelectedSavedSession, Mode=TwoWay}"
-                              Margin="0,0,0,24"/>
+                        <!-- Saved Sessions Dropdown -->
+                        <TextBlock Text="SELECT SAVED SESSION"
+                                   FontSize="9"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource BrushTextDim}"
+                                   Margin="0,0,0,8"/>
+                        <ComboBox ItemsSource="{Binding SavedSessions}"
+                                  SelectedItem="{Binding SelectedSavedSession, Mode=TwoWay}"
+                                  Margin="0,0,0,24"/>
 
-                    <!-- Action buttons -->
-                    <Button Content="RESUME TOURNAMENT  ►"
-                            Style="{StaticResource BtnPrimary}"
-                            FontSize="13"
-                            Padding="0,11"
-                            Margin="0,0,0,12"
-                            Command="{Binding ResumeCommand}"/>
+                        <!-- Action buttons -->
+                        <Button Content="RESUME TOURNAMENT  ►"
+                                Style="{StaticResource BtnPrimary}"
+                                FontSize="13"
+                                Padding="0,11"
+                                Margin="0,0,0,12"
+                                Command="{Binding ResumeCommand}"/>
 
-                    <Button Content="DELETE SESSION  ✗"
-                            Style="{StaticResource BtnGhost}"
-                            FontSize="11"
-                            Padding="0,9"
-                            Command="{Binding DeleteSessionCommand}"/>
-                </StackPanel>
-            </Border>
+                        <Button Content="DELETE SESSION  ✗"
+                                Style="{StaticResource BtnGhost}"
+                                FontSize="11"
+                                Padding="0,9"
+                                Command="{Binding DeleteSessionCommand}"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Presets Card -->
+                <Border Background="{StaticResource BrushSurface}"
+                        BorderBrush="{StaticResource BrushBorder}"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        Padding="24,24">
+                    <StackPanel>
+                        <TextBlock Text="SAVED PRESETS"
+                                   FontSize="11"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource BrushAccent}"
+                                   Margin="0,0,0,20"
+                                   HorizontalAlignment="Center"/>
+
+                        <TextBlock Text="LOAD SAVED PRESET"
+                                   FontSize="9"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource BrushTextDim}"
+                                   Margin="0,0,0,8"/>
+                        <Grid Margin="0,0,0,18">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <ComboBox ItemsSource="{Binding UserPresets}"
+                                      SelectedItem="{Binding SelectedUserPreset, Mode=TwoWay}"
+                                      DisplayMemberPath="PresetName"
+                                      VerticalAlignment="Center"/>
+                            <Button Grid.Column="1"
+                                    Content="Delete"
+                                    Style="{StaticResource BtnGhost}"
+                                    Width="60"
+                                    Margin="8,0,0,0"
+                                    Padding="0,6"
+                                    Command="{Binding DeletePresetCommand}"/>
+                        </Grid>
+
+                        <TextBlock Text="SAVE CURRENT SETUP AS PRESET"
+                                   FontSize="9"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource BrushTextDim}"
+                                   Margin="0,0,0,8"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Text="{Binding NewPresetName, UpdateSourceTrigger=PropertyChanged}"
+                                     VerticalAlignment="Center"/>
+                            <Button Grid.Column="1"
+                                    Content="Save"
+                                    Style="{StaticResource BtnGhost}"
+                                    Width="60"
+                                    Margin="8,0,0,0"
+                                    Padding="0,6"
+                                    Command="{Binding SavePresetCommand}"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
 
             <!-- ── RIGHT SIDEBAR: Registered Players ── -->
             <Border Grid.Column="5"
@@ -407,9 +484,8 @@
             </Border>
         </Grid>
 
-        <!-- ── Row 2: Footer ── -->
         <TextBlock Grid.Row="2"
-                   Text="Round-robin · all vs all · circle algorithm"
+                   Text="Round-robin  ·  all-pairs per cycle  ·  endless or championship"
                    FontSize="11"
                    HorizontalAlignment="Center"
                    Foreground="{StaticResource BrushTextDim}"

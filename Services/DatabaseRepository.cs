@@ -38,14 +38,15 @@ public static class DatabaseRepository
             {
                 insertTournamentCmd.Transaction = transaction;
                 insertTournamentCmd.CommandText = @"
-                    INSERT INTO Tournaments (SessionName, SelectedGame, CurrentCycleIndex, IsFinished, TournamentMode)
-                    VALUES (@SessionName, @SelectedGame, @CurrentCycleIndex, @IsFinished, @TournamentMode);
+                    INSERT INTO Tournaments (SessionName, SelectedGame, CurrentCycleIndex, IsFinished, TournamentMode, DefaultRounds)
+                    VALUES (@SessionName, @SelectedGame, @CurrentCycleIndex, @IsFinished, @TournamentMode, @DefaultRounds);
                     SELECT last_insert_rowid();";
                 insertTournamentCmd.Parameters.AddWithValue("@SessionName", tournament.SessionName);
                 insertTournamentCmd.Parameters.AddWithValue("@SelectedGame", tournament.SelectedGame);
                 insertTournamentCmd.Parameters.AddWithValue("@CurrentCycleIndex", tournament.CurrentCycleIndex);
                 insertTournamentCmd.Parameters.AddWithValue("@IsFinished", tournament.IsFinished ? 1 : 0);
                 insertTournamentCmd.Parameters.AddWithValue("@TournamentMode", tournament.Mode.ToString());
+                insertTournamentCmd.Parameters.AddWithValue("@DefaultRounds", tournament.DefaultRounds);
 
                 tournamentId = (long)insertTournamentCmd.ExecuteScalar()!;
             }
@@ -129,14 +130,15 @@ public static class DatabaseRepository
                     using var insertMatchCmd = connection.CreateCommand();
                     insertMatchCmd.Transaction = transaction;
                     insertMatchCmd.CommandText = @"
-                        INSERT INTO Matches (CycleId, Player1Id, Player2Id, WinnerId, Character1, Character2)
-                        VALUES (@CycleId, @Player1Id, @Player2Id, @WinnerId, @Character1, @Character2);";
+                        INSERT INTO Matches (CycleId, Player1Id, Player2Id, WinnerId, Character1, Character2, Rounds)
+                        VALUES (@CycleId, @Player1Id, @Player2Id, @WinnerId, @Character1, @Character2, @Rounds);";
                     insertMatchCmd.Parameters.AddWithValue("@CycleId", cycleId);
                     insertMatchCmd.Parameters.AddWithValue("@Player1Id", p1Id);
                     insertMatchCmd.Parameters.AddWithValue("@Player2Id", p2Id);
                     insertMatchCmd.Parameters.AddWithValue("@WinnerId", (object?)match.WinnerId ?? DBNull.Value);
                     insertMatchCmd.Parameters.AddWithValue("@Character1", (object?)match.Character1 ?? DBNull.Value);
                     insertMatchCmd.Parameters.AddWithValue("@Character2", (object?)match.Character2 ?? DBNull.Value);
+                    insertMatchCmd.Parameters.AddWithValue("@Rounds", match.Rounds);
                     insertMatchCmd.ExecuteNonQuery();
                 }
             }
@@ -222,10 +224,11 @@ public static class DatabaseRepository
         long tournamentId;
         string selectedGame;
         int currentCycleIndex;
+        int defaultRounds = 3;
         TournamentMode tournamentMode = TournamentMode.Endless;
         using (var cmd = connection.CreateCommand())
         {
-            cmd.CommandText = "SELECT Id, SelectedGame, CurrentCycleIndex, TournamentMode FROM Tournaments WHERE SessionName = @SessionName";
+            cmd.CommandText = "SELECT Id, SelectedGame, CurrentCycleIndex, TournamentMode, DefaultRounds FROM Tournaments WHERE SessionName = @SessionName";
             cmd.Parameters.AddWithValue("@SessionName", sessionName);
             using var reader = cmd.ExecuteReader();
             if (!reader.Read()) return null;
@@ -244,6 +247,11 @@ public static class DatabaseRepository
             {
                 tournamentMode = parsedMode;
             }
+
+            if (reader.FieldCount > 4 && !reader.IsDBNull(4))
+            {
+                defaultRounds = reader.GetInt32(4);
+            }
         }
 
         var tournament = new Tournament
@@ -251,7 +259,8 @@ public static class DatabaseRepository
             SessionName = sessionName,
             SelectedGame = selectedGame,
             CurrentCycleIndex = currentCycleIndex,
-            Mode = tournamentMode
+            Mode = tournamentMode,
+            DefaultRounds = defaultRounds
         };
 
         // 2. Fetch players and their character picks
@@ -313,7 +322,7 @@ public static class DatabaseRepository
                 // Fetch matches in this cycle
                 using (var matchCmd = connection.CreateCommand())
                 {
-                    matchCmd.CommandText = "SELECT Player1Id, Player2Id, WinnerId, Character1, Character2 FROM Matches WHERE CycleId = @CycleId";
+                    matchCmd.CommandText = "SELECT Player1Id, Player2Id, WinnerId, Character1, Character2, Rounds FROM Matches WHERE CycleId = @CycleId";
                     matchCmd.Parameters.AddWithValue("@CycleId", cycleId);
                     using var matchReader = matchCmd.ExecuteReader();
                     while (matchReader.Read())
@@ -323,6 +332,11 @@ public static class DatabaseRepository
                         int? winnerId = matchReader.IsDBNull(2) ? null : matchReader.GetInt32(2);
                         string? char1 = matchReader.IsDBNull(3) ? null : matchReader.GetString(3);
                         string? char2 = matchReader.IsDBNull(4) ? null : matchReader.GetString(4);
+                        int rounds = 3;
+                        if (matchReader.FieldCount > 5 && !matchReader.IsDBNull(5))
+                        {
+                            rounds = matchReader.GetInt32(5);
+                        }
 
                         if (playerMap.TryGetValue(p1Id, out var p1) && playerMap.TryGetValue(p2Id, out var p2))
                         {
@@ -330,7 +344,8 @@ public static class DatabaseRepository
                             {
                                 WinnerId = winnerId,
                                 Character1 = char1,
-                                Character2 = char2
+                                Character2 = char2,
+                                Rounds = rounds
                             };
                             cycle.Matches.Add(match);
                         }
@@ -340,5 +355,137 @@ public static class DatabaseRepository
         }
 
         return tournament;
+    }
+
+    // ── Custom Games ──────────────────────────────────────────────────
+
+    public static List<string> GetCustomGames()
+    {
+        var list = new List<string>();
+        using var connection = DatabaseConnector.Instance.GetConnection();
+        connection.Open();
+
+        using var command = connection.CreateCommand();
+        command.CommandText = "SELECT Name FROM CustomGames ORDER BY Name";
+
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            list.Add(reader.GetString(0));
+        }
+
+        return list;
+    }
+
+    public static void SaveCustomGame(string gameName)
+    {
+        if (string.IsNullOrWhiteSpace(gameName)) return;
+
+        using var connection = DatabaseConnector.Instance.GetConnection();
+        connection.Open();
+
+        using var command = connection.CreateCommand();
+        command.CommandText = "INSERT OR IGNORE INTO CustomGames (Name) VALUES (@Name)";
+        command.Parameters.AddWithValue("@Name", gameName.Trim());
+        command.ExecuteNonQuery();
+    }
+
+    // ── Custom Characters ─────────────────────────────────────────────
+
+    public static List<string> GetCustomCharacters(string gameName)
+    {
+        var list = new List<string>();
+        if (string.IsNullOrWhiteSpace(gameName)) return list;
+
+        using var connection = DatabaseConnector.Instance.GetConnection();
+        connection.Open();
+
+        using var command = connection.CreateCommand();
+        command.CommandText = "SELECT Name FROM CustomCharacters WHERE GameName = @GameName ORDER BY Name";
+        command.Parameters.AddWithValue("@GameName", gameName.Trim());
+
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            list.Add(reader.GetString(0));
+        }
+
+        return list;
+    }
+
+    public static void SaveCustomCharacter(string gameName, string charName)
+    {
+        if (string.IsNullOrWhiteSpace(gameName) || string.IsNullOrWhiteSpace(charName)) return;
+
+        using var connection = DatabaseConnector.Instance.GetConnection();
+        connection.Open();
+
+        using var command = connection.CreateCommand();
+        command.CommandText = "INSERT OR IGNORE INTO CustomCharacters (GameName, Name) VALUES (@GameName, @Name)";
+        command.Parameters.AddWithValue("@GameName", gameName.Trim());
+        command.Parameters.AddWithValue("@Name", charName.Trim());
+        command.ExecuteNonQuery();
+    }
+
+    // ── User Presets ──────────────────────────────────────────────────
+
+    public static List<UserPreset> GetUserPresets()
+    {
+        var list = new List<UserPreset>();
+        using var connection = DatabaseConnector.Instance.GetConnection();
+        connection.Open();
+
+        using var command = connection.CreateCommand();
+        command.CommandText = "SELECT Id, PresetName, DefaultGame, DefaultMode, DefaultRounds, PlayerCount, PlayerNames FROM UserPresets ORDER BY PresetName";
+
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            list.Add(new UserPreset
+            {
+                Id = reader.GetInt32(0),
+                PresetName = reader.GetString(1),
+                DefaultGame = reader.IsDBNull(2) ? null : reader.GetString(2),
+                DefaultMode = reader.IsDBNull(3) ? null : reader.GetString(3),
+                DefaultRounds = reader.IsDBNull(4) ? 3 : reader.GetInt32(4),
+                PlayerCount = reader.IsDBNull(5) ? 0 : reader.GetInt32(5),
+                PlayerNames = reader.IsDBNull(6) ? null : reader.GetString(6)
+            });
+        }
+
+        return list;
+    }
+
+    public static void SaveUserPreset(UserPreset preset)
+    {
+        if (string.IsNullOrWhiteSpace(preset.PresetName)) return;
+
+        using var connection = DatabaseConnector.Instance.GetConnection();
+        connection.Open();
+
+        using var command = connection.CreateCommand();
+        command.CommandText = @"
+            INSERT OR REPLACE INTO UserPresets (PresetName, DefaultGame, DefaultMode, DefaultRounds, PlayerCount, PlayerNames)
+            VALUES (@PresetName, @DefaultGame, @DefaultMode, @DefaultRounds, @PlayerCount, @PlayerNames)";
+        command.Parameters.AddWithValue("@PresetName", preset.PresetName.Trim());
+        command.Parameters.AddWithValue("@DefaultGame", (object?)preset.DefaultGame ?? DBNull.Value);
+        command.Parameters.AddWithValue("@DefaultMode", (object?)preset.DefaultMode ?? DBNull.Value);
+        command.Parameters.AddWithValue("@DefaultRounds", preset.DefaultRounds);
+        command.Parameters.AddWithValue("@PlayerCount", preset.PlayerCount);
+        command.Parameters.AddWithValue("@PlayerNames", (object?)preset.PlayerNames ?? DBNull.Value);
+        command.ExecuteNonQuery();
+    }
+
+    public static void DeleteUserPreset(string presetName)
+    {
+        if (string.IsNullOrWhiteSpace(presetName)) return;
+
+        using var connection = DatabaseConnector.Instance.GetConnection();
+        connection.Open();
+
+        using var command = connection.CreateCommand();
+        command.CommandText = "DELETE FROM UserPresets WHERE PresetName = @PresetName";
+        command.Parameters.AddWithValue("@PresetName", presetName.Trim());
+        command.ExecuteNonQuery();
     }
 }

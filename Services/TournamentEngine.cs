@@ -13,9 +13,9 @@ public static class TournamentEngine
 {
     // ── Create ───────────────────────────────────────────────────────
 
-    public static Tournament Create(IReadOnlyList<string> playerNames, TournamentMode mode = TournamentMode.Endless)
+    public static Tournament Create(IReadOnlyList<string> playerNames, TournamentMode mode = TournamentMode.Endless, int defaultRounds = 3)
     {
-        var t = new Tournament { Mode = mode };
+        var t = new Tournament { Mode = mode, DefaultRounds = defaultRounds };
 
         if (mode == TournamentMode.Championship)
         {
@@ -41,7 +41,7 @@ public static class TournamentEngine
             {
                 var p1 = t.Players[i];
                 var p2 = t.Players[k - 1 - i];
-                var match = new Match(p1, p2);
+                var match = new Match(p1, p2) { Rounds = defaultRounds };
                 round1.Matches.Add(match);
 
                 // Auto-resolve matches containing BYE players
@@ -77,7 +77,7 @@ public static class TournamentEngine
 
         for (int i = 0; i < active.Count; i++)
             for (int j = i + 1; j < active.Count; j++)
-                cycle.Matches.Add(new Match(active[i], active[j]));
+                cycle.Matches.Add(new Match(active[i], active[j]) { Rounds = t.DefaultRounds });
 
         return cycle;
     }
@@ -101,7 +101,7 @@ public static class TournamentEngine
         {
             if (i + 1 < winners.Count)
             {
-                var match = new Match(winners[i], winners[i + 1]);
+                var match = new Match(winners[i], winners[i + 1]) { Rounds = t.DefaultRounds };
                 cycle.Matches.Add(match);
 
                 // Auto-resolve matches containing BYE players

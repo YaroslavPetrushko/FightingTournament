@@ -146,20 +146,12 @@
                 Padding="20,12">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-
-                <!-- Title -->
-                <StackPanel Grid.Column="0" Orientation="Horizontal">
-                    <TextBlock Text="" FontSize="16" VerticalAlignment="Center" Margin="0,0,50,0"/>
-                    <!-- <TextBlock Text="FIGHTING TOURNAMENT" FontSize="14" FontWeight="Bold" -->
-                    <!--            VerticalAlignment="Center"/> -->
-                </StackPanel>
-
-                <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                
+                <StackPanel Grid.Column="0" HorizontalAlignment="Center">
                     <TextBlock Text="{Binding CycleHeader}"
                                FontSize="13" FontWeight="SemiBold"
                                HorizontalAlignment="Center"
@@ -170,12 +162,12 @@
                                Visibility="{Binding StatusMessage, Converter={StaticResource StrVis}}"/>
                 </StackPanel>
 
-                <Button Grid.Column="2" Content="New Tournament"
+                <Button Grid.Column="1" Content="New Tournament"
                         Style="{StaticResource BtnGhost}"
                         Padding="12,7" FontSize="11" Margin="0,0,10,0"
                         Command="{Binding NewTournamentCommand}"/>
 
-                <Button Grid.Column="3" Content="{Binding SaveButtonText}"
+                <Button Grid.Column="2" Content="{Binding SaveButtonText}"
                         Style="{StaticResource BtnPrimary}"
                         Padding="16,8" FontSize="12"
                         Command="{Binding CommitCycleCommand}"/>
@@ -304,12 +296,14 @@
                             <!-- Column headers -->
                             <Grid DockPanel.Dock="Top" Margin="0,0,0,6">
                                 <Grid.ColumnDefinitions>
-                                    <!-- P1 name | WIN | vs | WIN | P2 name | gap | Char1 | gap | Char2 -->
+                                    <!-- P1 name | WIN | vs | WIN | P2 name | gap | Rounds | gap | Char1 | gap | Char2 -->
                                     <ColumnDefinition Width="*"    MinWidth="80"/>
                                     <ColumnDefinition Width="54"/>
                                     <ColumnDefinition Width="26"/>
                                     <ColumnDefinition Width="54"/>
                                     <ColumnDefinition Width="*"    MinWidth="80"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="64"/>
                                     <ColumnDefinition Width="12"/>
                                     <ColumnDefinition Width="140"/>
                                     <ColumnDefinition Width="8"/>
@@ -321,10 +315,13 @@
                                 <TextBlock Grid.Column="4" Text="PLAYER 2"
                                            Style="{StaticResource ColHeader}"
                                            HorizontalAlignment="Left"  Margin="6,0,0,0"/>
-                                <TextBlock Grid.Column="6" Text="CHARACTER 1"
+                                <TextBlock Grid.Column="6" Text="ROUNDS"
                                            Style="{StaticResource ColHeader}"
                                            HorizontalAlignment="Center"/>
-                                <TextBlock Grid.Column="8" Text="CHARACTER 2"
+                                <TextBlock Grid.Column="8" Text="CHARACTER 1"
+                                           Style="{StaticResource ColHeader}"
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock Grid.Column="10" Text="CHARACTER 2"
                                            Style="{StaticResource ColHeader}"
                                            HorizontalAlignment="Center"/>
                             </Grid>
@@ -347,6 +344,8 @@
                                                         <ColumnDefinition Width="26"/>
                                                         <ColumnDefinition Width="54"/>
                                                         <ColumnDefinition Width="*"    MinWidth="80"/>
+                                                        <ColumnDefinition Width="12"/>
+                                                        <ColumnDefinition Width="64"/>
                                                         <ColumnDefinition Width="12"/>
                                                         <ColumnDefinition Width="140"/>
                                                         <ColumnDefinition Width="8"/>
@@ -398,8 +397,16 @@
                                                                TextTrimming="CharacterEllipsis"
                                                                ToolTip="{Binding Player2Name}"/>
 
-                                                    <!-- Char 1 -->
+                                                    <!-- Rounds -->
                                                     <ComboBox Grid.Column="6"
+                                                              ItemsSource="{Binding AvailableRounds}"
+                                                              SelectedItem="{Binding Rounds, Mode=TwoWay}"
+                                                              IsEnabled="{Binding CanEditRounds}"
+                                                              HorizontalContentAlignment="Center"
+                                                              VerticalAlignment="Center"/>
+
+                                                    <!-- Char 1 -->
+                                                    <ComboBox Grid.Column="8"
                                                               IsEditable="True"
                                                               ItemsSource="{Binding AvailableCharacters}"
                                                               Text="{Binding Character1, Mode=TwoWay,
@@ -408,7 +415,7 @@
                                                               VerticalAlignment="Center"/>
 
                                                     <!-- Char 2 -->
-                                                    <ComboBox Grid.Column="8"
+                                                    <ComboBox Grid.Column="10"
                                                               IsEditable="True"
                                                               ItemsSource="{Binding AvailableCharacters}"
                                                               Text="{Binding Character2, Mode=TwoWay,
@@ -593,6 +600,76 @@
                         <TextBlock Grid.Column="5" Text="CHAR" Style="{StaticResource ColHeader}" HorizontalAlignment="Center"/>
                     </Grid>
                     <Separator DockPanel.Dock="Top" Margin="0,0,0,4"/>
+
+                    <!-- Add Player Mid-Tournament Panel -->
+                    <Grid DockPanel.Dock="Bottom" Margin="0,10,0,0" Visibility="{Binding CanAddPlayerMidTournament, Converter={StaticResource BoolVis}}">
+                        <Button Content="+  ADD PLAYER MID-TOURNAMENT"
+                                FontSize="11"
+                                Padding="0,9"
+                                Command="{Binding ShowAddPlayerCommand}">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource BtnGhost}">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsAddingPlayer}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+
+                        <!-- State 2: Active input form -->
+                        <Border Background="{StaticResource BrushSurface2}"
+                                BorderBrush="{StaticResource BrushBorder}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="10">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsAddingPlayer}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <StackPanel>
+                                <TextBlock Text="ADD PLAYER TO TOURNAMENT"
+                                           FontSize="9"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource BrushTextDim}"
+                                           Margin="0,0,0,6"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Text="{Binding NewPlayerName, UpdateSourceTrigger=PropertyChanged}"
+                                             Grid.Column="0"
+                                             Margin="0,0,6,0"
+                                             VerticalAlignment="Center"/>
+                                    <Button Grid.Column="1"
+                                            Content="Save"
+                                            Style="{StaticResource BtnPrimary}"
+                                            Padding="10,5"
+                                            FontSize="11"
+                                            Margin="0,0,4,0"
+                                            Command="{Binding SaveNewPlayerCommand}"
+                                            VerticalAlignment="Center"/>
+                                    <Button Grid.Column="2"
+                                            Content="Cancel"
+                                            Style="{StaticResource BtnGhost}"
+                                            Padding="8,5"
+                                            FontSize="11"
+                                            Command="{Binding CancelAddPlayerCommand}"
+                                            VerticalAlignment="Center"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
 
                     <!-- Player rows -->
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
