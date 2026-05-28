@@ -107,6 +107,7 @@
     <Grid Margin="{Binding Padding, RelativeSource={RelativeSource AncestorType=Window}}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/> <!-- Title Bar -->
+            <RowDefinition Height="Auto"/> <!-- Menu Bar -->
             <RowDefinition Height="*"/>    <!-- Main Content -->
         </Grid.RowDefinitions>
 
@@ -190,7 +191,25 @@
             </Border>
         </Grid>
 
+        <!-- ── Custom Dark Menu Bar ── -->
+        <Border Grid.Row="1" Background="{StaticResource BrushSurface}" BorderBrush="{StaticResource BrushBorder}" BorderThickness="0,0,0,1" Padding="15,2" WindowChrome.IsHitTestVisibleInChrome="True">
+            <Menu Background="Transparent" BorderThickness="0">
+                <MenuItem Header="_File" Style="{StaticResource MenuItem}">
+                    <MenuItem Header="_Open Database (.db)..." Command="{Binding OpenDatabaseCommand}"/>
+                    <MenuItem Header="_Save Database Copy As..." Command="{Binding SaveDatabaseAsCommand}"/>
+                    <Separator Style="{StaticResource MenuSeparator}"/>
+                    <MenuItem Header="_Exit" Command="{Binding ExitCommand}"/>
+                </MenuItem>
+                <MenuItem Header="_Settings" Style="{StaticResource MenuItem}">
+                    <MenuItem Header="_Clean Up Legacy Sessions" Command="{Binding CleanSessionsCommand}"/>
+                </MenuItem>
+                <MenuItem Header="_About" Style="{StaticResource MenuItem}">
+                    <MenuItem Header="_About Tracker" Command="{Binding AboutCommand}"/>
+                </MenuItem>
+            </Menu>
+        </Border>
+
         <!-- ── Main Content Area ── -->
-        <ContentControl Grid.Row="1" Content="{Binding CurrentView}" Focusable="False"/>
+        <ContentControl Grid.Row="2" Content="{Binding CurrentView}" Focusable="False"/>
     </Grid>
 </Window>
