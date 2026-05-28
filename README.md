@@ -5,7 +5,7 @@ Built with **.NET 8 + WPF**, using pure MVVM architecture and high-fidelity cust
 
 ---
 
-## 🚀 Features (v4.0 — current state)
+## 🚀 Features (v5.0 — current state)
 
 | Feature                                  | Description                                                                                                     | Status |
 |------------------------------------------|-----------------------------------------------------------------------------------------------------------------|:------:|
@@ -20,7 +20,7 @@ Built with **.NET 8 + WPF**, using pure MVVM architecture and high-fidelity cust
 | **Round-robin Schedule**                 | Generates pairing matching using the circle algorithm.                                                          |   ✅    |
 | **Dynamic Player Setup**                 | Custom player counts (2–16) with unique validation checks.                                                      |   ✅    |
 | **Select Game Presets**                  | Select a game at setup to populate game-specific character autocompletes.                                       |   ✅    |
-| **Rich Character Databases**             | Predefined rosters for Tekken 8, Guilty Gear -Strive-, SF6, MK1, Smash Ultimate., UMvC 3 and DBFZ               |   ✅    |
+| **Rich Character Databases**             | Predefined rosters for Tekken 8, Guilty Gear -Strive-, SF6, MK1, Smash Ultimate, UMvC 3 and DBFZ.               |   ✅    |
 | **Custom Dark Theme**                    | Custom dark mode styling for all inputs, buttons, sliders, text boxes, and scrollbars.                          |   ✅    |
 | **High-Legibility ToolTips**             | Custom dark-themed popover tooltips with crisp white text.                                                      |   ✅    |
 | **Interactive ComboBox Templates**       | Completely custom-templated dropdown inputs using toggle overlays for flawless UX.                              |   ✅    |
@@ -37,6 +37,11 @@ Built with **.NET 8 + WPF**, using pure MVVM architecture and high-fidelity cust
 | **Editable Game Selector**               | Game dropdown is fully editable, automatically registering new typed game names in the permanent registry.      |   ✅    |
 | **Character Auto-Learning**              | Auto-learns newly entered character names on round commits, instantly updating autocomplete suggestions.        |   ✅    |
 | **Match-Level Round Settings**           | Configure individual rounds count (2, 3, 4, 5) per match pair; Championship mode supports static default setup. |   ✅    |
+| **Visual Media PNG Exporter**            | Direct one-click PNG screenshots of Standings and Bracket trees, tightly cropped to eliminate empty space.      |   ✅    |
+| **Rounded Window Chrome & Glow**         | Transparent layout with a custom border (`CornerRadius="8"`) and a soft, dimmed active outline.                 |   ✅    |
+| **Top Outline Omission & Corner Inset**  | Border thickness excludes top edge to frame gradient accents; 1.5px inset mask prevents grid overlap clipping.  |   ✅    |
+| **Adaptive Dashboard Scaling**           | Proportional layout grids that dynamically expand names, standings columns, and character dropdowns up to 2K.   |   ✅    |
+| **Global Player Roster Deletion**        | Right-click registered players sidebar in setup to cleanly prompt and delete players from the global registry.  |   ✅    |
 
 ---
 
@@ -50,9 +55,13 @@ Built with **.NET 8 + WPF**, using pure MVVM architecture and high-fidelity cust
 - **Roster Ramps:** Full 50-character list for Ultimate Marvel Vs. Capcom 3, 41-character DBFZ, and recent SF6/MK1 DLC additions.
 - **Mid-Tournament Additions:** Sleek Endless Mode card button enabling player additions inside upcoming cycles.
 
-### 📊 Milestone 5: Advanced Analytics
-- **Performance Charting:** Dynamic round-by-round statistics and charts displaying character pick-rates and tournament progress.
-- **Media Exporter:** Direct one-click screenshot/image and PDF exports of the final standings, winner podium, and matches logs.
+### 📊 Milestone 5: Advanced Analytics & Polish [COMPLETED]
+- **Performance Charting:** Character pick-rates, win rate rankings, and progress tracking on setup/tournament layers.
+- **Media Exporter:** High-performance, tightly shrink-wrapped PNG visual exports of standings and single-elimination tournament brackets.
+- **Rounded Windows Chrome & Active Outline**: Custom transparent window styling with rounded borders, a dimmed premium crimson active outline, and top edge omission.
+- **Content Inset Masking**: 1.5px inset padding mask that prevents child elements from overlapping the rounded corner curves.
+- **Adaptive Grid Scaling**: Proportional grid columns across Left (schedule DockPanel), Right (star-sized player/character), and Center (expanded scoring dropdowns and player names) panels to support HD, Full HD, and 2K screens.
+- **Global Player Directory Maintenance**: Left-click to quick-add, right-click to prompt confirmation and delete registered players globally.
 
 ---
 
@@ -121,4 +130,4 @@ The round-robin pairings are generated using the **circle (polygon) rotation met
 
 ---
 
-#### Developed in collaboration with Antigravity AI (Google DeepMind).
+#### Developed using Antigravity AI (Google Gemini 3.5 Flash).

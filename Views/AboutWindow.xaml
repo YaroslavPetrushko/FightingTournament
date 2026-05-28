@@ -1,0 +1,83 @@
+<Window x:Class="FightingTournament.Views.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="About Tracker"
+        Height="400" Width="500"
+        WindowStartupLocation="CenterOwner"
+        Background="Transparent"
+        AllowsTransparency="True"
+        Foreground="{StaticResource BrushText}"
+        ResizeMode="NoResize"
+        WindowStyle="None">
+
+    <Border Background="{StaticResource BrushBg}">
+        <Border.Style>
+            <Style TargetType="Border">
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="1,0,1,1"/>
+                <Setter Property="CornerRadius" Value="8"/>
+                <Setter Property="Padding" Value="2"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsActive, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                        <Setter Property="BorderBrush" Value="{StaticResource BrushAccentDim}"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Title / Icon -->
+            <RowDefinition Height="*"/>    <!-- Text info / credits -->
+            <RowDefinition Height="Auto"/> <!-- Close Button -->
+        </Grid.RowDefinitions>
+
+        <!-- Gradients border on top of the window -->
+        <Border Height="3" VerticalAlignment="Top" Margin="-20,-20,-20,0" Grid.Row="0">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#0D0D15" Offset="0.0"/>
+                    <GradientStop Color="#E8003D" Offset="0.5"/>
+                    <GradientStop Color="#0D0D15" Offset="1.0"/>
+                </LinearGradientBrush>
+            </Border.Background>
+        </Border>
+
+        <!-- Icon & Title -->
+        <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,15,0,15">
+            <TextBlock Text="⚔" FontSize="36" Foreground="{StaticResource BrushAccent}" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+            <TextBlock Text="FIGHTING TOURNAMENT TRACKER" FontSize="14" FontWeight="Bold" Foreground="{StaticResource BrushText}" HorizontalAlignment="Center"/>
+            <TextBlock Text="Version 5.0" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource BrushTextDim}" HorizontalAlignment="Center"/>
+        </StackPanel>
+
+        <!-- Text Description & Credits -->
+        <StackPanel Grid.Row="1" Margin="10,0,10,20">
+            <TextBlock Text="A .NET 8 desktop application for scoring and managing local fighting game tournaments. Developed using Antigravity AI (Google Gemini 3.5 Flash)."
+                       FontSize="12"
+                       TextWrapping="Wrap"
+                       TextAlignment="Center"
+                       Foreground="{StaticResource BrushText}"
+                       Margin="0,0,0,18"
+                       LineHeight="18"/>
+
+            <Border Background="{StaticResource BrushSurface2}" BorderBrush="{StaticResource BrushBorder}" BorderThickness="1" Padding="12" CornerRadius="4">
+                <StackPanel>
+                    <TextBlock Text="✨ KEY ADVANCEMENTS IN V5.0" FontSize="10" FontWeight="Bold" Foreground="{StaticResource BrushAccent}" Margin="0,0,0,6"/>
+                    <TextBlock Text="• File Swapping: Open and backup custom tournament databases." FontSize="11" Foreground="{StaticResource BrushText}" Margin="0,0,0,4"/>
+                    <TextBlock Text="• PNG Exporters: Export standing leaders and brackets directly as images." FontSize="11" Foreground="{StaticResource BrushText}" Margin="0,0,0,4"/>
+                    <TextBlock Text="• Presets Manager: Save favorite rosters and settings in one click." FontSize="11" Foreground="{StaticResource BrushText}"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <!-- Close Button -->
+        <Button Grid.Row="2"
+                Content="CLOSE"
+                Style="{StaticResource BtnPrimary}"
+                Padding="30,8"
+                FontSize="11"
+                HorizontalAlignment="Center"
+                Click="CloseButton_Click"/>
+    </Grid>
+    </Border>
+</Window>

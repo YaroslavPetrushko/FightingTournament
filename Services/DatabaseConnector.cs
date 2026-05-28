@@ -11,8 +11,10 @@ public class DatabaseConnector
 
     public static DatabaseConnector Instance => _instance.Value;
 
-    private readonly string _dbPath;
-    private readonly string _connectionString;
+    private string _dbPath;
+    private string _connectionString;
+
+    public string CurrentDbPath => _dbPath;
 
     private DatabaseConnector()
     {
@@ -24,6 +26,37 @@ public class DatabaseConnector
             Mode = SqliteOpenMode.ReadWriteCreate,
             ForeignKeys = true // Enable foreign keys constraint support!
         }.ToString();
+    }
+
+    public void ChangeDatabasePath(string newPath)
+    {
+        if (string.IsNullOrWhiteSpace(newPath)) return;
+
+        _dbPath = newPath;
+        _connectionString = new SqliteConnectionStringBuilder
+        {
+            DataSource = _dbPath,
+            Mode = SqliteOpenMode.ReadWriteCreate,
+            ForeignKeys = true
+        }.ToString();
+
+        InitializeDatabase();
+    }
+
+    public void SaveDatabaseCopyAs(string targetPath)
+    {
+        if (string.IsNullOrWhiteSpace(targetPath)) return;
+
+        // Clear all Sqlite connection pools to release any lock on the current database file
+        SqliteConnection.ClearAllPools();
+
+        string currentPath = _dbPath;
+        if (File.Exists(currentPath))
+        {
+            File.Copy(currentPath, targetPath, true);
+        }
+
+        ChangeDatabasePath(targetPath);
     }
 
     /// <summary>
