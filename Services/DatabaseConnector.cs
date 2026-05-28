@@ -178,6 +178,14 @@ public class DatabaseConnector
             ExecuteNonQuery(createCustomCharacters, connection, transaction);
             ExecuteNonQuery(createUserPresets, connection, transaction);
 
+            // 9. UserSettings table
+            string createUserSettings = @"
+                CREATE TABLE IF NOT EXISTS UserSettings (
+                    Key TEXT PRIMARY KEY,
+                    Value TEXT
+                );";
+            ExecuteNonQuery(createUserSettings, connection, transaction);
+
             // Backward compatibility: Alter table to add TournamentMode and DefaultRounds if missing
             using (var checkCmd = connection.CreateCommand())
             {
@@ -246,6 +254,45 @@ public class DatabaseConnector
         {
             transaction.Rollback();
             throw;
+        }
+    }
+
+    public string GetSetting(string key, string defaultValue)
+    {
+        try
+        {
+            using var connection = GetConnection();
+            connection.Open();
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText = "SELECT Value FROM UserSettings WHERE Key = @Key;";
+            cmd.Parameters.AddWithValue("@Key", key);
+            var result = cmd.ExecuteScalar();
+            return result != null ? result.ToString()! : defaultValue;
+        }
+        catch
+        {
+            return defaultValue;
+        }
+    }
+
+    public void SaveSetting(string key, string value)
+    {
+        try
+        {
+            using var connection = GetConnection();
+            connection.Open();
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText = @"
+                INSERT INTO UserSettings (Key, Value) 
+                VALUES (@Key, @Value)
+                ON CONFLICT(Key) DO UPDATE SET Value = excluded.Value;";
+            cmd.Parameters.AddWithValue("@Key", key);
+            cmd.Parameters.AddWithValue("@Value", value);
+            cmd.ExecuteNonQuery();
+        }
+        catch
+        {
+            // Fail silently or handle
         }
     }
 

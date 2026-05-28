@@ -22,6 +22,7 @@ public class MainViewModel : BaseViewModel
     public ICommand CleanSessionsCommand  { get; }
     public ICommand AboutCommand          { get; }
     public ICommand ExitCommand           { get; }
+    public ICommand ChangeThemeCommand    { get; }
 
     public MainViewModel()
     {
@@ -30,8 +31,36 @@ public class MainViewModel : BaseViewModel
         CleanSessionsCommand  = new RelayCommand(CleanSessions);
         AboutCommand          = new RelayCommand(ShowAbout);
         ExitCommand           = new RelayCommand(ExitApplication);
+        ChangeThemeCommand    = new RelayCommand(p => ChangeTheme(p as string));
+
+        // Load persisted dynamic theme on startup
+        ThemeManager.Initialize();
 
         NavigateToSetup();
+    }
+
+    public string CurrentThemeName => ThemeManager.CurrentTheme;
+
+    public bool IsDefaultThemeChecked => CurrentThemeName == "default";
+    public bool IsVoltGreenThemeChecked => CurrentThemeName == "volt_green";
+    public bool IsElectricBlueThemeChecked => CurrentThemeName == "electric_blue";
+    public bool IsDeepDarkThemeChecked => CurrentThemeName == "deep_dark";
+    public bool IsMinimalistThemeChecked => CurrentThemeName == "minimalist";
+    public bool IsWhiteThemeChecked => CurrentThemeName == "white";
+
+    private void ChangeTheme(string? themeName)
+    {
+        if (themeName == null) return;
+        ThemeManager.ApplyTheme(themeName);
+        
+        // Notify UI to update checkmarks
+        OnPropertyChanged(nameof(CurrentThemeName));
+        OnPropertyChanged(nameof(IsDefaultThemeChecked));
+        OnPropertyChanged(nameof(IsVoltGreenThemeChecked));
+        OnPropertyChanged(nameof(IsElectricBlueThemeChecked));
+        OnPropertyChanged(nameof(IsDeepDarkThemeChecked));
+        OnPropertyChanged(nameof(IsMinimalistThemeChecked));
+        OnPropertyChanged(nameof(IsWhiteThemeChecked));
     }
 
     private void NavigateToSetup()

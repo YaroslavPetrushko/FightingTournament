@@ -6,11 +6,11 @@
         WindowStartupLocation="CenterOwner"
         Background="Transparent"
         AllowsTransparency="True"
-        Foreground="{StaticResource BrushText}"
+        Foreground="{DynamicResource BrushText}"
         ResizeMode="NoResize"
         WindowStyle="None">
 
-    <Border Background="{StaticResource BrushBg}">
+    <Border Background="{DynamicResource BrushBg}">
         <Border.Style>
             <Style TargetType="Border">
                 <Setter Property="BorderBrush" Value="Transparent"/>
@@ -19,7 +19,7 @@
                 <Setter Property="Padding" Value="2"/>
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding IsActive, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
-                        <Setter Property="BorderBrush" Value="{StaticResource BrushAccentDim}"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource BrushAccentDim}"/>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
@@ -36,18 +36,18 @@
         <Border Height="3" VerticalAlignment="Top" Margin="-20,-20,-20,0" Grid.Row="0">
             <Border.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                    <GradientStop Color="#0D0D15" Offset="0.0"/>
-                    <GradientStop Color="#E8003D" Offset="0.5"/>
-                    <GradientStop Color="#0D0D15" Offset="1.0"/>
+                    <GradientStop Color="{DynamicResource ColorBg}" Offset="0.0"/>
+                    <GradientStop Color="{DynamicResource ColorAccent}" Offset="0.5"/>
+                    <GradientStop Color="{DynamicResource ColorBg}" Offset="1.0"/>
                 </LinearGradientBrush>
             </Border.Background>
         </Border>
 
         <!-- Icon & Title -->
         <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,15,0,15">
-            <TextBlock Text="⚔" FontSize="36" Foreground="{StaticResource BrushAccent}" HorizontalAlignment="Center" Margin="0,0,0,5"/>
-            <TextBlock Text="FIGHTING TOURNAMENT TRACKER" FontSize="14" FontWeight="Bold" Foreground="{StaticResource BrushText}" HorizontalAlignment="Center"/>
-            <TextBlock Text="Version 5.0" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource BrushTextDim}" HorizontalAlignment="Center"/>
+            <TextBlock Text="⚔" FontSize="36" Foreground="{DynamicResource BrushAccent}" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+            <TextBlock Text="FIGHTING TOURNAMENT TRACKER" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource BrushText}" HorizontalAlignment="Center"/>
+            <TextBlock Text="Version 5.0" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextDim}" HorizontalAlignment="Center"/>
         </StackPanel>
 
         <!-- Text Description & Credits -->
@@ -56,16 +56,16 @@
                        FontSize="12"
                        TextWrapping="Wrap"
                        TextAlignment="Center"
-                       Foreground="{StaticResource BrushText}"
+                       Foreground="{DynamicResource BrushText}"
                        Margin="0,0,0,18"
                        LineHeight="18"/>
 
-            <Border Background="{StaticResource BrushSurface2}" BorderBrush="{StaticResource BrushBorder}" BorderThickness="1" Padding="12" CornerRadius="4">
+            <Border Background="{DynamicResource BrushSurface2}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" Padding="12" CornerRadius="4">
                 <StackPanel>
-                    <TextBlock Text="✨ KEY ADVANCEMENTS IN V5.0" FontSize="10" FontWeight="Bold" Foreground="{StaticResource BrushAccent}" Margin="0,0,0,6"/>
-                    <TextBlock Text="• File Swapping: Open and backup custom tournament databases." FontSize="11" Foreground="{StaticResource BrushText}" Margin="0,0,0,4"/>
-                    <TextBlock Text="• PNG Exporters: Export standing leaders and brackets directly as images." FontSize="11" Foreground="{StaticResource BrushText}" Margin="0,0,0,4"/>
-                    <TextBlock Text="• Presets Manager: Save favorite rosters and settings in one click." FontSize="11" Foreground="{StaticResource BrushText}"/>
+                    <TextBlock Text="✨ KEY ADVANCEMENTS IN V5.0" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}" Margin="0,0,0,6"/>
+                    <TextBlock Text="• File Swapping: Open and backup custom tournament databases." FontSize="11" Foreground="{DynamicResource BrushText}" Margin="0,0,0,4"/>
+                    <TextBlock Text="• PNG Exporters: Export standing leaders and brackets directly as images." FontSize="11" Foreground="{DynamicResource BrushText}" Margin="0,0,0,4"/>
+                    <TextBlock Text="• Presets Manager: Save favorite rosters and settings in one click." FontSize="11" Foreground="{DynamicResource BrushText}"/>
                 </StackPanel>
             </Border>
         </StackPanel>
