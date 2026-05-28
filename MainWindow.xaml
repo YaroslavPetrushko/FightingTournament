@@ -105,10 +105,11 @@
     </Window.DataContext>
 
     <!-- Outer Border to provide Active/Inactive Crimson Accent Line & Rounded Corners -->
-    <Border BorderThickness="1" Background="{StaticResource BrushBg}">
+    <Border Background="{StaticResource BrushBg}">
         <Border.Style>
             <Style TargetType="Border">
                 <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="1,0,1,1"/>
                 <Setter Property="CornerRadius" Value="8"/>
                 <Setter Property="Padding" Value="2"/>
                 <Style.Triggers>
