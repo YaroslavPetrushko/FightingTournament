@@ -120,6 +120,8 @@ public class TournamentViewModel : BaseViewModel
     public ICommand ShowAddPlayerCommand  { get; }
     public ICommand SaveNewPlayerCommand  { get; }
     public ICommand CancelAddPlayerCommand { get; }
+    public ICommand ExportStandingsPngCommand { get; }
+    public ICommand ExportBracketPngCommand   { get; }
 
     // ── Constructor ──────────────────────────────────────────────────
 
@@ -135,6 +137,8 @@ public class TournamentViewModel : BaseViewModel
         ShowAddPlayerCommand = new RelayCommand(ShowAddPlayer);
         SaveNewPlayerCommand = new RelayCommand(SaveNewPlayer);
         CancelAddPlayerCommand = new RelayCommand(CancelAddPlayer);
+        ExportStandingsPngCommand = new RelayCommand(ExportStandingsPng);
+        ExportBracketPngCommand   = new RelayCommand(ExportBracketPng);
 
         BuildStandings();
         RefreshScheduleSidebar();
@@ -508,5 +512,65 @@ public class TournamentViewModel : BaseViewModel
 
         IsAddingPlayer = false;
         NewPlayerName = string.Empty;
+    }
+
+    private void ExportStandingsPng(object? parameter)
+    {
+        if (parameter is FrameworkElement element)
+        {
+            var saveFileDialog = new Microsoft.Win32.SaveFileDialog
+            {
+                Filter = "PNG Image (*.png)|*.png",
+                Title = "Export Standings Leaderboard as PNG",
+                FileName = $"Standings_{_tournament.SessionName.Replace(" ", "_").Replace("-", "_").Replace(".", "_")}.png"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    PngExporter.Export(element, saveFileDialog.FileName);
+                    MessageBox.Show($"Standings successfully exported to:\n{saveFileDialog.FileName}", "Export Succeeded", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Could not export standings:\n{ex.Message}", "Export Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+        else
+        {
+            MessageBox.Show("Could not locate the standings component to export.", "Export Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
+    private void ExportBracketPng(object? parameter)
+    {
+        if (parameter is FrameworkElement element)
+        {
+            var saveFileDialog = new Microsoft.Win32.SaveFileDialog
+            {
+                Filter = "PNG Image (*.png)|*.png",
+                Title = "Export Tournament Bracket as PNG",
+                FileName = $"Bracket_{_tournament.SessionName.Replace(" ", "_").Replace("-", "_").Replace(".", "_")}.png"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    PngExporter.Export(element, saveFileDialog.FileName);
+                    MessageBox.Show($"Bracket successfully exported to:\n{saveFileDialog.FileName}", "Export Succeeded", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Could not export bracket:\n{ex.Message}", "Export Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+        else
+        {
+            MessageBox.Show("Could not locate the bracket component to export.", "Export Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 }

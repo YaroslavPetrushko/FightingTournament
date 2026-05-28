@@ -473,8 +473,24 @@
                     <!-- BRACKET VIEW (Visible when ShowBracket is true) -->
                     <Grid Visibility="{Binding ShowBracket, Converter={StaticResource BoolVis}}">
                         <DockPanel>
+                            <!-- Export Button Bar for Bracket -->
+                            <Grid DockPanel.Dock="Top" Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="CHAMPIONSHIP BRACKET" Style="{StaticResource ColHeader}" VerticalAlignment="Center" Margin="0"/>
+                                <Button Grid.Column="1"
+                                        Content="📷  Export Bracket PNG"
+                                        Style="{StaticResource BtnGhost}"
+                                        Padding="10,5"
+                                        FontSize="10"
+                                        Command="{Binding ExportBracketPngCommand}"
+                                        CommandParameter="{Binding ElementName=BracketTreeContainer}"/>
+                            </Grid>
+
                             <!-- Horizontal stack of rounds/cycles -->
-                            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                            <ScrollViewer x:Name="BracketTreeContainer" Background="{StaticResource BrushBg}" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                                 <ItemsControl ItemsSource="{Binding CycleSchedule}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
@@ -578,10 +594,25 @@
                     BorderThickness="1,0,0,0"
                     Padding="14,18">
                 <DockPanel>
-                    <TextBlock DockPanel.Dock="Top" Text="STANDINGS"
-                               Style="{StaticResource ColHeader}"/>
+                    <Grid DockPanel.Dock="Top" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="STANDINGS" Style="{StaticResource ColHeader}" Margin="0" VerticalAlignment="Center"/>
+                        <Button Grid.Column="1"
+                                Content="📷  Export PNG"
+                                Style="{StaticResource BtnGhost}"
+                                Padding="8,4"
+                                FontSize="9"
+                                VerticalAlignment="Center"
+                                Command="{Binding ExportStandingsPngCommand}"
+                                CommandParameter="{Binding ElementName=StandingsContainer}"/>
+                    </Grid>
 
-                    <!-- Header row -->
+                    <Border x:Name="StandingsContainer" Background="{StaticResource BrushSurface}">
+                        <DockPanel>
+                            <!-- Header row -->
                     <Grid DockPanel.Dock="Top" Margin="0,0,0,4">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="22"/>   <!-- # -->
@@ -762,6 +793,8 @@
                     </ScrollViewer>
                 </DockPanel>
             </Border>
+        </DockPanel>
+    </Border>
         </Grid>
     </DockPanel>
 </UserControl>
