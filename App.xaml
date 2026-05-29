@@ -5,6 +5,9 @@
              xmlns:views="clr-namespace:FightingTournament.Views"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
+        <!-- Fallback static colors for dynamic theme resources -->
+        <Color x:Key="ColorBg">#0D0D15</Color>
+        <Color x:Key="ColorAccent">#E8003D</Color>
 
         <!-- ═══════════════════════════════════════════════════════════
              PALETTE

@@ -26,12 +26,19 @@ public static class PngExporter
 
         if (width <= 0 || height <= 0) return;
 
+        var source = PresentationSource.FromVisual(element);
+        double dpiX = 96d, dpiY = 96d;
+        if (source?.CompositionTarget != null)
+        {
+            dpiX = 96d * source.CompositionTarget.TransformToDevice.M11;
+            dpiY = 96d * source.CompositionTarget.TransformToDevice.M22;
+        }
+
         // Render the visual element onto a Bitmap
         RenderTargetBitmap rtb = new RenderTargetBitmap(
-            (int)width,
-            (int)height,
-            96d,
-            96d,
+            (int)(width * dpiX / 96d),
+            (int)(height * dpiY / 96d),
+            dpiX, dpiY,
             PixelFormats.Pbgra32);
 
         rtb.Render(element);

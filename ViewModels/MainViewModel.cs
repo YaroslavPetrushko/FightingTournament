@@ -78,6 +78,17 @@ public class MainViewModel : BaseViewModel
 
     private void OpenDatabase()
     {
+        if (CurrentView is TournamentViewModel)
+        {
+            var result = MessageBox.Show(
+                "A tournament is in progress. Unsaved cycle data will be lost.\n\nContinue?",
+                "Unsaved Changes",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (result != MessageBoxResult.Yes) return;
+        }
+
         var openFileDialog = new OpenFileDialog
         {
             Filter = "SQLite Database (*.db)|*.db",
@@ -113,8 +124,8 @@ public class MainViewModel : BaseViewModel
             try
             {
                 DatabaseConnector.Instance.SaveDatabaseCopyAs(saveFileDialog.FileName);
-                NavigateToSetup();
-                MessageBox.Show($"Database backup successfully created and active:\n{saveFileDialog.FileName}", "Database Saved", MessageBoxButton.OK, MessageBoxImage.Information);
+                // Active database stays active, so do NOT call NavigateToSetup() here.
+                MessageBox.Show($"Database backup successfully created:\n{saveFileDialog.FileName}", "Database Saved", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {

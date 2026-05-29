@@ -11,10 +11,20 @@ public class DatabaseConnector
 
     public static DatabaseConnector Instance => _instance.Value;
 
+    private readonly object _lock = new();
     private string _dbPath;
     private string _connectionString;
 
-    public string CurrentDbPath => _dbPath;
+    public string CurrentDbPath
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return _dbPath;
+            }
+        }
+    }
 
     private DatabaseConnector()
     {
@@ -32,13 +42,16 @@ public class DatabaseConnector
     {
         if (string.IsNullOrWhiteSpace(newPath)) return;
 
-        _dbPath = newPath;
-        _connectionString = new SqliteConnectionStringBuilder
+        lock (_lock)
         {
-            DataSource = _dbPath,
-            Mode = SqliteOpenMode.ReadWriteCreate,
-            ForeignKeys = true
-        }.ToString();
+            _dbPath = newPath;
+            _connectionString = new SqliteConnectionStringBuilder
+            {
+                DataSource = _dbPath,
+                Mode = SqliteOpenMode.ReadWriteCreate,
+                ForeignKeys = true
+            }.ToString();
+        }
 
         InitializeDatabase();
     }
@@ -50,19 +63,23 @@ public class DatabaseConnector
         // Clear all Sqlite connection pools to release any lock on the current database file
         SqliteConnection.ClearAllPools();
 
-        string currentPath = _dbPath;
+        string currentPath = CurrentDbPath;
         if (File.Exists(currentPath))
         {
             File.Copy(currentPath, targetPath, true);
         }
-
-        ChangeDatabasePath(targetPath);
     }
 
     /// <summary>
     /// Gets a new SQLite connection. The caller is responsible for opening and disposing it.
     /// </summary>
-    public SqliteConnection GetConnection() => new(_connectionString);
+    public SqliteConnection GetConnection()
+    {
+        lock (_lock)
+        {
+            return new SqliteConnection(_connectionString);
+        }
+    }
 
     /// <summary>
     /// Initializes the database file and creates the schema tables if they do not exist.
@@ -269,8 +286,9 @@ public class DatabaseConnector
             var result = cmd.ExecuteScalar();
             return result != null ? result.ToString()! : defaultValue;
         }
-        catch
+        catch (Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine($"Failed to get setting '{key}': {ex.Message}");
             return defaultValue;
         }
     }
@@ -290,9 +308,9 @@ public class DatabaseConnector
             cmd.Parameters.AddWithValue("@Value", value);
             cmd.ExecuteNonQuery();
         }
-        catch
+        catch (Exception ex)
         {
-            // Fail silently or handle
+            System.Diagnostics.Debug.WriteLine($"Failed to save setting '{key}' = '{value}': {ex.Message}");
         }
     }
 

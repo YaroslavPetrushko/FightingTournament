@@ -133,7 +133,10 @@ public class TournamentViewModel : BaseViewModel
 
         CommitCycleCommand   = new RelayCommand(CommitCycle);
         NewTournamentCommand = new RelayCommand(onNewTournament);
-        SelectCycleCommand   = new RelayCommand(p => SelectCycle((CycleInfoViewModel)p!));
+        SelectCycleCommand   = new RelayCommand(p =>
+        {
+            if (p is CycleInfoViewModel vm) SelectCycle(vm);
+        });
         ShowAddPlayerCommand = new RelayCommand(ShowAddPlayer);
         SaveNewPlayerCommand = new RelayCommand(SaveNewPlayer);
         CancelAddPlayerCommand = new RelayCommand(CancelAddPlayer);
@@ -322,7 +325,9 @@ public class TournamentViewModel : BaseViewModel
                 var cycle = _tournament.Cycles[i];
                 foreach (var m in cycle.Matches)
                 {
-                    if (m.IsCompleted)
+                    if (m.IsCompleted &&
+                        !m.Player1.Name.Equals("BYE", StringComparison.OrdinalIgnoreCase) &&
+                        !m.Player2.Name.Equals("BYE", StringComparison.OrdinalIgnoreCase))
                     {
                         bool p1Won = m.WinnerId == 1;
                         m.Player1.RecordResult(p1Won,  m.Character1);
@@ -394,10 +399,6 @@ public class TournamentViewModel : BaseViewModel
         {
             StatusMessage = $"⚠  Cycle {savedNumber} saved locally, but database save failed: {ex.Message}";
         }
-        OnPropertyChanged(nameof(CycleHeader));
-        OnPropertyChanged(nameof(IsFinished));
-        OnPropertyChanged(nameof(WinnerName));
-        OnPropertyChanged(nameof(CanAddPlayerMidTournament));
     }
 
     private void SelectCycle(CycleInfoViewModel cycleVm)
