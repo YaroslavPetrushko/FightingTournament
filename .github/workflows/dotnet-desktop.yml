@@ -2,7 +2,8 @@
 # built on .NET 8.
 #
 # Build & Test run on pushes and pull requests to both "develop" and "main" branches.
-# The portable ZIP package is compiled and uploaded as a build artifact ONLY on pushes/merges to the "main" branch.
+# The portable ZIP package is compiled and uploaded as a build artifact AND automatically
+# published as a GitHub Release asset ONLY on pushes/merges to the "main" branch.
 
 name: .NET Core Desktop CI/CD
 
@@ -21,6 +22,9 @@ jobs:
         configuration: [Release]
 
     runs-on: windows-latest
+
+    permissions:
+      contents: write
 
     env:
       Solution_Name: FightingTournament.sln
@@ -68,10 +72,23 @@ jobs:
       shell: powershell
       run: Compress-Archive -Path ./publish/* -DestinationPath ./FightingTournament-Portable-win-x64.zip
 
-    # Upload the portable ZIP package as an artifact (ONLY on push/merge to main branch)
+    # Upload the portable ZIP package as an Action artifact (ONLY on push/merge to main branch)
     - name: Upload portable ZIP artifact
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       uses: actions/upload-artifact@v4
       with:
         name: FightingTournament-Portable
         path: FightingTournament-Portable-win-x64.zip
+
+    # Create GitHub Release and upload portable ZIP asset (ONLY on push/merge to main branch)
+    - name: Create GitHub Release and Upload Asset
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: v1.0.${{ github.run_number }}
+        name: Release v1.0.${{ github.run_number }}
+        draft: false
+        prerelease: false
+        files: FightingTournament-Portable-win-x64.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
