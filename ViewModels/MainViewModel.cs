@@ -22,6 +22,7 @@ public class MainViewModel : BaseViewModel
     public ICommand CleanSessionsCommand  { get; }
     public ICommand AboutCommand          { get; }
     public ICommand ExitCommand           { get; }
+    public ICommand ChangeThemeCommand    { get; }
 
     public MainViewModel()
     {
@@ -30,8 +31,36 @@ public class MainViewModel : BaseViewModel
         CleanSessionsCommand  = new RelayCommand(CleanSessions);
         AboutCommand          = new RelayCommand(ShowAbout);
         ExitCommand           = new RelayCommand(ExitApplication);
+        ChangeThemeCommand    = new RelayCommand(p => ChangeTheme(p as string));
+
+        // Load persisted dynamic theme on startup
+        ThemeManager.Initialize();
 
         NavigateToSetup();
+    }
+
+    public string CurrentThemeName => ThemeManager.CurrentTheme;
+
+    public bool IsDefaultThemeChecked => CurrentThemeName == "default";
+    public bool IsVoltGreenThemeChecked => CurrentThemeName == "volt_green";
+    public bool IsElectricBlueThemeChecked => CurrentThemeName == "electric_blue";
+    public bool IsDeepDarkThemeChecked => CurrentThemeName == "deep_dark";
+    public bool IsMinimalistThemeChecked => CurrentThemeName == "minimalist";
+    public bool IsWhiteThemeChecked => CurrentThemeName == "white";
+
+    private void ChangeTheme(string? themeName)
+    {
+        if (themeName == null) return;
+        ThemeManager.ApplyTheme(themeName);
+        
+        // Notify UI to update checkmarks
+        OnPropertyChanged(nameof(CurrentThemeName));
+        OnPropertyChanged(nameof(IsDefaultThemeChecked));
+        OnPropertyChanged(nameof(IsVoltGreenThemeChecked));
+        OnPropertyChanged(nameof(IsElectricBlueThemeChecked));
+        OnPropertyChanged(nameof(IsDeepDarkThemeChecked));
+        OnPropertyChanged(nameof(IsMinimalistThemeChecked));
+        OnPropertyChanged(nameof(IsWhiteThemeChecked));
     }
 
     private void NavigateToSetup()
@@ -49,6 +78,17 @@ public class MainViewModel : BaseViewModel
 
     private void OpenDatabase()
     {
+        if (CurrentView is TournamentViewModel)
+        {
+            var result = MessageBox.Show(
+                "A tournament is in progress. Unsaved cycle data will be lost.\n\nContinue?",
+                "Unsaved Changes",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (result != MessageBoxResult.Yes) return;
+        }
+
         var openFileDialog = new OpenFileDialog
         {
             Filter = "SQLite Database (*.db)|*.db",
@@ -84,8 +124,8 @@ public class MainViewModel : BaseViewModel
             try
             {
                 DatabaseConnector.Instance.SaveDatabaseCopyAs(saveFileDialog.FileName);
-                NavigateToSetup();
-                MessageBox.Show($"Database backup successfully created and active:\n{saveFileDialog.FileName}", "Database Saved", MessageBoxButton.OK, MessageBoxImage.Information);
+                // Active database stays active, so do NOT call NavigateToSetup() here.
+                MessageBox.Show($"Database backup successfully created:\n{saveFileDialog.FileName}", "Database Saved", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {

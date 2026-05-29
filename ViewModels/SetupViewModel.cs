@@ -90,6 +90,8 @@ public class SetupViewModel : BaseViewModel
             {
                 if (value != null)
                 {
+                    // NOTE: Instantly loading the preset on selection is the intended UX flow 
+                    // for rapid bracket/setup configuration.
                     LoadPreset(value);
                 }
             }
@@ -192,13 +194,26 @@ public class SetupViewModel : BaseViewModel
     private void RefreshAvailableGames()
     {
         AvailableGames.Clear();
-        var games = new SortedSet<string>(GameDatabase.Games.Keys, StringComparer.OrdinalIgnoreCase);
+        
+        // Build sorted list of games excluding the "Custom (Any/Blank)" option to prevent it from sorting mid-list
+        var games = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var key in GameDatabase.Games.Keys)
+        {
+            if (!key.Equals("Custom (Any/Blank)", StringComparison.OrdinalIgnoreCase))
+            {
+                games.Add(key);
+            }
+        }
+
         try
         {
             var customGames = DatabaseRepository.GetCustomGames();
             foreach (var g in customGames)
             {
-                games.Add(g);
+                if (!g.Equals("Custom (Any/Blank)", StringComparison.OrdinalIgnoreCase))
+                {
+                    games.Add(g);
+                }
             }
         }
         catch {}
@@ -207,6 +222,9 @@ public class SetupViewModel : BaseViewModel
         {
             AvailableGames.Add(g);
         }
+
+        // Always place "Custom (Any/Blank)" at the very end of the list for clean UX
+        AvailableGames.Add("Custom (Any/Blank)");
     }
 
     public void RefreshUserPresets()

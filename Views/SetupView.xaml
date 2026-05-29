@@ -42,8 +42,8 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="RadioButton">
                         <Border x:Name="BtnBorder"
-                                Background="{StaticResource BrushSurface2}"
-                                BorderBrush="{StaticResource BrushBorder}"
+                                Background="{DynamicResource BrushSurface2}"
+                                BorderBrush="{DynamicResource BrushBorder}"
                                 BorderThickness="1"
                                 CornerRadius="4,0,0,4"
                                 Padding="10,8"
@@ -52,18 +52,18 @@
                                        Text="{TemplateBinding Content}"
                                        FontSize="10"
                                        FontWeight="Bold"
-                                       Foreground="{StaticResource BrushTextDim}"
+                                       Foreground="{DynamicResource BrushTextDim}"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="BtnBorder" Property="Background" Value="{StaticResource BrushAccentDim}"/>
-                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource BrushAccent}"/>
+                                <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource BrushAccentDim}"/>
+                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
                                 <Setter TargetName="Label" Property="Foreground" Value="White"/>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource BrushAccentHover}"/>
+                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{DynamicResource BrushAccentHover}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -77,8 +77,8 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="RadioButton">
                         <Border x:Name="BtnBorder"
-                                Background="{StaticResource BrushSurface2}"
-                                BorderBrush="{StaticResource BrushBorder}"
+                                Background="{DynamicResource BrushSurface2}"
+                                BorderBrush="{DynamicResource BrushBorder}"
                                 BorderThickness="0,1,1,1"
                                 CornerRadius="0,4,4,0"
                                 Padding="10,8"
@@ -87,18 +87,18 @@
                                        Text="{TemplateBinding Content}"
                                        FontSize="10"
                                        FontWeight="Bold"
-                                       Foreground="{StaticResource BrushTextDim}"
+                                       Foreground="{DynamicResource BrushTextDim}"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="BtnBorder" Property="Background" Value="{StaticResource BrushAccentDim}"/>
-                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource BrushAccent}"/>
+                                <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource BrushAccentDim}"/>
+                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
                                 <Setter TargetName="Label" Property="Foreground" Value="White"/>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource BrushAccentHover}"/>
+                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{DynamicResource BrushAccentHover}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -121,13 +121,13 @@
                        FontFamily="Segoe UI"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center">
-                <Run Text="⚔  FIGHTING TOURNAMENT " Foreground="{StaticResource BrushText}"/>
-                <Run Text="TRACKER" Foreground="{StaticResource BrushAccent}"/>
+                <Run Text="⚔  FIGHTING TOURNAMENT " Foreground="{DynamicResource BrushText}"/>
+                <Run Text="TRACKER" Foreground="{DynamicResource BrushAccent}"/>
             </TextBlock>
 
             <!-- Global Validation Message -->
             <TextBlock Text="{Binding ValidationMessage}"
-                       Foreground="{StaticResource BrushLoss}"
+                       Foreground="{DynamicResource BrushLoss}"
                        FontSize="13"
                        FontWeight="SemiBold"
                        TextWrapping="Wrap"
@@ -151,8 +151,8 @@
 
             <!-- ── LEFT CARD: Create New Tournament ── -->
             <Border Grid.Column="1"
-                    Background="{StaticResource BrushSurface}"
-                    BorderBrush="{StaticResource BrushBorder}"
+                    Background="{DynamicResource BrushSurface}"
+                    BorderBrush="{DynamicResource BrushBorder}"
                     BorderThickness="1"
                     CornerRadius="6"
                     Padding="24,20"
@@ -162,7 +162,7 @@
                     <TextBlock Text="CREATE NEW TOURNAMENT"
                                FontSize="11"
                                FontWeight="Bold"
-                               Foreground="{StaticResource BrushAccent}"
+                               Foreground="{DynamicResource BrushAccent}"
                                Margin="0,0,0,15"
                                HorizontalAlignment="Center"
                                DockPanel.Dock="Top"/>
@@ -183,7 +183,7 @@
                             <TextBlock Text="SESSION NAME"
                                        FontSize="9"
                                        FontWeight="SemiBold"
-                                       Foreground="{StaticResource BrushTextDim}"
+                                       Foreground="{DynamicResource BrushTextDim}"
                                        Margin="0,0,0,8"/>
                             <TextBox Text="{Binding SessionName, UpdateSourceTrigger=PropertyChanged}"
                                      Margin="0,0,0,18"/>
@@ -192,10 +192,11 @@
                             <TextBlock Text="SELECT GAME"
                                        FontSize="9"
                                        FontWeight="SemiBold"
-                                       Foreground="{StaticResource BrushTextDim}"
+                                       Foreground="{DynamicResource BrushTextDim}"
                                        Margin="0,0,0,8"/>
                             <ComboBox ItemsSource="{Binding AvailableGames}"
                                       SelectedItem="{Binding SelectedGame, Mode=TwoWay}"
+                                      Text="{Binding SelectedGame, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                       IsEditable="True"
                                       Margin="0,0,0,18"/>
 
@@ -203,7 +204,7 @@
                             <TextBlock Text="DEFAULT ROUNDS"
                                        FontSize="9"
                                        FontWeight="SemiBold"
-                                       Foreground="{StaticResource BrushTextDim}"
+                                       Foreground="{DynamicResource BrushTextDim}"
                                        Margin="0,0,0,8"/>
                             <ComboBox ItemsSource="{Binding AvailableRoundsList}"
                                       SelectedItem="{Binding SelectedRounds, Mode=TwoWay}"
@@ -213,7 +214,7 @@
                             <TextBlock Text="TOURNAMENT MODE"
                                        FontSize="9"
                                        FontWeight="SemiBold"
-                                       Foreground="{StaticResource BrushTextDim}"
+                                       Foreground="{DynamicResource BrushTextDim}"
                                        Margin="0,0,0,8"/>
                             <Grid Margin="0,0,0,18" Height="34">
                                 <Grid.ColumnDefinitions>
@@ -236,7 +237,7 @@
                             <TextBlock Text="NUMBER OF PLAYERS"
                                        FontSize="9"
                                        FontWeight="SemiBold"
-                                       Foreground="{StaticResource BrushTextDim}"
+                                       Foreground="{DynamicResource BrushTextDim}"
                                        Margin="0,0,0,8"/>
                             <Grid Margin="0,0,0,18">
                                 <Grid.ColumnDefinitions>
@@ -256,7 +257,7 @@
                                            FontWeight="Bold"
                                            HorizontalAlignment="Center"
                                            VerticalAlignment="Center"
-                                           Foreground="{StaticResource BrushText}"/>
+                                           Foreground="{DynamicResource BrushText}"/>
                                 <Button Grid.Column="3"
                                         Content="+"
                                         Style="{StaticResource BtnCounter}"
@@ -267,7 +268,7 @@
                             <TextBlock Text="PLAYER NAMES"
                                        FontSize="9"
                                        FontWeight="SemiBold"
-                                       Foreground="{StaticResource BrushTextDim}"
+                                       Foreground="{DynamicResource BrushTextDim}"
                                        Margin="0,0,0,8"/>
                             <ItemsControl ItemsSource="{Binding PlayerEntries}" Margin="0,0,0,10">
                                 <ItemsControl.ItemTemplate>
@@ -281,7 +282,7 @@
                                                        Text="{Binding Index}"
                                                        VerticalAlignment="Center"
                                                        FontSize="11"
-                                                       Foreground="{StaticResource BrushTextDim}"/>
+                                                       Foreground="{DynamicResource BrushTextDim}"/>
                                             <TextBox Grid.Column="1"
                                                      Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
                                         </Grid>
@@ -296,8 +297,8 @@
             <!-- ── CENTER CARD: Resume Saved Session & Presets ── -->
             <StackPanel Grid.Column="3" VerticalAlignment="Center">
                 <!-- Resume Card -->
-                <Border Background="{StaticResource BrushSurface}"
-                        BorderBrush="{StaticResource BrushBorder}"
+                <Border Background="{DynamicResource BrushSurface}"
+                        BorderBrush="{DynamicResource BrushBorder}"
                         BorderThickness="1"
                         CornerRadius="6"
                         Padding="24,24"
@@ -306,7 +307,7 @@
                         <TextBlock Text="RESUME SAVED SESSION"
                                    FontSize="11"
                                    FontWeight="Bold"
-                                   Foreground="{StaticResource BrushAccent}"
+                                   Foreground="{DynamicResource BrushAccent}"
                                    Margin="0,0,0,20"
                                    HorizontalAlignment="Center"/>
 
@@ -314,7 +315,7 @@
                         <TextBlock Text="SELECT SAVED SESSION"
                                    FontSize="9"
                                    FontWeight="SemiBold"
-                                   Foreground="{StaticResource BrushTextDim}"
+                                   Foreground="{DynamicResource BrushTextDim}"
                                    Margin="0,0,0,8"/>
                         <ComboBox ItemsSource="{Binding SavedSessions}"
                                   SelectedItem="{Binding SelectedSavedSession, Mode=TwoWay}"
@@ -337,8 +338,8 @@
                 </Border>
 
                 <!-- Presets Card -->
-                <Border Background="{StaticResource BrushSurface}"
-                        BorderBrush="{StaticResource BrushBorder}"
+                <Border Background="{DynamicResource BrushSurface}"
+                        BorderBrush="{DynamicResource BrushBorder}"
                         BorderThickness="1"
                         CornerRadius="6"
                         Padding="24,24">
@@ -346,14 +347,14 @@
                         <TextBlock Text="SAVED PRESETS"
                                    FontSize="11"
                                    FontWeight="Bold"
-                                   Foreground="{StaticResource BrushAccent}"
+                                   Foreground="{DynamicResource BrushAccent}"
                                    Margin="0,0,0,20"
                                    HorizontalAlignment="Center"/>
 
                         <TextBlock Text="LOAD SAVED PRESET"
                                    FontSize="9"
                                    FontWeight="SemiBold"
-                                   Foreground="{StaticResource BrushTextDim}"
+                                   Foreground="{DynamicResource BrushTextDim}"
                                    Margin="0,0,0,8"/>
                         <Grid Margin="0,0,0,18">
                             <Grid.ColumnDefinitions>
@@ -376,7 +377,7 @@
                         <TextBlock Text="SAVE CURRENT SETUP AS PRESET"
                                    FontSize="9"
                                    FontWeight="SemiBold"
-                                   Foreground="{StaticResource BrushTextDim}"
+                                   Foreground="{DynamicResource BrushTextDim}"
                                    Margin="0,0,0,8"/>
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -399,8 +400,8 @@
 
             <!-- ── RIGHT SIDEBAR: Registered Players ── -->
             <Border Grid.Column="5"
-                    Background="{StaticResource BrushSurface}"
-                    BorderBrush="{StaticResource BrushBorder}"
+                    Background="{DynamicResource BrushSurface}"
+                    BorderBrush="{DynamicResource BrushBorder}"
                     BorderThickness="1"
                     CornerRadius="6"
                     Padding="20,24"
@@ -409,14 +410,14 @@
                     <TextBlock Text="REGISTERED PLAYERS"
                                FontSize="11"
                                FontWeight="Bold"
-                               Foreground="{StaticResource BrushAccent}"
+                               Foreground="{DynamicResource BrushAccent}"
                                Margin="0,0,0,4"
                                HorizontalAlignment="Center"/>
 
                     <TextBlock Text="L-CLICK TO ADD | R-CLICK TO DELETE"
                                FontSize="9"
                                FontWeight="SemiBold"
-                               Foreground="{StaticResource BrushTextDim}"
+                               Foreground="{DynamicResource BrushTextDim}"
                                Margin="0,0,0,16"
                                HorizontalAlignment="Center"/>
 
@@ -442,20 +443,20 @@
                                         <Button.Template>
                                             <ControlTemplate TargetType="Button">
                                                 <Border x:Name="BtnBorder"
-                                                        Background="{StaticResource BrushSurface2}"
-                                                        BorderBrush="{StaticResource BrushBorder}"
+                                                        Background="{DynamicResource BrushSurface2}"
+                                                        BorderBrush="{DynamicResource BrushBorder}"
                                                         BorderThickness="1"
                                                         CornerRadius="4"
                                                         Padding="{TemplateBinding Padding}">
                                                     <TextBlock Text="{Binding}"
                                                                FontSize="12"
                                                                FontWeight="Medium"
-                                                               Foreground="{StaticResource BrushText}"/>
+                                                               Foreground="{DynamicResource BrushText}"/>
                                                 </Border>
                                                 <ControlTemplate.Triggers>
                                                     <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter TargetName="BtnBorder" Property="Background" Value="{StaticResource BrushSurface3}"/>
-                                                        <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource BrushAccent}"/>
+                                                        <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource BrushSurface3}"/>
+                                                        <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
                                                     </Trigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>
@@ -469,7 +470,7 @@
                     <!-- Placeholder text when empty using standard WPF logic -->
                     <TextBlock Text="No players registered yet. They will appear here after starting your first tournament."
                                FontSize="11"
-                               Foreground="{StaticResource BrushTextDim}"
+                               Foreground="{DynamicResource BrushTextDim}"
                                TextWrapping="Wrap"
                                HorizontalAlignment="Center"
                                TextAlignment="Center"
@@ -493,7 +494,7 @@
                    Text="Round-robin  ·  all-pairs per cycle  ·  endless or championship"
                    FontSize="11"
                    HorizontalAlignment="Center"
-                   Foreground="{StaticResource BrushTextDim}"
+                   Foreground="{DynamicResource BrushTextDim}"
                    Margin="0,0,0,20"/>
     </Grid>
 </UserControl>

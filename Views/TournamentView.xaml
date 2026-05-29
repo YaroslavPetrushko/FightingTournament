@@ -45,7 +45,7 @@
         <Style x:Key="ColHeader" TargetType="TextBlock">
             <Setter Property="FontSize"   Value="9"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Foreground" Value="{StaticResource BrushTextDim}"/>
+            <Setter Property="Foreground" Value="{DynamicResource BrushTextDim}"/>
             <Setter Property="Margin"     Value="0,0,0,10"/>
         </Style>
 
@@ -53,7 +53,7 @@
         <Style x:Key="StatCell" TargetType="TextBlock">
             <Setter Property="FontFamily"          Value="Consolas"/>
             <Setter Property="FontSize"            Value="12"/>
-            <Setter Property="Foreground"          Value="{StaticResource BrushText}"/>
+            <Setter Property="Foreground"          Value="{DynamicResource BrushText}"/>
             <Setter Property="VerticalAlignment"   Value="Center"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
         </Style>
@@ -67,12 +67,13 @@
 
         <!-- Segmented toggle button left style -->
         <Style x:Key="RadioToggleLeftBtn" TargetType="RadioButton">
+            <Setter Property="Panel.ZIndex" Value="0"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="RadioButton">
                         <Border x:Name="BtnBorder"
-                                Background="{StaticResource BrushSurface2}"
-                                BorderBrush="{StaticResource BrushBorder}"
+                                Background="{DynamicResource BrushSurface2}"
+                                BorderBrush="{DynamicResource BrushBorder}"
                                 BorderThickness="1"
                                 CornerRadius="4,0,0,4"
                                 Padding="14,6"
@@ -81,34 +82,41 @@
                                        Text="{TemplateBinding Content}"
                                        FontSize="10"
                                        FontWeight="Bold"
-                                       Foreground="{StaticResource BrushTextDim}"
+                                       Foreground="{DynamicResource BrushTextDim}"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="BtnBorder" Property="Background" Value="{StaticResource BrushSurface3}"/>
-                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource BrushAccent}"/>
+                                <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource BrushSurface3}"/>
+                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
                                 <Setter TargetName="Label" Property="Foreground" Value="White"/>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource BrushAccentHover}"/>
+                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{DynamicResource BrushAccentHover}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="Panel.ZIndex" Value="1"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
 
         <!-- Segmented toggle button right style -->
         <Style x:Key="RadioToggleRightBtn" TargetType="RadioButton">
+            <Setter Property="Panel.ZIndex" Value="0"/>
+            <Setter Property="Margin" Value="-1,0,0,0"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="RadioButton">
                         <Border x:Name="BtnBorder"
-                                Background="{StaticResource BrushSurface2}"
-                                BorderBrush="{StaticResource BrushBorder}"
-                                BorderThickness="0,1,1,1"
+                                Background="{DynamicResource BrushSurface2}"
+                                BorderBrush="{DynamicResource BrushBorder}"
+                                BorderThickness="1"
                                 CornerRadius="0,4,4,0"
                                 Padding="14,6"
                                 Cursor="Hand">
@@ -116,23 +124,28 @@
                                        Text="{TemplateBinding Content}"
                                        FontSize="10"
                                        FontWeight="Bold"
-                                       Foreground="{StaticResource BrushTextDim}"
+                                       Foreground="{DynamicResource BrushTextDim}"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="BtnBorder" Property="Background" Value="{StaticResource BrushSurface3}"/>
-                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource BrushAccent}"/>
+                                <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource BrushSurface3}"/>
+                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
                                 <Setter TargetName="Label" Property="Foreground" Value="White"/>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource BrushAccentHover}"/>
+                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{DynamicResource BrushAccentHover}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="Panel.ZIndex" Value="1"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
     </UserControl.Resources>
 
@@ -140,8 +153,8 @@
 
         <!-- ══ TOP BAR ══════════════════════════════════════════════ -->
         <Border DockPanel.Dock="Top"
-                Background="{StaticResource BrushSurface}"
-                BorderBrush="{StaticResource BrushBorder}"
+                Background="{DynamicResource BrushSurface}"
+                BorderBrush="{DynamicResource BrushBorder}"
                 BorderThickness="0,0,0,1"
                 Padding="20,12">
             <Grid>
@@ -155,10 +168,10 @@
                     <TextBlock Text="{Binding CycleHeader}"
                                FontSize="13" FontWeight="SemiBold"
                                HorizontalAlignment="Center"
-                               Foreground="{StaticResource BrushCurrent}"/>
+                               Foreground="{DynamicResource BrushCurrent}"/>
                     <TextBlock Text="{Binding StatusMessage}"
                                FontSize="11" HorizontalAlignment="Center"
-                               Foreground="{StaticResource BrushTextDim}"
+                               Foreground="{DynamicResource BrushTextDim}"
                                Visibility="{Binding StatusMessage, Converter={StaticResource StrVis}}"/>
                 </StackPanel>
 
@@ -186,8 +199,8 @@
 
             <!-- ── LEFT: Schedule ────────────────────────────────── -->
             <Border Grid.Column="0"
-                    Background="{StaticResource BrushSurface}"
-                    BorderBrush="{StaticResource BrushBorder}"
+                    Background="{DynamicResource BrushSurface}"
+                    BorderBrush="{DynamicResource BrushBorder}"
                     BorderThickness="0,0,1,0"
                     Padding="14,18">
                 <DockPanel>
@@ -210,7 +223,7 @@
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding IsCurrent}" Value="True">
                                                         <Setter Property="Background"
-                                                                Value="{StaticResource BrushSurface3}"/>
+                                                                Value="{DynamicResource BrushSurface3}"/>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
@@ -222,13 +235,13 @@
                                                            FontSize="10" Width="14" VerticalAlignment="Center">
                                                     <TextBlock.Style>
                                                         <Style TargetType="TextBlock">
-                                                            <Setter Property="Foreground" Value="{StaticResource BrushTextDim}"/>
+                                                            <Setter Property="Foreground" Value="{DynamicResource BrushTextDim}"/>
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding IsCompleted}" Value="True">
-                                                                    <Setter Property="Foreground" Value="{StaticResource BrushWin}"/>
+                                                                    <Setter Property="Foreground" Value="{DynamicResource BrushWin}"/>
                                                                 </DataTrigger>
                                                                 <DataTrigger Binding="{Binding IsCurrent}" Value="True">
-                                                                    <Setter Property="Foreground" Value="{StaticResource BrushCurrent}"/>
+                                                                    <Setter Property="Foreground" Value="{DynamicResource BrushCurrent}"/>
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
@@ -238,7 +251,7 @@
                                                 <!-- Match Count docked Right -->
                                                 <TextBlock DockPanel.Dock="Right" Text="{Binding MatchCount}"
                                                            FontSize="9" VerticalAlignment="Center"
-                                                           Foreground="{StaticResource BrushTextDim}"
+                                                           Foreground="{DynamicResource BrushTextDim}"
                                                            HorizontalAlignment="Right"/>
 
                                                 <!-- Cycle Name fills middle -->
@@ -249,10 +262,10 @@
                                                     </TextBlock.Text>
                                                     <TextBlock.Style>
                                                         <Style TargetType="TextBlock">
-                                                            <Setter Property="Foreground" Value="{StaticResource BrushTextDim}"/>
+                                                            <Setter Property="Foreground" Value="{DynamicResource BrushTextDim}"/>
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding IsCurrent}" Value="True">
-                                                                    <Setter Property="Foreground" Value="{StaticResource BrushText}"/>
+                                                                    <Setter Property="Foreground" Value="{DynamicResource BrushText}"/>
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
@@ -262,7 +275,7 @@
                                             <!-- Match list (small) -->
                                             <TextBlock Text="{Binding Matchups}"
                                                        FontSize="9"
-                                                       Foreground="{StaticResource BrushTextDim}"
+                                                       Foreground="{DynamicResource BrushTextDim}"
                                                        LineHeight="15"
                                                        Margin="14,0,0,0"
                                                        TextWrapping="Wrap"/>
@@ -276,7 +289,7 @@
             </Border>
 
             <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"
-                          Background="{StaticResource BrushBorder}" ShowsPreview="True"/>
+                          Background="{DynamicResource BrushBorder}" ShowsPreview="True"/>
 
             <!-- ── CENTER: Dashboard Panels ── -->
             <Border Grid.Column="2" Padding="22,18">
@@ -297,7 +310,7 @@
 
                     <!-- MATCHES VIEW (Visible when ShowBracket is false) -->
                     <Grid Visibility="{Binding ShowBracket, Converter={StaticResource InvBoolVis}}">
-                        <DockPanel Visibility="{Binding IsFinished, Converter={StaticResource InvBoolVis}}">
+                        <DockPanel HorizontalAlignment="Stretch" Visibility="{Binding IsFinished, Converter={StaticResource InvBoolVis}}">
                             <!-- Column headers -->
                             <Grid DockPanel.Dock="Top" Margin="0,0,0,6">
                                 <Grid.ColumnDefinitions>
@@ -341,7 +354,7 @@
                                             <Border Margin="0,0,0,4"
                                                     Padding="0,8"
                                                     BorderThickness="0,0,0,1"
-                                                    BorderBrush="{StaticResource BrushBorder}">
+                                                    BorderBrush="{DynamicResource BrushBorder}">
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="1.5*"  MinWidth="100"/>
@@ -379,7 +392,7 @@
                                                     <!-- vs -->
                                                     <TextBlock Grid.Column="2" Text="vs"
                                                                FontSize="10"
-                                                               Foreground="{StaticResource BrushTextDim}"
+                                                               Foreground="{DynamicResource BrushTextDim}"
                                                                HorizontalAlignment="Center"
                                                                VerticalAlignment="Center"/>
 
@@ -437,8 +450,8 @@
 
                         <!-- Winner Celebration Card (Visible when tournament is finished) -->
                         <Border Visibility="{Binding IsFinished, Converter={StaticResource BoolVis}}"
-                                Background="{StaticResource BrushSurface}"
-                                BorderBrush="{StaticResource BrushAccent}"
+                                Background="{DynamicResource BrushSurface}"
+                                BorderBrush="{DynamicResource BrushAccent}"
                                 BorderThickness="1"
                                 CornerRadius="8"
                                 Padding="40,30"
@@ -454,20 +467,20 @@
                                 <TextBlock Text="THE CHAMPION HAS BEEN CROWNED!"
                                            FontSize="18"
                                            FontWeight="ExtraBold"
-                                           Foreground="{StaticResource BrushAccent}"
+                                           Foreground="{DynamicResource BrushAccent}"
                                            HorizontalAlignment="Center"
                                            Margin="0,0,0,10"
                                            TextAlignment="Center"/>
                                 <TextBlock Text="{Binding WinnerName, StringFormat='Congratulations, {0}! 🏆'}"
                                            FontSize="15"
                                            FontWeight="Bold"
-                                           Foreground="{StaticResource BrushText}"
+                                           Foreground="{DynamicResource BrushText}"
                                            HorizontalAlignment="Center"
                                            Margin="0,0,0,15"
                                            TextAlignment="Center"/>
                                 <TextBlock Text="You have conquered the tournament bracket and claimed ultimate victory!"
                                            FontSize="11"
-                                           Foreground="{StaticResource BrushTextDim}"
+                                           Foreground="{DynamicResource BrushTextDim}"
                                            HorizontalAlignment="Center"
                                            TextAlignment="Center"
                                            TextWrapping="Wrap"/>
@@ -496,12 +509,12 @@
 
                             <!-- Horizontal stack of rounds/cycles inside export border inside scroll viewer -->
                             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                                <Border x:Name="BracketExportContainer" Background="{StaticResource BrushBg}" Padding="20,25,20,25" HorizontalAlignment="Left" VerticalAlignment="Top">
+                                <Border x:Name="BracketExportContainer" Background="{DynamicResource BrushBg}" Padding="20,25,20,25" HorizontalAlignment="Left" VerticalAlignment="Top">
                                     <StackPanel>
                                         <TextBlock Text="TOURNAMENT BRACKET" 
                                                    FontSize="15" 
                                                    FontWeight="Bold" 
-                                                   Foreground="{StaticResource BrushAccent}" 
+                                                   Foreground="{DynamicResource BrushAccent}" 
                                                    HorizontalAlignment="Center" 
                                                    Margin="0,0,0,20"/>
 
@@ -515,13 +528,13 @@
                                                 <DataTemplate DataType="{x:Type vm:CycleInfoViewModel}">
                                                     <!-- One Round Column -->
                                                     <StackPanel Margin="15,0" Width="190" VerticalAlignment="Center">
-                                                        <Border Background="{StaticResource BrushSurface}" 
-                                                                BorderBrush="{StaticResource BrushBorder}" 
+                                                        <Border Background="{DynamicResource BrushSurface}" 
+                                                                BorderBrush="{DynamicResource BrushBorder}" 
                                                                 BorderThickness="1" 
                                                                 CornerRadius="4" 
                                                                 Padding="10,8" 
                                                                 Margin="0,0,0,15">
-                                                            <TextBlock FontSize="10" FontWeight="Bold" Foreground="{StaticResource BrushAccent}" HorizontalAlignment="Center">
+                                                            <TextBlock FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}" HorizontalAlignment="Center">
                                                                 <TextBlock.Text>
                                                                     <Binding Path="Number" StringFormat="ROUND {0}"/>
                                                                 </TextBlock.Text>
@@ -533,8 +546,8 @@
                                                             <ItemsControl.ItemTemplate>
                                                                 <DataTemplate DataType="{x:Type models:Match}">
                                                                     <StackPanel Margin="0,8">
-                                                                        <Border Background="{StaticResource BrushSurface2}" 
-                                                                                BorderBrush="{StaticResource BrushBorder}" 
+                                                                        <Border Background="{DynamicResource BrushSurface2}" 
+                                                                                BorderBrush="{DynamicResource BrushBorder}" 
                                                                                 BorderThickness="1" 
                                                                                 CornerRadius="4" 
                                                                                 Padding="10,8">
@@ -550,8 +563,8 @@
                                                                                         <ColumnDefinition Width="*"/>
                                                                                         <ColumnDefinition Width="Auto"/>
                                                                                     </Grid.ColumnDefinitions>
-                                                                                    <TextBlock x:Name="TxtP1" Text="{Binding Player1.Name}" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource BrushText}"/>
-                                                                                    <TextBlock x:Name="GlyphP1" Grid.Column="1" Text="✓" Foreground="{StaticResource BrushWin}" Visibility="Collapsed" FontWeight="Bold"/>
+                                                                                    <TextBlock x:Name="TxtP1" Text="{Binding Player1.Name}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrushText}"/>
+                                                                                    <TextBlock x:Name="GlyphP1" Grid.Column="1" Text="✓" Foreground="{DynamicResource BrushWin}" Visibility="Collapsed" FontWeight="Bold"/>
                                                                                 </Grid>
                                                                                 
                                                                                 <!-- Player 2 Row -->
@@ -560,8 +573,8 @@
                                                                                         <ColumnDefinition Width="*"/>
                                                                                         <ColumnDefinition Width="Auto"/>
                                                                                     </Grid.ColumnDefinitions>
-                                                                                    <TextBlock x:Name="TxtP2" Text="{Binding Player2.Name}" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource BrushText}"/>
-                                                                                    <TextBlock x:Name="GlyphP2" Grid.Column="1" Text="✓" Foreground="{StaticResource BrushWin}" Visibility="Collapsed" FontWeight="Bold"/>
+                                                                                    <TextBlock x:Name="TxtP2" Text="{Binding Player2.Name}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrushText}"/>
+                                                                                    <TextBlock x:Name="GlyphP2" Grid.Column="1" Text="✓" Foreground="{DynamicResource BrushWin}" Visibility="Collapsed" FontWeight="Bold"/>
                                                                                 </Grid>
                                                                             </Grid>
                                                                         </Border>
@@ -569,24 +582,24 @@
                                                                     <DataTemplate.Triggers>
                                                                         <!-- Dim out BYE slots -->
                                                                         <DataTrigger Binding="{Binding Player1.Name}" Value="BYE">
-                                                                            <Setter TargetName="TxtP1" Property="Foreground" Value="{StaticResource BrushTextDim}"/>
+                                                                            <Setter TargetName="TxtP1" Property="Foreground" Value="{DynamicResource BrushTextDim}"/>
                                                                             <Setter TargetName="TxtP1" Property="FontStyle" Value="Italic"/>
                                                                         </DataTrigger>
                                                                         <DataTrigger Binding="{Binding Player2.Name}" Value="BYE">
-                                                                            <Setter TargetName="TxtP2" Property="Foreground" Value="{StaticResource BrushTextDim}"/>
+                                                                            <Setter TargetName="TxtP2" Property="Foreground" Value="{DynamicResource BrushTextDim}"/>
                                                                             <Setter TargetName="TxtP2" Property="FontStyle" Value="Italic"/>
                                                                         </DataTrigger>
                                                                         
                                                                         <!-- Winner 1 highlights -->
                                                                         <DataTrigger Binding="{Binding WinnerId}" Value="1">
-                                                                            <Setter TargetName="TxtP1" Property="Foreground" Value="{StaticResource BrushWin}"/>
-                                                                            <Setter TargetName="TxtP2" Property="Foreground" Value="{StaticResource BrushTextDim}"/>
+                                                                            <Setter TargetName="TxtP1" Property="Foreground" Value="{DynamicResource BrushWin}"/>
+                                                                            <Setter TargetName="TxtP2" Property="Foreground" Value="{DynamicResource BrushTextDim}"/>
                                                                             <Setter TargetName="GlyphP1" Property="Visibility" Value="Visible"/>
                                                                         </DataTrigger>
                                                                         <!-- Winner 2 highlights -->
                                                                         <DataTrigger Binding="{Binding WinnerId}" Value="2">
-                                                                            <Setter TargetName="TxtP2" Property="Foreground" Value="{StaticResource BrushWin}"/>
-                                                                            <Setter TargetName="TxtP1" Property="Foreground" Value="{StaticResource BrushTextDim}"/>
+                                                                            <Setter TargetName="TxtP2" Property="Foreground" Value="{DynamicResource BrushWin}"/>
+                                                                            <Setter TargetName="TxtP1" Property="Foreground" Value="{DynamicResource BrushTextDim}"/>
                                                                             <Setter TargetName="GlyphP2" Property="Visibility" Value="Visible"/>
                                                                         </DataTrigger>
                                                                     </DataTemplate.Triggers>
@@ -606,12 +619,12 @@
             </Border>
 
             <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Stretch"
-                          Background="{StaticResource BrushBorder}" ShowsPreview="True"/>
+                          Background="{DynamicResource BrushBorder}" ShowsPreview="True"/>
 
             <!-- ── RIGHT: Standings ───────────────────────────────── -->
             <Border Grid.Column="4"
-                    Background="{StaticResource BrushSurface}"
-                    BorderBrush="{StaticResource BrushBorder}"
+                    Background="{DynamicResource BrushSurface}"
+                    BorderBrush="{DynamicResource BrushBorder}"
                     BorderThickness="1,0,0,0"
                     Padding="14,18">
                 <DockPanel>
@@ -632,7 +645,7 @@
                     </Grid>
 
                     <!-- Add Player Mid-Tournament Panel -->
-                    <Grid DockPanel.Dock="Bottom" Margin="0,10,0,0" Visibility="{Binding CanAddPlayerMidTournament, Converter={StaticResource BoolVis}}">
+                    <Grid DockPanel.Dock="Top" Margin="0,0,0,12" Visibility="{Binding CanAddPlayerMidTournament, Converter={StaticResource BoolVis}}">
                         <Button Content="+  ADD PLAYER MID-TOURNAMENT"
                                 FontSize="11"
                                 Padding="0,9"
@@ -650,8 +663,8 @@
                         </Button>
 
                         <!-- State 2: Active input form -->
-                        <Border Background="{StaticResource BrushSurface2}"
-                                BorderBrush="{StaticResource BrushBorder}"
+                        <Border Background="{DynamicResource BrushSurface2}"
+                                BorderBrush="{DynamicResource BrushBorder}"
                                 BorderThickness="1"
                                 CornerRadius="4"
                                 Padding="10">
@@ -669,7 +682,7 @@
                                 <TextBlock Text="ADD PLAYER TO TOURNAMENT"
                                            FontSize="9"
                                            FontWeight="SemiBold"
-                                           Foreground="{StaticResource BrushTextDim}"
+                                           Foreground="{DynamicResource BrushTextDim}"
                                            Margin="0,0,0,6"/>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -703,12 +716,12 @@
 
                     <!-- Player rows ScrollViewer wrapping isolated Export Container -->
                     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                        <Border x:Name="StandingsExportContainer" Background="{StaticResource BrushSurface}" Padding="10,15,10,15" VerticalAlignment="Top">
+                        <Border x:Name="StandingsExportContainer" Background="{DynamicResource BrushSurface}" Padding="10,15,10,15" VerticalAlignment="Top">
                             <StackPanel>
                                 <TextBlock Text="TOURNAMENT LEADERBOARD"
                                            FontSize="13"
                                            FontWeight="Bold"
-                                           Foreground="{StaticResource BrushAccent}"
+                                           Foreground="{DynamicResource BrushAccent}"
                                            HorizontalAlignment="Center"
                                            Margin="0,0,0,15"/>
 
@@ -725,8 +738,8 @@
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Grid.Column="0" Text="#"    Style="{StaticResource ColHeader}" HorizontalAlignment="Center"/>
                                     <TextBlock Grid.Column="1" Text="NAME" Style="{StaticResource ColHeader}"/>
-                                    <TextBlock Grid.Column="2" Text="W"    Style="{StaticResource ColHeader}" HorizontalAlignment="Center" Foreground="{StaticResource BrushWin}"/>
-                                    <TextBlock Grid.Column="3" Text="L"    Style="{StaticResource ColHeader}" HorizontalAlignment="Center" Foreground="{StaticResource BrushLoss}"/>
+                                    <TextBlock Grid.Column="2" Text="W"    Style="{StaticResource ColHeader}" HorizontalAlignment="Center" Foreground="{DynamicResource BrushWin}"/>
+                                    <TextBlock Grid.Column="3" Text="L"    Style="{StaticResource ColHeader}" HorizontalAlignment="Center" Foreground="{DynamicResource BrushLoss}"/>
                                     <TextBlock Grid.Column="4" Text="WR%"  Style="{StaticResource ColHeader}" HorizontalAlignment="Center"/>
                                     <TextBlock Grid.Column="5" Text="CHAR" Style="{StaticResource ColHeader}" HorizontalAlignment="Center"/>
                                 </Grid>
@@ -743,7 +756,7 @@
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding IsEliminated}" Value="True">
                                                                 <Setter Property="Background"
-                                                                        Value="{StaticResource BrushElim}"/>
+                                                                        Value="{DynamicResource BrushElim}"/>
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
@@ -763,7 +776,7 @@
                                                     <TextBlock Grid.Column="0" Text="{Binding Rank}"
                                                                Style="{StaticResource StatCell}"
                                                                FontSize="11"
-                                                               Foreground="{StaticResource BrushTextDim}"/>
+                                                               Foreground="{DynamicResource BrushTextDim}"/>
 
                                                     <!-- Name -->
                                                     <TextBlock Grid.Column="1" Text="{Binding Name}"
@@ -774,7 +787,7 @@
                                                             <Style TargetType="TextBlock" BasedOn="{StaticResource StatName}">
                                                                 <Style.Triggers>
                                                                     <DataTrigger Binding="{Binding IsEliminated}" Value="True">
-                                                                        <Setter Property="Foreground" Value="{StaticResource BrushTextDim}"/>
+                                                                        <Setter Property="Foreground" Value="{DynamicResource BrushTextDim}"/>
                                                                         <Setter Property="TextDecorations" Value="Strikethrough"/>
                                                                     </DataTrigger>
                                                                 </Style.Triggers>
@@ -785,12 +798,12 @@
                                                     <!-- W -->
                                                     <TextBlock Grid.Column="2" Text="{Binding Wins}"
                                                                Style="{StaticResource StatCell}"
-                                                               Foreground="{StaticResource BrushWin}"/>
+                                                               Foreground="{DynamicResource BrushWin}"/>
 
                                                     <!-- L -->
                                                     <TextBlock Grid.Column="3" Text="{Binding Losses}"
                                                                Style="{StaticResource StatCell}"
-                                                               Foreground="{StaticResource BrushLoss}"/>
+                                                               Foreground="{DynamicResource BrushLoss}"/>
 
                                                     <!-- WR% -->
                                                     <TextBlock Grid.Column="4" Text="{Binding WinRate}"
@@ -801,7 +814,7 @@
                                                     <TextBlock Grid.Column="5" Text="{Binding MostPicked}"
                                                                Style="{StaticResource StatCell}"
                                                                FontSize="10"
-                                                               Foreground="{StaticResource BrushTextDim}"
+                                                               Foreground="{DynamicResource BrushTextDim}"
                                                                TextTrimming="CharacterEllipsis"
                                                                ToolTip="{Binding MostPicked}"/>
 

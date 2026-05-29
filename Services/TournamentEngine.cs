@@ -129,8 +129,13 @@ public static class TournamentEngine
         foreach (var m in cycle.Matches)
         {
             bool p1Won = m.WinnerId == 1;
-            m.Player1.RecordResult(p1Won,  m.Character1);
-            m.Player2.RecordResult(!p1Won, m.Character2);
+            
+            if (!m.Player1.Name.Equals("BYE", StringComparison.OrdinalIgnoreCase) &&
+                !m.Player2.Name.Equals("BYE", StringComparison.OrdinalIgnoreCase))
+            {
+                m.Player1.RecordResult(p1Won,  m.Character1);
+                m.Player2.RecordResult(!p1Won, m.Character2);
+            }
 
             // In Championship mode, eliminate the loser immediately
             if (tournament.Mode == TournamentMode.Championship)

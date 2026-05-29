@@ -1,0 +1,77 @@
+# This workflow will build, test, and package a portable single-file WPF desktop application
+# built on .NET 8.
+#
+# Build & Test run on pushes and pull requests to both "develop" and "main" branches.
+# The portable ZIP package is compiled and uploaded as a build artifact ONLY on pushes/merges to the "main" branch.
+
+name: .NET Core Desktop CI/CD
+
+on:
+  push:
+    branches: [ "develop", "main" ]
+  pull_request:
+    branches: [ "develop", "main" ]
+
+jobs:
+
+  build:
+
+    strategy:
+      matrix:
+        configuration: [Release]
+
+    runs-on: windows-latest
+
+    env:
+      Solution_Name: FightingTournament.sln
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    # Install the .NET Core workload
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    # Restore the solution
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.Solution_Name }}
+
+    # Execute all unit tests in the solution
+    - name: Execute unit tests
+      run: dotnet test ${{ env.Solution_Name }} --no-restore --configuration ${{ matrix.configuration }}
+
+    # Build the WPF project
+    - name: Build application
+      run: dotnet build FightingTournament.csproj --no-restore --configuration ${{ matrix.configuration }}
+
+    # Publish portable single-file executable (ONLY on push/merge to main branch)
+    - name: Publish single-file executable
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: >
+        dotnet publish FightingTournament.csproj
+        -c ${{ matrix.configuration }}
+        -r win-x64
+        --self-contained true
+        -p:PublishSingleFile=true
+        -p:PublishReadyToRun=true
+        -p:IncludeNativeLibrariesForSelfExtract=true
+        -o ./publish
+
+    # Zip the published portable directory (ONLY on push/merge to main branch)
+    - name: Package to ZIP
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      shell: powershell
+      run: Compress-Archive -Path ./publish/* -DestinationPath ./FightingTournament-Portable-win-x64.zip
+
+    # Upload the portable ZIP package as an artifact (ONLY on push/merge to main branch)
+    - name: Upload portable ZIP artifact
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      uses: actions/upload-artifact@v4
+      with:
+        name: FightingTournament-Portable
+        path: FightingTournament-Portable-win-x64.zip

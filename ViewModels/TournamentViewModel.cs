@@ -133,7 +133,10 @@ public class TournamentViewModel : BaseViewModel
 
         CommitCycleCommand   = new RelayCommand(CommitCycle);
         NewTournamentCommand = new RelayCommand(onNewTournament);
-        SelectCycleCommand   = new RelayCommand(p => SelectCycle((CycleInfoViewModel)p!));
+        SelectCycleCommand   = new RelayCommand(p =>
+        {
+            if (p is CycleInfoViewModel vm) SelectCycle(vm);
+        });
         ShowAddPlayerCommand = new RelayCommand(ShowAddPlayer);
         SaveNewPlayerCommand = new RelayCommand(SaveNewPlayer);
         CancelAddPlayerCommand = new RelayCommand(CancelAddPlayer);
@@ -260,22 +263,32 @@ public class TournamentViewModel : BaseViewModel
             ? new HashSet<string>(list, StringComparer.OrdinalIgnoreCase)
             : new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
+        char[] separators = new char[] { ';', '/', '\\' };
+
         foreach (var m in cycle.Matches)
         {
             if (!string.IsNullOrWhiteSpace(m.Character1))
             {
-                string c1 = m.Character1.Trim();
-                if (!predefined.Contains(c1))
+                string[] parts = m.Character1.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var part in parts)
                 {
-                    try { DatabaseRepository.SaveCustomCharacter(game, c1); } catch { }
+                    string c = part.Trim();
+                    if (!string.IsNullOrWhiteSpace(c) && !predefined.Contains(c))
+                    {
+                        try { DatabaseRepository.SaveCustomCharacter(game, c); } catch { }
+                    }
                 }
             }
             if (!string.IsNullOrWhiteSpace(m.Character2))
             {
-                string c2 = m.Character2.Trim();
-                if (!predefined.Contains(c2))
+                string[] parts = m.Character2.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var part in parts)
                 {
-                    try { DatabaseRepository.SaveCustomCharacter(game, c2); } catch { }
+                    string c = part.Trim();
+                    if (!string.IsNullOrWhiteSpace(c) && !predefined.Contains(c))
+                    {
+                        try { DatabaseRepository.SaveCustomCharacter(game, c); } catch { }
+                    }
                 }
             }
         }
@@ -312,7 +325,9 @@ public class TournamentViewModel : BaseViewModel
                 var cycle = _tournament.Cycles[i];
                 foreach (var m in cycle.Matches)
                 {
-                    if (m.IsCompleted)
+                    if (m.IsCompleted &&
+                        !m.Player1.Name.Equals("BYE", StringComparison.OrdinalIgnoreCase) &&
+                        !m.Player2.Name.Equals("BYE", StringComparison.OrdinalIgnoreCase))
                     {
                         bool p1Won = m.WinnerId == 1;
                         m.Player1.RecordResult(p1Won,  m.Character1);
@@ -384,10 +399,6 @@ public class TournamentViewModel : BaseViewModel
         {
             StatusMessage = $"⚠  Cycle {savedNumber} saved locally, but database save failed: {ex.Message}";
         }
-        OnPropertyChanged(nameof(CycleHeader));
-        OnPropertyChanged(nameof(IsFinished));
-        OnPropertyChanged(nameof(WinnerName));
-        OnPropertyChanged(nameof(CanAddPlayerMidTournament));
     }
 
     private void SelectCycle(CycleInfoViewModel cycleVm)

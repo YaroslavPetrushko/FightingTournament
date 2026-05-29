@@ -8,7 +8,7 @@
         WindowStartupLocation="CenterScreen"
         Background="Transparent"
         AllowsTransparency="True"
-        Foreground="{StaticResource BrushText}"
+        Foreground="{DynamicResource BrushText}"
         WindowStyle="None">
 
     <WindowChrome.WindowChrome>
@@ -24,7 +24,7 @@
             <Style.Triggers>
                 <Trigger Property="WindowState" Value="Maximized">
                     <!-- Prevent window from spilling over taskbar and screen boundary when maximized -->
-                    <Setter Property="Padding" Value="7"/>
+                    <Setter Property="Padding" Value="8"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -46,10 +46,10 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource BrushSurface2}"/>
+                                <Setter TargetName="Bg" Property="Background" Value="{DynamicResource BrushSurface2}"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Bg" Property="Background" Value="{StaticResource BrushSurface3}"/>
+                                <Setter TargetName="Bg" Property="Background" Value="{DynamicResource BrushSurface3}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -58,10 +58,10 @@
             <Style.Resources>
                 <!-- Automatic hover colors for Path inside the content -->
                 <Style TargetType="Path">
-                    <Setter Property="Stroke" Value="{StaticResource BrushTextDim}"/>
+                    <Setter Property="Stroke" Value="{DynamicResource BrushTextDim}"/>
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
-                            <Setter Property="Stroke" Value="{StaticResource BrushText}"/>
+                            <Setter Property="Stroke" Value="{DynamicResource BrushText}"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
@@ -89,7 +89,7 @@
             </Setter>
             <Style.Resources>
                 <Style TargetType="Path">
-                    <Setter Property="Stroke" Value="{StaticResource BrushTextDim}"/>
+                    <Setter Property="Stroke" Value="{DynamicResource BrushTextDim}"/>
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
                             <Setter Property="Stroke" Value="White"/>
@@ -105,7 +105,7 @@
     </Window.DataContext>
 
     <!-- Outer Border to provide Active/Inactive Crimson Accent Line & Rounded Corners -->
-    <Border Background="{StaticResource BrushBg}">
+    <Border Background="{DynamicResource BrushBg}">
         <Border.Style>
             <Style TargetType="Border">
                 <Setter Property="BorderBrush" Value="Transparent"/>
@@ -115,7 +115,7 @@
                 <Style.Triggers>
                     <!-- Thin red outline when window is active (dimmed subtle crimson) -->
                     <DataTrigger Binding="{Binding IsActive, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
-                        <Setter Property="BorderBrush" Value="{StaticResource BrushAccentDim}"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource BrushAccentDim}"/>
                     </DataTrigger>
                     
                     <!-- Hide outline and corner radius when window is maximized to avoid screen clipping -->
@@ -137,7 +137,7 @@
         </Grid.RowDefinitions>
 
         <!-- ── Custom Title Bar Border Wrapper ── -->
-        <Border Grid.Row="0" Height="40" Background="{StaticResource BrushSurface}">
+        <Border Grid.Row="0" Height="40" Background="{DynamicResource BrushSurface}">
             <Border.Style>
                 <Style TargetType="Border">
                     <Setter Property="CornerRadius" Value="7,7,0,0"/>
@@ -159,8 +159,8 @@
 
                 <!-- Left: App Icon & Title -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0,0,0">
-                    <TextBlock Text="⚔" FontSize="18" Foreground="{StaticResource BrushAccent}" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                    <TextBlock Text="FIGHTING TOURNAMENT TRACKER" FontSize="11" FontWeight="Bold" Foreground="{StaticResource BrushText}" VerticalAlignment="Center"/>
+                    <TextBlock Text="⚔" FontSize="18" Foreground="{DynamicResource BrushAccent}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                    <TextBlock Text="FIGHTING TOURNAMENT TRACKER" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrushText}" VerticalAlignment="Center"/>
                 </StackPanel>
 
                 <!-- Right: Action Buttons -->
@@ -177,14 +177,14 @@
                             <Path x:Name="MaximizeIcon" Data="M0.5,0.5 H8.5 V8.5 H0.5 Z" StrokeThickness="1.5" Width="9" Height="9">
                                 <Path.Style>
                                     <Style TargetType="Path">
-                                        <Setter Property="Stroke" Value="{StaticResource BrushTextDim}"/>
+                                        <Setter Property="Stroke" Value="{DynamicResource BrushTextDim}"/>
                                         <Setter Property="Visibility" Value="Visible"/>
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
                                                 <Setter Property="Visibility" Value="Collapsed"/>
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
-                                                <Setter Property="Stroke" Value="{StaticResource BrushText}"/>
+                                                <Setter Property="Stroke" Value="{DynamicResource BrushText}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -195,14 +195,14 @@
                             <Path x:Name="RestoreIcon" Data="M2.5,0.5 H8.5 V6.5 H2.5 Z M0.5,2.5 H6.5 V8.5 H0.5 Z" StrokeThickness="1.5" Width="9" Height="9">
                                 <Path.Style>
                                     <Style TargetType="Path">
-                                        <Setter Property="Stroke" Value="{StaticResource BrushTextDim}"/>
+                                        <Setter Property="Stroke" Value="{DynamicResource BrushTextDim}"/>
                                         <Setter Property="Visibility" Value="Collapsed"/>
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
                                                 <Setter Property="Visibility" Value="Visible"/>
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
-                                                <Setter Property="Stroke" Value="{StaticResource BrushText}"/>
+                                                <Setter Property="Stroke" Value="{DynamicResource BrushText}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -217,13 +217,13 @@
                     </Button>
                 </StackPanel>
 
-                <!-- ── Stylized Black-Red-Black Gradient Line ── -->
+                <!-- ── Stylized Custom Gradient Line ── -->
                 <Border Height="1" VerticalAlignment="Top" Grid.ColumnSpan="3">
                     <Border.Background>
                         <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                            <GradientStop Color="#0D0D15" Offset="0.0"/>
-                            <GradientStop Color="#E8003D" Offset="0.7"/>
-                            <GradientStop Color="#0D0D15" Offset="1.0"/>
+                            <GradientStop Color="{DynamicResource ColorBg}" Offset="0.0"/>
+                            <GradientStop Color="{DynamicResource ColorAccent}" Offset="0.7"/>
+                            <GradientStop Color="{DynamicResource ColorBg}" Offset="1.0"/>
                         </LinearGradientBrush>
                     </Border.Background>
                 </Border>
@@ -231,7 +231,7 @@
         </Border>
 
         <!-- ── Custom Dark Menu Bar ── -->
-        <Border Grid.Row="1" Background="{StaticResource BrushSurface}" BorderBrush="{StaticResource BrushBorder}" BorderThickness="0,0,0,1" Padding="15,2" WindowChrome.IsHitTestVisibleInChrome="True">
+        <Border Grid.Row="1" Background="{DynamicResource BrushSurface}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="0,0,0,1" Padding="15,2" WindowChrome.IsHitTestVisibleInChrome="True">
             <Menu Background="Transparent" BorderThickness="0">
                 <MenuItem Header="_File" Style="{StaticResource MenuItem}">
                     <MenuItem Header="_Open Database (.db)..." Command="{Binding OpenDatabaseCommand}"/>
@@ -241,6 +241,14 @@
                 </MenuItem>
                 <MenuItem Header="_Settings" Style="{StaticResource MenuItem}">
                     <MenuItem Header="_Clean Up Legacy Sessions" Command="{Binding CleanSessionsCommand}"/>
+                    <MenuItem Header="_Theme">
+                        <MenuItem Header="Default (Black &amp; Red)" Command="{Binding ChangeThemeCommand}" CommandParameter="default" IsCheckable="True" IsChecked="{Binding IsDefaultThemeChecked, Mode=OneWay}"/>
+                        <MenuItem Header="Volt Green (Xbox Styled)" Command="{Binding ChangeThemeCommand}" CommandParameter="volt_green" IsCheckable="True" IsChecked="{Binding IsVoltGreenThemeChecked, Mode=OneWay}"/>
+                        <MenuItem Header="Electric Blue (Arcade Retro)" Command="{Binding ChangeThemeCommand}" CommandParameter="electric_blue" IsCheckable="True" IsChecked="{Binding IsElectricBlueThemeChecked, Mode=OneWay}"/>
+                        <MenuItem Header="Deep Dark (Purple)" Command="{Binding ChangeThemeCommand}" CommandParameter="deep_dark" IsCheckable="True" IsChecked="{Binding IsDeepDarkThemeChecked, Mode=OneWay}"/>
+                        <MenuItem Header="Minimalist" Command="{Binding ChangeThemeCommand}" CommandParameter="minimalist" IsCheckable="True" IsChecked="{Binding IsMinimalistThemeChecked, Mode=OneWay}"/>
+                        <MenuItem Header="White" Command="{Binding ChangeThemeCommand}" CommandParameter="white" IsCheckable="True" IsChecked="{Binding IsWhiteThemeChecked, Mode=OneWay}"/>
+                    </MenuItem>
                 </MenuItem>
                 <MenuItem Header="_About" Style="{StaticResource MenuItem}">
                     <MenuItem Header="_About Tracker" Command="{Binding AboutCommand}"/>

@@ -11,10 +11,20 @@ public class DatabaseConnector
 
     public static DatabaseConnector Instance => _instance.Value;
 
+    private readonly object _lock = new();
     private string _dbPath;
     private string _connectionString;
 
-    public string CurrentDbPath => _dbPath;
+    public string CurrentDbPath
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return _dbPath;
+            }
+        }
+    }
 
     private DatabaseConnector()
     {
@@ -32,13 +42,16 @@ public class DatabaseConnector
     {
         if (string.IsNullOrWhiteSpace(newPath)) return;
 
-        _dbPath = newPath;
-        _connectionString = new SqliteConnectionStringBuilder
+        lock (_lock)
         {
-            DataSource = _dbPath,
-            Mode = SqliteOpenMode.ReadWriteCreate,
-            ForeignKeys = true
-        }.ToString();
+            _dbPath = newPath;
+            _connectionString = new SqliteConnectionStringBuilder
+            {
+                DataSource = _dbPath,
+                Mode = SqliteOpenMode.ReadWriteCreate,
+                ForeignKeys = true
+            }.ToString();
+        }
 
         InitializeDatabase();
     }
@@ -50,19 +63,23 @@ public class DatabaseConnector
         // Clear all Sqlite connection pools to release any lock on the current database file
         SqliteConnection.ClearAllPools();
 
-        string currentPath = _dbPath;
+        string currentPath = CurrentDbPath;
         if (File.Exists(currentPath))
         {
             File.Copy(currentPath, targetPath, true);
         }
-
-        ChangeDatabasePath(targetPath);
     }
 
     /// <summary>
     /// Gets a new SQLite connection. The caller is responsible for opening and disposing it.
     /// </summary>
-    public SqliteConnection GetConnection() => new(_connectionString);
+    public SqliteConnection GetConnection()
+    {
+        lock (_lock)
+        {
+            return new SqliteConnection(_connectionString);
+        }
+    }
 
     /// <summary>
     /// Initializes the database file and creates the schema tables if they do not exist.
@@ -178,6 +195,14 @@ public class DatabaseConnector
             ExecuteNonQuery(createCustomCharacters, connection, transaction);
             ExecuteNonQuery(createUserPresets, connection, transaction);
 
+            // 9. UserSettings table
+            string createUserSettings = @"
+                CREATE TABLE IF NOT EXISTS UserSettings (
+                    Key TEXT PRIMARY KEY,
+                    Value TEXT
+                );";
+            ExecuteNonQuery(createUserSettings, connection, transaction);
+
             // Backward compatibility: Alter table to add TournamentMode and DefaultRounds if missing
             using (var checkCmd = connection.CreateCommand())
             {
@@ -246,6 +271,46 @@ public class DatabaseConnector
         {
             transaction.Rollback();
             throw;
+        }
+    }
+
+    public string GetSetting(string key, string defaultValue)
+    {
+        try
+        {
+            using var connection = GetConnection();
+            connection.Open();
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText = "SELECT Value FROM UserSettings WHERE Key = @Key;";
+            cmd.Parameters.AddWithValue("@Key", key);
+            var result = cmd.ExecuteScalar();
+            return result != null ? result.ToString()! : defaultValue;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to get setting '{key}': {ex.Message}");
+            return defaultValue;
+        }
+    }
+
+    public void SaveSetting(string key, string value)
+    {
+        try
+        {
+            using var connection = GetConnection();
+            connection.Open();
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText = @"
+                INSERT INTO UserSettings (Key, Value) 
+                VALUES (@Key, @Value)
+                ON CONFLICT(Key) DO UPDATE SET Value = excluded.Value;";
+            cmd.Parameters.AddWithValue("@Key", key);
+            cmd.Parameters.AddWithValue("@Value", value);
+            cmd.ExecuteNonQuery();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to save setting '{key}' = '{value}': {ex.Message}");
         }
     }
 
