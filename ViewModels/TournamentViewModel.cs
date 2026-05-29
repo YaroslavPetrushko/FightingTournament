@@ -260,22 +260,32 @@ public class TournamentViewModel : BaseViewModel
             ? new HashSet<string>(list, StringComparer.OrdinalIgnoreCase)
             : new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
+        char[] separators = new char[] { ';', '/', '\\' };
+
         foreach (var m in cycle.Matches)
         {
             if (!string.IsNullOrWhiteSpace(m.Character1))
             {
-                string c1 = m.Character1.Trim();
-                if (!predefined.Contains(c1))
+                string[] parts = m.Character1.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var part in parts)
                 {
-                    try { DatabaseRepository.SaveCustomCharacter(game, c1); } catch { }
+                    string c = part.Trim();
+                    if (!string.IsNullOrWhiteSpace(c) && !predefined.Contains(c))
+                    {
+                        try { DatabaseRepository.SaveCustomCharacter(game, c); } catch { }
+                    }
                 }
             }
             if (!string.IsNullOrWhiteSpace(m.Character2))
             {
-                string c2 = m.Character2.Trim();
-                if (!predefined.Contains(c2))
+                string[] parts = m.Character2.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var part in parts)
                 {
-                    try { DatabaseRepository.SaveCustomCharacter(game, c2); } catch { }
+                    string c = part.Trim();
+                    if (!string.IsNullOrWhiteSpace(c) && !predefined.Contains(c))
+                    {
+                        try { DatabaseRepository.SaveCustomCharacter(game, c); } catch { }
+                    }
                 }
             }
         }

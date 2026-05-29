@@ -24,7 +24,7 @@
             <Style.Triggers>
                 <Trigger Property="WindowState" Value="Maximized">
                     <!-- Prevent window from spilling over taskbar and screen boundary when maximized -->
-                    <Setter Property="Padding" Value="7"/>
+                    <Setter Property="Padding" Value="8"/>
                 </Trigger>
             </Style.Triggers>
         </Style>

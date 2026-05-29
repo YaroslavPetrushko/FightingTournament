@@ -27,7 +27,7 @@ public class Player
             ? "—"
             : _charPicks.OrderByDescending(kv => kv.Value).First().Key;
 
-    /// <summary>Records one match result and optionally logs the character played.</summary>
+    /// <summary>Records one match result and optionally logs the characters played (splits by ;, /, or \ for team games).</summary>
     public void RecordResult(bool won, string? character)
     {
         TotalMatches++;
@@ -36,8 +36,17 @@ public class Player
 
         if (!string.IsNullOrWhiteSpace(character))
         {
-            _charPicks.TryGetValue(character, out int n);
-            _charPicks[character] = n + 1;
+            char[] separators = new char[] { ';', '/', '\\' };
+            string[] parts = character.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var part in parts)
+            {
+                string c = part.Trim();
+                if (!string.IsNullOrWhiteSpace(c))
+                {
+                    _charPicks.TryGetValue(c, out int n);
+                    _charPicks[c] = n + 1;
+                }
+            }
         }
     }
 
