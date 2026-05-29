@@ -118,6 +118,7 @@ public class TournamentViewModel : BaseViewModel
     public ICommand NewTournamentCommand { get; }
     public ICommand SelectCycleCommand   { get; }
     public ICommand ShowAddPlayerCommand  { get; }
+    public ICommand ShowUserProfileCommand { get; }
     public ICommand SaveNewPlayerCommand  { get; }
     public ICommand CancelAddPlayerCommand { get; }
     public ICommand ExportStandingsPngCommand { get; }
@@ -138,6 +139,13 @@ public class TournamentViewModel : BaseViewModel
             if (p is CycleInfoViewModel vm) SelectCycle(vm);
         });
         ShowAddPlayerCommand = new RelayCommand(ShowAddPlayer);
+        ShowUserProfileCommand = new RelayCommand(p =>
+        {
+            if (p is string nickname)
+            {
+                ShowUserProfile(nickname);
+            }
+        });
         SaveNewPlayerCommand = new RelayCommand(SaveNewPlayer);
         CancelAddPlayerCommand = new RelayCommand(CancelAddPlayer);
         ExportStandingsPngCommand = new RelayCommand(ExportStandingsPng);
@@ -582,6 +590,23 @@ public class TournamentViewModel : BaseViewModel
         else
         {
             MessageBox.Show("Could not locate the bracket component to export.", "Export Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
+    private void ShowUserProfile(string nickname)
+    {
+        if (string.IsNullOrWhiteSpace(nickname) || nickname.Equals("BYE", StringComparison.OrdinalIgnoreCase)) return;
+
+        try
+        {
+            var profile = DatabaseRepository.GetUserProfile(nickname);
+            var window = new Views.UserProfileWindow(profile, isTournamentActive: true);
+            window.Owner = System.Windows.Application.Current.MainWindow;
+            window.ShowDialog();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Could not load user profile:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }

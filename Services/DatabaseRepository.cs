@@ -533,4 +533,134 @@ public static class DatabaseRepository
             throw;
         }
     }
+
+    public static UserProfileInfo GetUserProfile(string nickname)
+    {
+        var info = new UserProfileInfo { Nickname = nickname };
+
+        using var connection = DatabaseConnector.Instance.GetConnection();
+        connection.Open();
+
+        // 1. Fetch total matches and wins
+        using (var cmd = connection.CreateCommand())
+        {
+            cmd.CommandText = @"
+                SELECT SUM(TotalWins), SUM(TotalMatches) 
+                FROM Players 
+                WHERE Name = @Nickname;";
+            cmd.Parameters.AddWithValue("@Nickname", nickname);
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read() && !reader.IsDBNull(1))
+            {
+                info.TotalWins = reader.GetInt32(0);
+                info.TotalMatches = reader.GetInt32(1);
+                if (info.TotalMatches > 0)
+                {
+                    info.WinRate = (info.TotalWins * 100.0) / info.TotalMatches;
+                }
+            }
+        }
+
+        // 2. Fetch favorite character
+        using (var cmd = connection.CreateCommand())
+        {
+            cmd.CommandText = @"
+                SELECT CharacterName, SUM(PickCount) as TotalPicks 
+                FROM PlayerCharacterPicks 
+                INNER JOIN Players ON PlayerCharacterPicks.PlayerId = Players.Id 
+                WHERE Players.Name = @Nickname 
+                GROUP BY CharacterName 
+                ORDER BY TotalPicks DESC 
+                LIMIT 1;";
+            cmd.Parameters.AddWithValue("@Nickname", nickname);
+            var result = cmd.ExecuteScalar();
+            if (result != null)
+            {
+                info.FavoriteCharacter = result.ToString()!;
+            }
+        }
+
+        // 3. Fetch favorite game
+        using (var cmd = connection.CreateCommand())
+        {
+            cmd.CommandText = @"
+                SELECT Tournaments.SelectedGame, COUNT(Players.Id) as PlayCount 
+                FROM Players 
+                INNER JOIN Tournaments ON Players.TournamentId = Tournaments.Id 
+                WHERE Players.Name = @Nickname 
+                GROUP BY Tournaments.SelectedGame 
+                ORDER BY PlayCount DESC 
+                LIMIT 1;";
+            cmd.Parameters.AddWithValue("@Nickname", nickname);
+            var result = cmd.ExecuteScalar();
+            if (result != null)
+            {
+                info.FavoriteGame = result.ToString()!;
+            }
+        }
+
+        // 4. Fetch last match record (date) from last tournament session
+        using (var cmd = connection.CreateCommand())
+        {
+            cmd.CommandText = @"
+                SELECT Tournaments.SessionName 
+                FROM Players 
+                INNER JOIN Tournaments ON Players.TournamentId = Tournaments.Id 
+                WHERE Players.Name = @Nickname 
+                ORDER BY Tournaments.Id DESC 
+                LIMIT 1;";
+            cmd.Parameters.AddWithValue("@Nickname", nickname);
+            var result = cmd.ExecuteScalar();
+            if (result != null)
+            {
+                string sessionName = result.ToString()!;
+                // Extract date if session name is formatted as "yyyy-MM-dd - Mode - Game"
+                var parts = sessionName.Split(new[] { " - " }, StringSplitOptions.None);
+                if (parts.Length > 0 && parts[0].Length == 10 && parts[0].Contains('-'))
+                {
+                    info.LastMatchDate = parts[0];
+                }
+                else
+                {
+                    info.LastMatchDate = sessionName;
+                }
+            }
+        }
+
+        return info;
+    }
+
+    public static void PurgeUserCompletely(string nickname)
+    {
+        using var connection = DatabaseConnector.Instance.GetConnection();
+        connection.Open();
+        using var transaction = connection.BeginTransaction();
+        try
+        {
+            // 1. Delete from Users table
+            using (var cmd = connection.CreateCommand())
+            {
+                cmd.CommandText = "DELETE FROM Users WHERE Nickname = @Nickname;";
+                cmd.Parameters.AddWithValue("@Nickname", nickname);
+                cmd.Transaction = transaction;
+                cmd.ExecuteNonQuery();
+            }
+
+            // 2. Delete from Players table (cascading deletes picks, matches, etc.!)
+            using (var cmd = connection.CreateCommand())
+            {
+                cmd.CommandText = "DELETE FROM Players WHERE Name = @Nickname;";
+                cmd.Parameters.AddWithValue("@Nickname", nickname);
+                cmd.Transaction = transaction;
+                cmd.ExecuteNonQuery();
+            }
+
+            transaction.Commit();
+        }
+        catch
+        {
+            transaction.Rollback();
+            throw;
+        }
+    }
 }

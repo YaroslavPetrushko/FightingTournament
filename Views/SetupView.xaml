@@ -414,7 +414,7 @@
                                Margin="0,0,0,4"
                                HorizontalAlignment="Center"/>
 
-                    <TextBlock Text="L-CLICK TO ADD | R-CLICK TO DELETE"
+                    <TextBlock Text="L-CLICK ADD | DBL-CLICK PROFILE"
                                FontSize="9"
                                FontWeight="SemiBold"
                                Foreground="{DynamicResource BrushTextDim}"
@@ -438,6 +438,9 @@
                                         <Button.InputBindings>
                                             <MouseBinding Gesture="RightClick"
                                                           Command="{Binding DataContext.DeleteRegisteredPlayerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                          CommandParameter="{Binding}"/>
+                                            <MouseBinding Gesture="LeftDoubleClick"
+                                                          Command="{Binding DataContext.ShowUserProfileCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                           CommandParameter="{Binding}"/>
                                         </Button.InputBindings>
                                         <Button.Template>

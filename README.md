@@ -97,4 +97,4 @@ The round-robin pairings are generated using the **circle (polygon) rotation met
 
 ---
 
-#### Developed using Antigravity AI (Google Gemini 3.5 Flash).
+#### Developed using Google Antigravity.

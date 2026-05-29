@@ -156,6 +156,7 @@ public class SetupViewModel : BaseViewModel
     public ICommand SavePresetCommand    { get; }
     public ICommand DeletePresetCommand  { get; }
     public ICommand DeleteRegisteredPlayerCommand { get; }
+    public ICommand ShowUserProfileCommand { get; }
 
     public SetupViewModel()
     {
@@ -178,6 +179,13 @@ public class SetupViewModel : BaseViewModel
             if (p is string nickname)
             {
                 DeleteRegisteredPlayer(nickname);
+            }
+        });
+        ShowUserProfileCommand = new RelayCommand(p =>
+        {
+            if (p is string nickname)
+            {
+                ShowUserProfile(nickname);
             }
         });
 
@@ -465,6 +473,26 @@ public class SetupViewModel : BaseViewModel
             {
                 System.Windows.MessageBox.Show($"Could not delete player:\n{ex.Message}", "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
             }
+        }
+    }
+
+    private void ShowUserProfile(string nickname)
+    {
+        if (string.IsNullOrWhiteSpace(nickname) || nickname.Equals("BYE", StringComparison.OrdinalIgnoreCase)) return;
+
+        try
+        {
+            var profile = DatabaseRepository.GetUserProfile(nickname);
+            var window = new Views.UserProfileWindow(profile, isTournamentActive: false, onDeleted: () =>
+            {
+                RefreshRegisteredUsers();
+            });
+            window.Owner = System.Windows.Application.Current.MainWindow;
+            window.ShowDialog();
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show($"Could not load user profile:\n{ex.Message}", "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
         }
     }
 

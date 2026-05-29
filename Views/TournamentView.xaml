@@ -779,21 +779,31 @@
                                                                Foreground="{DynamicResource BrushTextDim}"/>
 
                                                     <!-- Name -->
-                                                    <TextBlock Grid.Column="1" Text="{Binding Name}"
-                                                               FontSize="12"
-                                                               Padding="2,0"
-                                                               ToolTip="{Binding Name}">
-                                                        <TextBlock.Style>
-                                                            <Style TargetType="TextBlock" BasedOn="{StaticResource StatName}">
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding IsEliminated}" Value="True">
-                                                                        <Setter Property="Foreground" Value="{DynamicResource BrushTextDim}"/>
-                                                                        <Setter Property="TextDecorations" Value="Strikethrough"/>
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </TextBlock.Style>
-                                                    </TextBlock>
+                                                     <TextBlock Grid.Column="1" Text="{Binding Name}"
+                                                                FontSize="12"
+                                                                Padding="2,0"
+                                                                Cursor="Hand"
+                                                                ToolTip="Left-click to view profile">
+                                                         <TextBlock.InputBindings>
+                                                             <MouseBinding Gesture="LeftClick"
+                                                                           Command="{Binding DataContext.ShowUserProfileCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                           CommandParameter="{Binding Name}"/>
+                                                         </TextBlock.InputBindings>
+                                                         <TextBlock.Style>
+                                                             <Style TargetType="TextBlock" BasedOn="{StaticResource StatName}">
+                                                                 <Style.Triggers>
+                                                                     <DataTrigger Binding="{Binding IsEliminated}" Value="True">
+                                                                         <Setter Property="Foreground" Value="{DynamicResource BrushTextDim}"/>
+                                                                         <Setter Property="TextDecorations" Value="Strikethrough"/>
+                                                                     </DataTrigger>
+                                                                     <Trigger Property="IsMouseOver" Value="True">
+                                                                         <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+                                                                         <Setter Property="TextDecorations" Value="Underline"/>
+                                                                     </Trigger>
+                                                                 </Style.Triggers>
+                                                             </Style>
+                                                         </TextBlock.Style>
+                                                     </TextBlock>
 
                                                     <!-- W -->
                                                     <TextBlock Grid.Column="2" Text="{Binding Wins}"
