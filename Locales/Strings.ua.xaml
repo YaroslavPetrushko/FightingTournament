@@ -53,7 +53,7 @@
     <system:String x:Key="Loc_SetupSelectedGame">ОБРАНА ГРА</system:String>
     <system:String x:Key="Loc_SetupTournamentMode">РЕЖИМ ТУРНІРУ</system:String>
     <system:String x:Key="Loc_SetupModeEndless">Круговий турнір (Колові ротації)</system:String>
-    <system:String x:Key="Loc_SetupModeChampionship">Сітка чемпіонату (Олімпійська система)</system:String>
+    <system:String x:Key="Loc_SetupModeChampionship">Сітка чемпіонату (Олімпійська система / Плейоф)</system:String>
     <system:String x:Key="Loc_SetupDefaultRounds">РАУНДИ МАТЧУ ЗА ЗАМОВЧУВАННЯМ</system:String>
     <system:String x:Key="Loc_SetupSessionName">НАЗВА СЕСІЇ</system:String>
     <system:String x:Key="Loc_SetupPlayerRoster">СПИСОК ГРАВЦІВ</system:String>
@@ -198,7 +198,7 @@
     <system:String x:Key="Loc_StandingsWR">В%</system:String>
     <system:String x:Key="Loc_StandingsChar">ПЕРС</system:String>
     <system:String x:Key="Loc_TviewWin">Win</system:String>
-    <system:String x:Key="Loc_SetupFooter">Коловий турнір  ·  всі пари за раунд  ·  круговий або олімпійський</system:String>
+    <system:String x:Key="Loc_SetupFooter">Коловий турнір  ·  всі пари за раунд  ·  круговий або плейоф</system:String>
     <system:String x:Key="Loc_TValEditingStatus">✏️  Редагування Раунду {0}. Натисніть '{1}' після завершення.</system:String>
     <system:String x:Key="Loc_TValNoHistoricalEditChampionship">⚠  Історичні редагування не підтримуються в режимі Чемпіонату.</system:String>
     <system:String x:Key="Loc_TValCannotEliminateLimit">⚠  Неможливо виключити: необхідно щонайменше 2 активних гравці.</system:String>

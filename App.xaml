@@ -22,7 +22,7 @@
         <SolidColorBrush x:Key="BrushSurface2"    Color="#1E1E2A"/>
         <SolidColorBrush x:Key="BrushSurface3"    Color="#26263A"/>
         <SolidColorBrush x:Key="BrushAccent"      Color="#E8003D"/>
-        <SolidColorBrush x:Key="BrushAccentDim"   Color="#8C0025"/>
+        <SolidColorBrush x:Key="BrushAccentDim"   Color="#550922"/>
         <SolidColorBrush x:Key="BrushAccentHover" Color="#FF1A54"/>
         <SolidColorBrush x:Key="BrushText"        Color="#E8E8F2"/>
         <SolidColorBrush x:Key="BrushTextDim"     Color="#7070A0"/>

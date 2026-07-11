@@ -120,6 +120,12 @@ public class SetupViewModel : BaseViewModel
 
     public ObservableCollection<string> RegisteredUsers { get; } = new();
 
+
+
+    public string? AssignedPlayerName => ProfileManager.GetAssignedPlayerName();
+
+
+
     // ── Player count ─────────────────────────────────────────────────
 
     private int _playerCount = 4;
@@ -195,7 +201,22 @@ public class SetupViewModel : BaseViewModel
         RefreshAvailableGames();
         RefreshUserPresets();
         UpdateDefaultSessionName();
+
+        ProfileManager.ProfileChanged += OnProfileChanged;
+
     }
+
+
+
+    private void OnProfileChanged()
+
+    {
+
+        OnPropertyChanged(nameof(AssignedPlayerName));
+
+    }
+
+
 
     // ── Helpers ──────────────────────────────────────────────────────
 
@@ -410,7 +431,9 @@ public class SetupViewModel : BaseViewModel
         var tournament = TournamentEngine.Create(names, SelectedMode, SelectedRounds);
         tournament.SelectedGame = SelectedGame;
         tournament.SessionName = session;
-        TournamentStarted?.Invoke(tournament);
+
+        OnTournamentStarted(tournament);
+
     }
 
     public void RefreshSavedSessions()
@@ -558,7 +581,10 @@ public class SetupViewModel : BaseViewModel
                 return;
             }
 
-            TournamentStarted?.Invoke(tournament);
+
+
+            OnTournamentStarted(tournament);
+
         }
         catch (Exception ex)
         {
@@ -589,4 +615,17 @@ public class SetupViewModel : BaseViewModel
             ValidationMessage = $"⚠  Error deleting session: {ex.Message}";
         }
     }
+
+
+
+    private void OnTournamentStarted(Tournament tournament)
+
+    {
+
+        ProfileManager.ProfileChanged -= OnProfileChanged;
+
+        TournamentStarted?.Invoke(tournament);
+
+    }
+
 }

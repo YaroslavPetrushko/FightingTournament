@@ -35,6 +35,7 @@
 
     <UserControl.Resources>
         <conv:StringToVisibilityConverter x:Key="StrVis"/>
+        <conv:PlayerMatchToBoolConverter x:Key="PlayerMatchToBool"/>
 
         <!-- Segmented button left style -->
         <Style x:Key="RadioModeLeftBtn" TargetType="RadioButton">
@@ -451,16 +452,42 @@
                                                         BorderThickness="1"
                                                         CornerRadius="4"
                                                         Padding="{TemplateBinding Padding}">
-                                                    <TextBlock Text="{Binding}"
-                                                               FontSize="12"
-                                                               FontWeight="Medium"
-                                                               Foreground="{DynamicResource BrushText}"/>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0" Text="{Binding}"
+                                                                   FontSize="12"
+                                                                   FontWeight="Medium"
+                                                                   Foreground="{DynamicResource BrushText}"/>
+                                                        <TextBlock x:Name="MeIndicator" Grid.Column="1" Text="★"
+                                                                   FontSize="12"
+                                                                   Foreground="{DynamicResource BrushAccent}"
+                                                                   Visibility="Collapsed"
+                                                                   Margin="5,0,0,0"/>
+                                                    </Grid>
                                                 </Border>
                                                 <ControlTemplate.Triggers>
                                                     <Trigger Property="IsMouseOver" Value="True">
                                                         <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource BrushSurface3}"/>
                                                         <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
                                                     </Trigger>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Value="True">
+                                                                <Condition.Binding>
+                                                                    <MultiBinding Converter="{StaticResource PlayerMatchToBool}">
+                                                                        <Binding/>
+                                                                        <Binding Path="DataContext.AssignedPlayerName" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                                                                    </MultiBinding>
+                                                                </Condition.Binding>
+                                                            </Condition>
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource BrushAccentDim}"/>
+                                                        <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
+                                                        <Setter TargetName="MeIndicator" Property="Visibility" Value="Visible"/>
+                                                    </MultiDataTrigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>
                                         </Button.Template>

@@ -372,13 +372,25 @@
 
                                                     <!-- P1 name -->
                                                     <TextBlock Grid.Column="0"
-                                                               Text="{Binding Player1Name}"
                                                                FontSize="13" FontWeight="SemiBold"
                                                                HorizontalAlignment="Right"
                                                                VerticalAlignment="Center"
                                                                Margin="0,0,6,0"
                                                                TextTrimming="CharacterEllipsis"
-                                                               ToolTip="{Binding Player1Name}"/>
+                                                               ToolTip="{Binding Player1Name}">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                                                <Setter Property="Text" Value="{Binding Player1Name}"/>
+                                                                <Setter Property="Foreground" Value="{DynamicResource BrushText}"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding Player1IsMe}" Value="True">
+                                                                        <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+                                                                        <Setter Property="Text" Value="{Binding Player1Name, StringFormat='★ {0}'}"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
 
                                                     <!-- P1 WIN -->
                                                     <RadioButton Grid.Column="1"
@@ -398,7 +410,7 @@
 
                                                     <!-- P2 WIN -->
                                                     <RadioButton Grid.Column="3"
-                                                                 Content="WIN"
+                                                                 Content="{DynamicResource Loc_TviewWin}"
                                                                  Style="{StaticResource RadioWin}"
                                                                  GroupName="{Binding MatchId}"
                                                                  IsChecked="{Binding Player2Won, Mode=TwoWay}"
@@ -407,13 +419,25 @@
 
                                                     <!-- P2 name -->
                                                     <TextBlock Grid.Column="4"
-                                                               Text="{Binding Player2Name}"
                                                                FontSize="13" FontWeight="SemiBold"
                                                                HorizontalAlignment="Left"
                                                                VerticalAlignment="Center"
                                                                Margin="6,0,0,0"
                                                                TextTrimming="CharacterEllipsis"
-                                                               ToolTip="{Binding Player2Name}"/>
+                                                               ToolTip="{Binding Player2Name}">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                                                <Setter Property="Text" Value="{Binding Player2Name}"/>
+                                                                <Setter Property="Foreground" Value="{DynamicResource BrushText}"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding Player2IsMe}" Value="True">
+                                                                        <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+                                                                        <Setter Property="Text" Value="{Binding Player2Name, StringFormat='{}{0} ★'}"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
 
                                                     <!-- Rounds -->
                                                     <ComboBox Grid.Column="6"
