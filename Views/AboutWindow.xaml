@@ -1,7 +1,7 @@
 <Window x:Class="FightingTournament.Views.AboutWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="About Tracker"
+        Title="{DynamicResource Loc_AboutTitle}"
         Height="400" Width="500"
         WindowStartupLocation="CenterOwner"
         Background="Transparent"
@@ -46,13 +46,13 @@
         <!-- Icon & Title -->
         <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="0,15,0,15">
             <TextBlock Text="⚔" FontSize="36" Foreground="{DynamicResource BrushAccent}" HorizontalAlignment="Center" Margin="0,0,0,5"/>
-            <TextBlock Text="FIGHTING TOURNAMENT TRACKER" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource BrushText}" HorizontalAlignment="Center"/>
-            <TextBlock Text="Version 5.0" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextDim}" HorizontalAlignment="Center"/>
+            <TextBlock Text="{DynamicResource Loc_AppTitle}" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource BrushText}" HorizontalAlignment="Center"/>
+            <TextBlock Text="{DynamicResource Loc_AboutVersion}" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextDim}" HorizontalAlignment="Center"/>
         </StackPanel>
 
         <!-- Text Description & Credits -->
         <StackPanel Grid.Row="1" Margin="10,0,10,20">
-            <TextBlock Text="A .NET 8 desktop application for scoring and managing local fighting game tournaments. Developed using Antigravity AI (Google Gemini 3.5 Flash)."
+            <TextBlock Text="{DynamicResource Loc_AboutDescription}"
                        FontSize="12"
                        TextWrapping="Wrap"
                        TextAlignment="Center"
@@ -62,17 +62,17 @@
 
             <Border Background="{DynamicResource BrushSurface2}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" Padding="12" CornerRadius="4">
                 <StackPanel>
-                    <TextBlock Text="✨ KEY ADVANCEMENTS IN V5.0" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}" Margin="0,0,0,6"/>
-                    <TextBlock Text="• File Swapping: Open and backup custom tournament databases." FontSize="11" Foreground="{DynamicResource BrushText}" Margin="0,0,0,4"/>
-                    <TextBlock Text="• PNG Exporters: Export standing leaders and brackets directly as images." FontSize="11" Foreground="{DynamicResource BrushText}" Margin="0,0,0,4"/>
-                    <TextBlock Text="• Presets Manager: Save favorite rosters and settings in one click." FontSize="11" Foreground="{DynamicResource BrushText}"/>
+                    <TextBlock Text="{DynamicResource Loc_AboutKeyAdvancements}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}" Margin="0,0,0,6"/>
+                    <TextBlock Text="{DynamicResource Loc_AboutAdvFileSwapping}" FontSize="11" Foreground="{DynamicResource BrushText}" Margin="0,0,0,4"/>
+                    <TextBlock Text="{DynamicResource Loc_AboutAdvPngExporters}" FontSize="11" Foreground="{DynamicResource BrushText}" Margin="0,0,0,4"/>
+                    <TextBlock Text="{DynamicResource Loc_AboutAdvPresetsManager}" FontSize="11" Foreground="{DynamicResource BrushText}"/>
                 </StackPanel>
             </Border>
         </StackPanel>
 
         <!-- Close Button -->
         <Button Grid.Row="2"
-                Content="CLOSE"
+                Content="{DynamicResource Loc_Close}"
                 Style="{StaticResource BtnPrimary}"
                 Padding="30,8"
                 FontSize="11"

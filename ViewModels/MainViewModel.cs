@@ -23,6 +23,8 @@ public class MainViewModel : BaseViewModel
     public ICommand AboutCommand          { get; }
     public ICommand ExitCommand           { get; }
     public ICommand ChangeThemeCommand    { get; }
+    public ICommand ChangeLanguageCommand { get; }
+    public ICommand OpenProfileCommand    { get; }
 
     public MainViewModel()
     {
@@ -32,9 +34,13 @@ public class MainViewModel : BaseViewModel
         AboutCommand          = new RelayCommand(ShowAbout);
         ExitCommand           = new RelayCommand(ExitApplication);
         ChangeThemeCommand    = new RelayCommand(p => ChangeTheme(p as string));
+        ChangeLanguageCommand = new RelayCommand(p => ChangeLanguage(p as string));
+        OpenProfileCommand    = new RelayCommand(OpenProfile);
 
         // Load persisted dynamic theme on startup
         ThemeManager.Initialize();
+
+        ProfileManager.ProfileChanged += () => OnPropertyChanged(nameof(ProfileButtonText));
 
         NavigateToSetup();
     }
@@ -47,6 +53,9 @@ public class MainViewModel : BaseViewModel
     public bool IsDeepDarkThemeChecked => CurrentThemeName == "deep_dark";
     public bool IsMinimalistThemeChecked => CurrentThemeName == "minimalist";
     public bool IsWhiteThemeChecked => CurrentThemeName == "white";
+
+    public bool IsEnglishLanguageChecked => LocalizationManager.CurrentLanguage == "en";
+    public bool IsUkrainianLanguageChecked => LocalizationManager.CurrentLanguage == "ua";
 
     private void ChangeTheme(string? themeName)
     {
@@ -61,6 +70,17 @@ public class MainViewModel : BaseViewModel
         OnPropertyChanged(nameof(IsDeepDarkThemeChecked));
         OnPropertyChanged(nameof(IsMinimalistThemeChecked));
         OnPropertyChanged(nameof(IsWhiteThemeChecked));
+    }
+
+    private void ChangeLanguage(string? lang)
+    {
+        if (lang == null) return;
+        LocalizationManager.ApplyLanguage(lang);
+        
+        // Notify UI to update checkmarks
+        OnPropertyChanged(nameof(IsEnglishLanguageChecked));
+        OnPropertyChanged(nameof(IsUkrainianLanguageChecked));
+        OnPropertyChanged(nameof(ProfileButtonText));
     }
 
     private void NavigateToSetup()
@@ -81,8 +101,8 @@ public class MainViewModel : BaseViewModel
         if (CurrentView is TournamentViewModel)
         {
             var result = MessageBox.Show(
-                "A tournament is in progress. Unsaved cycle data will be lost.\n\nContinue?",
-                "Unsaved Changes",
+                LocalizationManager.GetString("Loc_MainDbWarning"),
+                LocalizationManager.GetString("Loc_MainDbWarningTitle"),
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Warning);
 
@@ -137,8 +157,8 @@ public class MainViewModel : BaseViewModel
     private void CleanSessions()
     {
         var result = MessageBox.Show(
-            "This will delete all saved sessions with 0 matches scored.\n\nAre you sure you want to clean up legacy sessions?",
-            "Clean Up Legacy Sessions",
+            LocalizationManager.GetString("Loc_MainCleanConfirm"),
+            LocalizationManager.GetString("Loc_MainCleanConfirmTitle"),
             MessageBoxButton.YesNo,
             MessageBoxImage.Question);
 
@@ -148,11 +168,15 @@ public class MainViewModel : BaseViewModel
         {
             int deletedCount = DatabaseRepository.PruneEmptySessions();
             NavigateToSetup();
-            MessageBox.Show($"Successfully cleaned up database!\nPruned {deletedCount} empty sessions.", "Cleanup Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(
+                string.Format(LocalizationManager.GetString("Loc_MainCleanSuccess"), deletedCount),
+                LocalizationManager.GetString("Loc_UserPurgedTitle"),
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Could not prune sessions:\n{ex.Message}", "Database Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show($"{LocalizationManager.GetString("Loc_DeleteUserError")} {ex.Message}", LocalizationManager.GetString("Loc_DatabaseError"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -173,14 +197,58 @@ public class MainViewModel : BaseViewModel
     private void ExitApplication()
     {
         var result = MessageBox.Show(
-            "Are you sure you want to exit the Fighting Tournament Tracker?",
-            "Exit Application",
+            LocalizationManager.GetString("Loc_MainExitConfirm"),
+            LocalizationManager.GetString("Loc_MainExitConfirmTitle"),
             MessageBoxButton.YesNo,
             MessageBoxImage.Question);
 
         if (result == MessageBoxResult.Yes)
         {
             Application.Current.Shutdown();
+        }
+    }
+
+    public string ProfileButtonText
+    {
+        get
+        {
+            string? name = ProfileManager.GetAssignedPlayerName();
+            return name != null 
+                ? $"👤  {name}" 
+                : $"👤  {LocalizationManager.GetString("Loc_ProfileAssign")}";
+        }
+    }
+
+    private void OpenProfile()
+    {
+        string? assigned = ProfileManager.GetAssignedPlayerName();
+        if (assigned != null)
+        {
+            try
+            {
+                var profile = DatabaseRepository.GetUserProfile(assigned);
+                bool isTournamentActive = CurrentView is TournamentViewModel;
+                var window = new Views.UserProfileWindow(profile, isTournamentActive);
+                window.Owner = Application.Current.MainWindow;
+                window.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Could not open user profile:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+        else
+        {
+            try
+            {
+                var window = new Views.AssignProfileWindow();
+                window.Owner = Application.Current.MainWindow;
+                window.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Could not open profile assignment:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }

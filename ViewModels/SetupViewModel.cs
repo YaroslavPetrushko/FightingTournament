@@ -256,7 +256,7 @@ public class SetupViewModel : BaseViewModel
     {
         if (string.IsNullOrWhiteSpace(NewPresetName))
         {
-            ValidationMessage = "⚠  Please enter a name for the new preset.";
+            ValidationMessage = LocalizationManager.GetString("Loc_ValPresetNameEmpty");
             return;
         }
 
@@ -275,7 +275,7 @@ public class SetupViewModel : BaseViewModel
             DatabaseRepository.SaveUserPreset(preset);
             NewPresetName = string.Empty;
             RefreshUserPresets();
-            ValidationMessage = $"✓  Preset '{preset.PresetName}' saved.";
+            ValidationMessage = string.Format(LocalizationManager.GetString("Loc_ValPresetSaved"), preset.PresetName);
         }
         catch (Exception ex)
         {
@@ -288,8 +288,8 @@ public class SetupViewModel : BaseViewModel
         if (SelectedUserPreset == null) return;
 
         var result = System.Windows.MessageBox.Show(
-            $"Are you sure you want to delete the preset \"{SelectedUserPreset.PresetName}\"?",
-            "Delete Preset",
+            string.Format(LocalizationManager.GetString("Loc_ValPresetDeleteConfirm"), SelectedUserPreset.PresetName),
+            LocalizationManager.GetString("Loc_SetupManagePresets"),
             System.Windows.MessageBoxButton.YesNo,
             System.Windows.MessageBoxImage.Question);
 
@@ -300,7 +300,7 @@ public class SetupViewModel : BaseViewModel
             DatabaseRepository.DeleteUserPreset(SelectedUserPreset.PresetName);
             RefreshUserPresets();
             SelectedUserPreset = null;
-            ValidationMessage = "✓  Preset deleted successfully.";
+            ValidationMessage = "✓  " + LocalizationManager.GetString("Loc_ValPresetDeleted");
         }
         catch (Exception ex)
         {
@@ -380,20 +380,20 @@ public class SetupViewModel : BaseViewModel
 
         if (names.Any(string.IsNullOrWhiteSpace))
         {
-            ValidationMessage = "⚠  All player names must be filled in.";
+            ValidationMessage = LocalizationManager.GetString("Loc_ValAllPlayerNamesFilled");
             return;
         }
 
         if (names.Distinct(StringComparer.OrdinalIgnoreCase).Count() != names.Count)
         {
-            ValidationMessage = "⚠  Player names must be unique.";
+            ValidationMessage = LocalizationManager.GetString("Loc_ValPlayersUnique");
             return;
         }
 
         string session = SessionName.Trim();
         if (string.IsNullOrWhiteSpace(session))
         {
-            ValidationMessage = "⚠  Session name cannot be empty.";
+            ValidationMessage = LocalizationManager.GetString("Loc_ValEnterSessionName");
             return;
         }
 
@@ -459,8 +459,11 @@ public class SetupViewModel : BaseViewModel
     {
         if (string.IsNullOrWhiteSpace(nickname)) return;
 
-        var result = System.Windows.MessageBox.Show($"Are you sure you want to delete \"{nickname}\" from the registered players list?", 
-            "Confirm Delete", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Warning);
+        var result = System.Windows.MessageBox.Show(
+            string.Format(LocalizationManager.GetString("Loc_ValConfirmDeleteRegistry"), nickname), 
+            LocalizationManager.GetString("Loc_Confirm"), 
+            System.Windows.MessageBoxButton.YesNo, 
+            System.Windows.MessageBoxImage.Warning);
         
         if (result == System.Windows.MessageBoxResult.Yes)
         {
@@ -569,8 +572,8 @@ public class SetupViewModel : BaseViewModel
         if (string.IsNullOrWhiteSpace(SelectedSavedSession)) return;
 
         var result = System.Windows.MessageBox.Show(
-            $"Are you sure you want to delete the saved session \"{SelectedSavedSession}\"?\n\nThis cannot be undone.",
-            "Delete Saved Session",
+            string.Format(LocalizationManager.GetString("Loc_ValSessionDeleteConfirm"), SelectedSavedSession),
+            LocalizationManager.GetString("Loc_ValSessionDeleteTitle"),
             System.Windows.MessageBoxButton.YesNo,
             System.Windows.MessageBoxImage.Warning);
 

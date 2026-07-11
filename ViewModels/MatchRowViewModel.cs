@@ -15,6 +15,15 @@ public class MatchRowViewModel : BaseViewModel
     public string Player1Name => _match.Player1.Name;
     public string Player2Name => _match.Player2.Name;
 
+    public bool Player1IsMe => ProfileManager.IsAssigned(Player1Name);
+    public bool Player2IsMe => ProfileManager.IsAssigned(Player2Name);
+
+    public void NotifyIsMeChanged()
+    {
+        OnPropertyChanged(nameof(Player1IsMe));
+        OnPropertyChanged(nameof(Player2IsMe));
+    }
+
     // ── Characters ───────────────────────────────────────────────────
 
     private string? _char1;

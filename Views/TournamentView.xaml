@@ -175,7 +175,7 @@
                                Visibility="{Binding StatusMessage, Converter={StaticResource StrVis}}"/>
                 </StackPanel>
 
-                <Button Grid.Column="1" Content="New Tournament"
+                <Button Grid.Column="1" Content="{DynamicResource Loc_TviewNewTournamentBtn}"
                         Style="{StaticResource BtnGhost}"
                         Padding="12,7" FontSize="11" Margin="0,0,10,0"
                         Command="{Binding NewTournamentCommand}"/>
@@ -204,7 +204,7 @@
                     BorderThickness="0,0,1,0"
                     Padding="14,18">
                 <DockPanel>
-                    <TextBlock DockPanel.Dock="Top" Text="SCHEDULE"
+                    <TextBlock DockPanel.Dock="Top" Text="{DynamicResource Loc_TviewSchedule}"
                                Style="{StaticResource ColHeader}"/>
 
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -298,11 +298,11 @@
                     <!-- Toggle Buttons (Only visible in Championship mode) -->
                     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,15"
                                 Visibility="{Binding ShowBracketToggleVisible, Converter={StaticResource BoolVis}}">
-                        <RadioButton Content="MATCH LIST" 
+                        <RadioButton Content="{DynamicResource Loc_TviewMatchList}" 
                                      Style="{StaticResource RadioToggleLeftBtn}"
                                      GroupName="ViewToggle"
                                      IsChecked="{Binding ShowBracket, Converter={StaticResource InvBool}, Mode=TwoWay}"/>
-                        <RadioButton Content="BRACKET VIEW" 
+                        <RadioButton Content="{DynamicResource Loc_TviewBracketViewShort}" 
                                      Style="{StaticResource RadioToggleRightBtn}"
                                      GroupName="ViewToggle"
                                      IsChecked="{Binding ShowBracket, Mode=TwoWay}"/>
@@ -327,19 +327,19 @@
                                     <ColumnDefinition Width="8"/>
                                     <ColumnDefinition Width="1.2*"  MinWidth="110"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="PLAYER 1"
+                                <TextBlock Grid.Column="0" Text="{DynamicResource Loc_TviewPlayer1}"
                                            Style="{StaticResource ColHeader}"
                                            HorizontalAlignment="Right" Margin="0,0,6,0"/>
-                                <TextBlock Grid.Column="4" Text="PLAYER 2"
+                                <TextBlock Grid.Column="4" Text="{DynamicResource Loc_TviewPlayer2}"
                                            Style="{StaticResource ColHeader}"
                                            HorizontalAlignment="Left"  Margin="6,0,0,0"/>
-                                <TextBlock Grid.Column="6" Text="ROUNDS"
+                                <TextBlock Grid.Column="6" Text="{DynamicResource Loc_TviewRounds}"
                                            Style="{StaticResource ColHeader}"
                                            HorizontalAlignment="Center"/>
-                                <TextBlock Grid.Column="8" Text="CHARACTER 1"
+                                <TextBlock Grid.Column="8" Text="{DynamicResource Loc_TviewCharacter1}"
                                            Style="{StaticResource ColHeader}"
                                            HorizontalAlignment="Center"/>
-                                <TextBlock Grid.Column="10" Text="CHARACTER 2"
+                                <TextBlock Grid.Column="10" Text="{DynamicResource Loc_TviewCharacter2}"
                                            Style="{StaticResource ColHeader}"
                                            HorizontalAlignment="Center"/>
                             </Grid>
@@ -382,7 +382,7 @@
 
                                                     <!-- P1 WIN -->
                                                     <RadioButton Grid.Column="1"
-                                                                 Content="WIN"
+                                                                 Content="{DynamicResource Loc_TviewWin}"
                                                                  Style="{StaticResource RadioWin}"
                                                                  GroupName="{Binding MatchId}"
                                                                  IsChecked="{Binding Player1Won, Mode=TwoWay}"
@@ -749,14 +749,19 @@
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate DataType="{x:Type vm:PlayerStatsViewModel}">
                                             <Border MinHeight="28" Padding="0,2" CornerRadius="3" Margin="0,1">
-                                                <!-- Eliminated tint -->
+                                                <!-- Highlights -->
                                                 <Border.Style>
                                                     <Style TargetType="Border">
                                                         <Setter Property="Background" Value="Transparent"/>
+                                                        <Setter Property="BorderBrush" Value="Transparent"/>
+                                                        <Setter Property="BorderThickness" Value="1"/>
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding IsEliminated}" Value="True">
-                                                                <Setter Property="Background"
-                                                                        Value="{DynamicResource BrushElim}"/>
+                                                                <Setter Property="Background" Value="{DynamicResource BrushElim}"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding IsMe}" Value="True">
+                                                                <Setter Property="Background" Value="{DynamicResource BrushAccentDim}"/>
+                                                                <Setter Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>

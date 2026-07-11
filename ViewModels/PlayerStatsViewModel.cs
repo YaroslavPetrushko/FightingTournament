@@ -1,4 +1,5 @@
 using FightingTournament.Models;
+using FightingTournament.Services;
 using System;
 using System.Windows.Input;
 
@@ -29,6 +30,12 @@ public class PlayerStatsViewModel : BaseViewModel
     public int    Matches    => PlayerModel.TotalMatches;
     public string WinRate    => $"{PlayerModel.WinRate:F1}%";
     public string MostPicked => PlayerModel.MostPickedCharacter;
+    public bool   IsMe       => ProfileManager.IsAssigned(Name);
+
+    public void NotifyIsMeChanged()
+    {
+        OnPropertyChanged(nameof(IsMe));
+    }
 
     public ICommand EliminateCommand { get; }
 

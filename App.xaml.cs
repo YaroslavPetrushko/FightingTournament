@@ -13,6 +13,8 @@ public partial class App : Application
         try
         {
             DatabaseConnector.Instance.InitializeDatabase();
+            LocalizationManager.Initialize();
+            ProfileManager.Initialize();
         }
         catch (Exception ex)
         {

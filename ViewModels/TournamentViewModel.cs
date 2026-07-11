@@ -64,7 +64,9 @@ public class TournamentViewModel : BaseViewModel
     }
 
     public string SaveButtonText =>
-        SelectedCycleIndex == _tournament.CurrentCycleIndex ? "Save & Next Cycle  ►" : "Save Changes  ✓";
+        SelectedCycleIndex == _tournament.CurrentCycleIndex 
+            ? LocalizationManager.GetString("Loc_TviewSaveNextBtn") 
+            : LocalizationManager.GetString("Loc_TviewSaveChangesBtn");
 
     // ── Header ───────────────────────────────────────────────────────
 
@@ -74,11 +76,12 @@ public class TournamentViewModel : BaseViewModel
         {
             if (SelectedCycleIndex != _tournament.CurrentCycleIndex)
             {
-                return $"EDITING Cycle  {SelectedCycleIndex + 1}   •   [HISTORICAL DATA]";
+                return string.Format(LocalizationManager.GetString("Loc_TviewEditingCycle"), SelectedCycleIndex + 1);
             }
-            return $"Cycle  {_tournament.CurrentCycleIndex + 1}   •   " +
-                   $"{ActiveCount()} active players   •   " +
-                   $"{_tournament.CurrentCycle?.Matches.Count ?? 0} matches";
+            return string.Format(LocalizationManager.GetString("Loc_TviewCycleHeader"), 
+                _tournament.CurrentCycleIndex + 1, 
+                ActiveCount(), 
+                _tournament.CurrentCycle?.Matches.Count ?? 0);
         }
     }
 
@@ -133,7 +136,11 @@ public class TournamentViewModel : BaseViewModel
         _selectedCycleIndex = tournament.CurrentCycleIndex;
 
         CommitCycleCommand   = new RelayCommand(CommitCycle);
-        NewTournamentCommand = new RelayCommand(onNewTournament);
+        NewTournamentCommand = new RelayCommand(() =>
+        {
+            ProfileManager.ProfileChanged -= OnProfileChanged;
+            onNewTournament();
+        });
         SelectCycleCommand   = new RelayCommand(p =>
         {
             if (p is CycleInfoViewModel vm) SelectCycle(vm);
@@ -155,6 +162,8 @@ public class TournamentViewModel : BaseViewModel
         RefreshScheduleSidebar();
         LoadCurrentCycleMatches();
 
+        ProfileManager.ProfileChanged += OnProfileChanged;
+
         try
         {
             DatabaseRepository.SaveTournamentState(_tournament);
@@ -162,6 +171,18 @@ public class TournamentViewModel : BaseViewModel
         catch (Exception ex)
         {
             StatusMessage = $"⚠  Could not save tournament to database: {ex.Message}";
+        }
+    }
+
+    private void OnProfileChanged()
+    {
+        foreach (var vm in Standings)
+        {
+            vm.NotifyIsMeChanged();
+        }
+        foreach (var vm in CurrentMatches)
+        {
+            vm.NotifyIsMeChanged();
         }
     }
 
@@ -306,7 +327,7 @@ public class TournamentViewModel : BaseViewModel
     {
         if (CurrentMatches.Any(m => !m.IsCompleted))
         {
-            StatusMessage = "⚠  Fill in all match results before saving.";
+            StatusMessage = LocalizationManager.GetString("Loc_TValCycleIncomplete");
             return;
         }
 
@@ -418,14 +439,14 @@ public class TournamentViewModel : BaseViewModel
         // Championship bracket cannot be safely re-edited — structure depends on prior winners
         if (_tournament.Mode == TournamentMode.Championship && index < _tournament.CurrentCycleIndex)
         {
-            StatusMessage = "⚠  Historical edits are not supported in Championship mode.";
+            StatusMessage = LocalizationManager.GetString("Loc_TValNoHistoricalEditChampionship");
             return;
         }
 
         if (index >= 0 && index <= _tournament.CurrentCycleIndex)
         {
             SelectedCycleIndex = index;
-            StatusMessage = $"✏️  Editing Cycle {index + 1}. Press '{SaveButtonText}' when finished.";
+            StatusMessage = string.Format(LocalizationManager.GetString("Loc_TValEditingStatus"), index + 1, SaveButtonText);
         }
     }
 
@@ -435,15 +456,13 @@ public class TournamentViewModel : BaseViewModel
     {
         if (ActiveCount() <= 2)
         {
-            StatusMessage = "⚠  Cannot eliminate: at least 2 active players required.";
+            StatusMessage = LocalizationManager.GetString("Loc_TValCannotEliminateLimit");
             return;
         }
 
         var result = MessageBox.Show(
-            $"Remove \"{player.Name}\" from the tournament?\n\n" +
-            "• Completed match results are kept.\n" +
-            "• Unplayed matches in the current cycle will be removed.",
-            "Eliminate Player",
+            string.Format(LocalizationManager.GetString("Loc_TValEliminatePlayerConfirm"), player.Name),
+            LocalizationManager.GetString("Loc_TValEliminatePlayerTitle"),
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
 
@@ -461,11 +480,11 @@ public class TournamentViewModel : BaseViewModel
         try
         {
             DatabaseRepository.SaveTournamentState(_tournament);
-            StatusMessage = $"✗  {player.Name} eliminated and database updated. {ActiveCount()} players remaining.";
+            StatusMessage = string.Format(LocalizationManager.GetString("Loc_TValEliminateSuccessDb"), player.Name, ActiveCount());
         }
         catch (Exception ex)
         {
-            StatusMessage = $"✗  {player.Name} eliminated locally, but database update failed: {ex.Message}";
+            StatusMessage = string.Format(LocalizationManager.GetString("Loc_TValEliminateSuccess"), player.Name, ActiveCount()) + $" (DB error: {ex.Message})";
         }
         OnPropertyChanged(nameof(CycleHeader));
         OnPropertyChanged(nameof(IsFinished));
@@ -492,20 +511,20 @@ public class TournamentViewModel : BaseViewModel
         string name = NewPlayerName.Trim();
         if (string.IsNullOrWhiteSpace(name))
         {
-            StatusMessage = "⚠  Player name cannot be empty.";
+            StatusMessage = LocalizationManager.GetString("Loc_ValPlayerNameEmpty");
             return;
         }
 
         if (name.Equals("BYE", StringComparison.OrdinalIgnoreCase))
         {
-            StatusMessage = "⚠  'BYE' is a reserved keyword.";
+            StatusMessage = LocalizationManager.GetString("Loc_TValReservedKeywordBye");
             return;
         }
 
         // Check if player with the same name already exists
         if (_tournament.Players.Any(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
         {
-            StatusMessage = $"⚠  Player \"{name}\" is already registered.";
+            StatusMessage = string.Format(LocalizationManager.GetString("Loc_TValActiveAddAlreadyInTournament"), name);
             return;
         }
 
@@ -522,11 +541,11 @@ public class TournamentViewModel : BaseViewModel
         try
         {
             DatabaseRepository.SaveTournamentState(_tournament);
-            StatusMessage = $"✓  Added new player: \"{name}\". They will enter the schedule in the next cycle.";
+            StatusMessage = string.Format(LocalizationManager.GetString("Loc_TValActiveAddSuccess"), name);
         }
         catch (Exception ex)
         {
-            StatusMessage = $"⚠  Added \"{name}\" locally, but database save failed: {ex.Message}";
+            StatusMessage = string.Format(LocalizationManager.GetString("Loc_TValActiveAddSuccess"), name) + $" (DB error: {ex.Message})";
         }
 
         IsAddingPlayer = false;
