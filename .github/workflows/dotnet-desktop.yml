@@ -41,6 +41,10 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore ${{ env.Solution_Name }}
 
+    # Verify C# code styling matches .editorconfig
+    - name: Verify Code Formatting
+      run: dotnet format ${{ env.Solution_Name }} --verify-no-changes --severity warn
+
     # Execute all unit tests in the solution
     - name: Execute unit tests
       run: dotnet test ${{ env.Solution_Name }} --no-restore --configuration ${{ matrix.configuration }}
