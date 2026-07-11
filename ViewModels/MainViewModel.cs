@@ -1,8 +1,8 @@
-using FightingTournament.Models;
-using FightingTournament.Services;
 using System;
 using System.Windows;
 using System.Windows.Input;
+using FightingTournament.Models;
+using FightingTournament.Services;
 using Microsoft.Win32;
 
 namespace FightingTournament.ViewModels;
@@ -17,25 +17,25 @@ public class MainViewModel : BaseViewModel
         private set => Set(ref _currentView, value);
     }
 
-    public ICommand OpenDatabaseCommand   { get; }
+    public ICommand OpenDatabaseCommand { get; }
     public ICommand SaveDatabaseAsCommand { get; }
-    public ICommand CleanSessionsCommand  { get; }
-    public ICommand AboutCommand          { get; }
-    public ICommand ExitCommand           { get; }
-    public ICommand ChangeThemeCommand    { get; }
+    public ICommand CleanSessionsCommand { get; }
+    public ICommand AboutCommand { get; }
+    public ICommand ExitCommand { get; }
+    public ICommand ChangeThemeCommand { get; }
     public ICommand ChangeLanguageCommand { get; }
-    public ICommand OpenProfileCommand    { get; }
+    public ICommand OpenProfileCommand { get; }
 
     public MainViewModel()
     {
-        OpenDatabaseCommand   = new RelayCommand(OpenDatabase);
+        OpenDatabaseCommand = new RelayCommand(OpenDatabase);
         SaveDatabaseAsCommand = new RelayCommand(SaveDatabaseAs);
-        CleanSessionsCommand  = new RelayCommand(CleanSessions);
-        AboutCommand          = new RelayCommand(ShowAbout);
-        ExitCommand           = new RelayCommand(ExitApplication);
-        ChangeThemeCommand    = new RelayCommand(p => ChangeTheme(p as string));
+        CleanSessionsCommand = new RelayCommand(CleanSessions);
+        AboutCommand = new RelayCommand(ShowAbout);
+        ExitCommand = new RelayCommand(ExitApplication);
+        ChangeThemeCommand = new RelayCommand(p => ChangeTheme(p as string));
         ChangeLanguageCommand = new RelayCommand(p => ChangeLanguage(p as string));
-        OpenProfileCommand    = new RelayCommand(OpenProfile);
+        OpenProfileCommand = new RelayCommand(OpenProfile);
 
         // Load persisted dynamic theme on startup
         ThemeManager.Initialize();
@@ -61,7 +61,7 @@ public class MainViewModel : BaseViewModel
     {
         if (themeName == null) return;
         ThemeManager.ApplyTheme(themeName);
-        
+
         // Notify UI to update checkmarks
         OnPropertyChanged(nameof(CurrentThemeName));
         OnPropertyChanged(nameof(IsDefaultThemeChecked));
@@ -76,7 +76,7 @@ public class MainViewModel : BaseViewModel
     {
         if (lang == null) return;
         LocalizationManager.ApplyLanguage(lang);
-        
+
         // Notify UI to update checkmarks
         OnPropertyChanged(nameof(IsEnglishLanguageChecked));
         OnPropertyChanged(nameof(IsUkrainianLanguageChecked));
@@ -213,8 +213,8 @@ public class MainViewModel : BaseViewModel
         get
         {
             string? name = ProfileManager.GetAssignedPlayerName();
-            return name != null 
-                ? $"👤  {name}" 
+            return name != null
+                ? $"👤  {name}"
                 : $"👤  {LocalizationManager.GetString("Loc_ProfileAssign")}";
         }
     }

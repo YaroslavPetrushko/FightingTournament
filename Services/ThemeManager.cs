@@ -8,7 +8,7 @@ namespace FightingTournament.Services;
 public static class ThemeManager
 {
     private const string ThemeSettingKey = "SelectedTheme";
-    
+
     public static string CurrentTheme { get; private set; } = "default";
 
     private static readonly Dictionary<string, Dictionary<string, string>> Themes = new(StringComparer.OrdinalIgnoreCase)
@@ -159,7 +159,7 @@ public static class ThemeManager
                 var color = (Color)ColorConverter.ConvertFromString(pair.Value);
                 var brush = new SolidColorBrush(color);
                 brush.Freeze(); // Speed up WPF rendering and ensure thread safety
-                
+
                 // Overwrite the dynamic resource key at the Application level
                 Application.Current.Resources[pair.Key] = brush;
 

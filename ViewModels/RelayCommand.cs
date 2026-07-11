@@ -13,17 +13,17 @@ public sealed class RelayCommand : ICommand
 
     public RelayCommand(Action<object?> execute, Func<object?, bool>? canExecute = null)
     {
-        _execute    = execute;
+        _execute = execute;
         _canExecute = canExecute;
     }
 
     // Piggyback on WPF's built-in re-query mechanism
     public event EventHandler? CanExecuteChanged
     {
-        add    => CommandManager.RequerySuggested += value;
+        add => CommandManager.RequerySuggested += value;
         remove => CommandManager.RequerySuggested -= value;
     }
 
     public bool CanExecute(object? p) => _canExecute?.Invoke(p) ?? true;
-    public void Execute(object? p)    => _execute(p);
+    public void Execute(object? p) => _execute(p);
 }

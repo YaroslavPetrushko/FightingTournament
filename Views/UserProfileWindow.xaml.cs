@@ -1,8 +1,8 @@
-using FightingTournament.Models;
-using FightingTournament.Services;
 using System;
 using System.Windows;
 using System.Windows.Input;
+using FightingTournament.Models;
+using FightingTournament.Services;
 
 namespace FightingTournament.Views;
 

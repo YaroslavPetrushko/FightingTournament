@@ -1,9 +1,9 @@
-using FightingTournament.Models;
-using FightingTournament.Services;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+using FightingTournament.Models;
+using FightingTournament.Services;
 
 namespace FightingTournament.ViewModels;
 
@@ -153,33 +153,33 @@ public class SetupViewModel : BaseViewModel
 
     // ── Commands ─────────────────────────────────────────────────────
 
-    public ICommand IncrementCommand     { get; }
-    public ICommand DecrementCommand     { get; }
-    public ICommand StartCommand         { get; }
-    public ICommand ResumeCommand        { get; }
+    public ICommand IncrementCommand { get; }
+    public ICommand DecrementCommand { get; }
+    public ICommand StartCommand { get; }
+    public ICommand ResumeCommand { get; }
     public ICommand DeleteSessionCommand { get; }
-    public ICommand AddPlayerCommand     { get; }
-    public ICommand SavePresetCommand    { get; }
-    public ICommand DeletePresetCommand  { get; }
+    public ICommand AddPlayerCommand { get; }
+    public ICommand SavePresetCommand { get; }
+    public ICommand DeletePresetCommand { get; }
     public ICommand DeleteRegisteredPlayerCommand { get; }
     public ICommand ShowUserProfileCommand { get; }
 
     public SetupViewModel()
     {
-        IncrementCommand     = new RelayCommand(() => PlayerCount++);
-        DecrementCommand     = new RelayCommand(() => PlayerCount--);
-        StartCommand         = new RelayCommand(StartTournament);
-        ResumeCommand        = new RelayCommand(ResumeTournament);
+        IncrementCommand = new RelayCommand(() => PlayerCount++);
+        DecrementCommand = new RelayCommand(() => PlayerCount--);
+        StartCommand = new RelayCommand(StartTournament);
+        ResumeCommand = new RelayCommand(ResumeTournament);
         DeleteSessionCommand = new RelayCommand(DeleteSession);
-        AddPlayerCommand     = new RelayCommand(p =>
+        AddPlayerCommand = new RelayCommand(p =>
         {
             if (p is string nickname)
             {
                 AddPlayer(nickname);
             }
         });
-        SavePresetCommand    = new RelayCommand(SavePreset);
-        DeletePresetCommand  = new RelayCommand(DeletePreset);
+        SavePresetCommand = new RelayCommand(SavePreset);
+        DeletePresetCommand = new RelayCommand(DeletePreset);
         DeleteRegisteredPlayerCommand = new RelayCommand(p =>
         {
             if (p is string nickname)
@@ -223,7 +223,7 @@ public class SetupViewModel : BaseViewModel
     private void RefreshAvailableGames()
     {
         AvailableGames.Clear();
-        
+
         // Build sorted list of games excluding the "Custom (Any/Blank)" option to prevent it from sorting mid-list
         var games = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var key in GameDatabase.Games.Keys)
@@ -245,7 +245,7 @@ public class SetupViewModel : BaseViewModel
                 }
             }
         }
-        catch {}
+        catch { }
 
         foreach (var g in games)
         {
@@ -425,7 +425,7 @@ public class SetupViewModel : BaseViewModel
             {
                 DatabaseRepository.SaveCustomGame(SelectedGame);
             }
-            catch {}
+            catch { }
         }
 
         var tournament = TournamentEngine.Create(names, SelectedMode, SelectedRounds);
@@ -483,11 +483,11 @@ public class SetupViewModel : BaseViewModel
         if (string.IsNullOrWhiteSpace(nickname)) return;
 
         var result = System.Windows.MessageBox.Show(
-            string.Format(LocalizationManager.GetString("Loc_ValConfirmDeleteRegistry"), nickname), 
-            LocalizationManager.GetString("Loc_Confirm"), 
-            System.Windows.MessageBoxButton.YesNo, 
+            string.Format(LocalizationManager.GetString("Loc_ValConfirmDeleteRegistry"), nickname),
+            LocalizationManager.GetString("Loc_Confirm"),
+            System.Windows.MessageBoxButton.YesNo,
             System.Windows.MessageBoxImage.Warning);
-        
+
         if (result == System.Windows.MessageBoxResult.Yes)
         {
             try

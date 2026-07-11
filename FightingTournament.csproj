@@ -10,6 +10,10 @@
     <AssemblyName>FightingTournament</AssemblyName>
     <Version>1.0.0</Version>
     <TargetFramework>net8.0-windows</TargetFramework>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <AnalysisMode>Recommended</AnalysisMode>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
   <ItemGroup>

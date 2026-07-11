@@ -1,8 +1,8 @@
-using FightingTournament.Models;
-using FightingTournament.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FightingTournament.Models;
+using FightingTournament.Services;
 using Xunit;
 
 namespace FightingTournament.Tests;

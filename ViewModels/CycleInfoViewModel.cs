@@ -1,5 +1,5 @@
-using FightingTournament.Models;
 using System.Linq;
+using FightingTournament.Models;
 
 namespace FightingTournament.ViewModels;
 
@@ -9,7 +9,7 @@ public class CycleInfoViewModel : BaseViewModel
 
     public Cycle CycleModel => _cycle;
 
-    public int    Number   => _cycle.Number;
+    public int Number => _cycle.Number;
     public string Matchups => string.Join("\n",
         _cycle.Matches.Select(m => $"{m.Player1.Name}  vs  {m.Player2.Name}"));
 
@@ -33,18 +33,18 @@ public class CycleInfoViewModel : BaseViewModel
     /// Visual indicator shown in the list: ✓ / ► / ○
     public string StatusGlyph =>
         IsCompleted ? "✓" :
-        IsCurrent   ? "►" : "○";
+        IsCurrent ? "►" : "○";
 
     public CycleInfoViewModel(Cycle cycle, bool isCurrent, bool isCompleted)
     {
-        _cycle       = cycle;
-        _isCurrent   = isCurrent;
+        _cycle = cycle;
+        _isCurrent = isCurrent;
         _isCompleted = isCompleted;
     }
 
     public void Refresh(bool isCurrent, bool isCompleted)
     {
-        IsCurrent   = isCurrent;
+        IsCurrent = isCurrent;
         IsCompleted = isCompleted;
         OnPropertyChanged(nameof(StatusGlyph));
         OnPropertyChanged(nameof(Matchups));

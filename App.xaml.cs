@@ -1,6 +1,6 @@
-using FightingTournament.Services;
 using System;
 using System.Windows;
+using FightingTournament.Services;
 
 namespace FightingTournament;
 
@@ -23,7 +23,7 @@ public partial class App : Application
                 "Database Initialization Error",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
-            
+
             Shutdown();
         }
     }

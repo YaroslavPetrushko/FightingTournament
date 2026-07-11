@@ -1,6 +1,6 @@
-using Microsoft.Data.Sqlite;
 using System;
 using System.IO;
+using Microsoft.Data.Sqlite;
 
 namespace FightingTournament.Services;
 

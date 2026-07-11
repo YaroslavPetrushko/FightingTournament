@@ -1,7 +1,7 @@
-using FightingTournament.Models;
-using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
+using FightingTournament.Models;
+using Microsoft.Data.Sqlite;
 
 namespace FightingTournament.Services;
 

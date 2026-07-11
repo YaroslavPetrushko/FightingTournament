@@ -7,7 +7,7 @@ namespace FightingTournament.Services;
 public static class LocalizationManager
 {
     private const string LanguageSettingKey = "SelectedLanguage";
-    
+
     public static string CurrentLanguage { get; private set; } = "en";
 
     public static void Initialize()

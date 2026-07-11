@@ -1,5 +1,5 @@
-using FightingTournament.Models;
 using System.Collections.Generic;
+using FightingTournament.Models;
 using Xunit;
 
 namespace FightingTournament.Tests;
