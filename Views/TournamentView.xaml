@@ -40,6 +40,7 @@
         <conv:BoolToVisibilityConverter x:Key="InvBoolVis" Invert="True"/>
         <conv:StringToVisibilityConverter x:Key="StrVis"/>
         <conv:InverseBooleanConverter x:Key="InvBool"/>
+        <conv:CycleToMatchMarginConverter x:Key="CycleToMatchMargin"/>
 
         <!-- ── Column header label style ── -->
         <Style x:Key="ColHeader" TargetType="TextBlock">
@@ -551,7 +552,7 @@
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate DataType="{x:Type vm:CycleInfoViewModel}">
                                                     <!-- One Round Column -->
-                                                    <StackPanel Margin="15,0" Width="190" VerticalAlignment="Center">
+                                                    <StackPanel Margin="15,0" Width="190" VerticalAlignment="Top">
                                                         <Border Background="{DynamicResource BrushSurface}" 
                                                                 BorderBrush="{DynamicResource BrushBorder}" 
                                                                 BorderThickness="1" 
@@ -569,13 +570,17 @@
                                                         <ItemsControl ItemsSource="{Binding CycleModel.Matches}">
                                                             <ItemsControl.ItemTemplate>
                                                                 <DataTemplate DataType="{x:Type models:Match}">
-                                                                    <StackPanel Margin="0,8">
-                                                                        <Border Background="{DynamicResource BrushSurface2}" 
-                                                                                BorderBrush="{DynamicResource BrushBorder}" 
-                                                                                BorderThickness="1" 
-                                                                                CornerRadius="4" 
-                                                                                Padding="10,8">
-                                                                            <Grid>
+                                                                    <StackPanel>
+                                                                         <StackPanel.Margin>
+                                                                             <Binding Path="DataContext.Number" RelativeSource="{RelativeSource AncestorType=ItemsControl}" Converter="{StaticResource CycleToMatchMargin}"/>
+                                                                         </StackPanel.Margin>
+                                                                         <Border Background="{DynamicResource BrushSurface2}" 
+                                                                                 BorderBrush="{DynamicResource BrushBorder}" 
+                                                                                 BorderThickness="1" 
+                                                                                 CornerRadius="4" 
+                                                                                 Padding="10,6"
+                                                                                 Height="60">
+                                                                             <Grid VerticalAlignment="Center">
                                                                                 <Grid.RowDefinitions>
                                                                                     <RowDefinition Height="Auto"/>
                                                                                     <RowDefinition Height="Auto"/>
