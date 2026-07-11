@@ -5,13 +5,15 @@ Built with **.NET 8 + WPF**, using pure MVVM architecture and dynamic theme desi
 
 ---
 
-## 🚀 Key Features (v5.1)
+## 🚀 Key Features (v1.1)
 
 | Core Module               | Key Features & Capabilities                                                                                                                                         | Status |
 |---------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|:------:|
 | **Engine & Formats**      | Switch between Endless **Round-Robin** lobbies (Circle Algorithm) and visual **Championship Single Elimination** Bracket Trees (with auto-handled `"BYE"` matches). |   ✅    |
 | **Active Analytics**      | Live leaderboard sorting (W/L ratio, win rate %, top characters), dynamic **mid-tournament pruning / additions**, and retro-active **history correction**.          |   ✅    |
 | **Team & Character Play** | Predefined rosters for major titles with **auto-learning autocompletes** and **multi-character pick inputs** (e.g., UMvC3 team support via delimiters `;` or `/`).  |   ✅    |
+| **User Profiles**         | Assign local profile nickname to **highlight yourself** throughout the application (standings, matches, brackets) and view stats instantly from the menu bar.       |   ✅    |
+| **Dynamic Localization**  | Fully dynamic, runtime language switching supporting **English (En)** and **Ukrainian (Ua)** resources preserved in SQLite settings database.                      |   ✅    |
 | **Custom Theme Engine**   | 6 swappable visual themes (Default Black/Red, Volt Green, Retro Electric Blue, Deep Dark Purple, Minimalist, White Light Mode) stored dynamically in user settings. |   ✅    |
 | **Visual Media Exporter** | One-click **cropped PNG screenshot export** of bracket trees and standings tables without margins or empty canvas spaces.                                           |   ✅    |
 | **Robust Persistence**    | SQLite database storage for global player registries, setups, active sessions, and settings, allowing **resuming and editing**.                                     |   ✅    |
@@ -25,8 +27,13 @@ Built with **.NET 8 + WPF**, using pure MVVM architecture and dynamic theme desi
 FightingTournament/
 ├── Converters/
 │   ├── BoolToVisibilityConverter.cs  — WPF boolean to visibility converter
+│   ├── CycleToMatchMarginConverter.cs — Bracket tree spacing margin converter
 │   ├── InverseBooleanConverter.cs     — WPF boolean negation converter
+│   ├── PlayerMatchToBoolConverter.cs  — Equality converter for player names matching
 │   └── StringToVisibilityConverter.cs — WPF string presence to visibility converter
+├── Locales/
+│   ├── Strings.en.xaml                — English language dictionary asset
+│   └── Strings.ua.xaml                — Ukrainian language dictionary asset
 ├── Models/
 │   ├── Cycle.cs                  — Represent a tournament round
 │   ├── GameDatabase.cs           — Roster definitions & default autocompletes
@@ -37,7 +44,9 @@ FightingTournament/
 ├── Services/
 │   ├── DatabaseConnector.cs      — SQLite database initializer & connection helper
 │   ├── DatabaseRepository.cs     — Persistence CRUD operations (sessions, setups, settings)
+│   ├── LocalizationManager.cs    — Dynamic runtime localization manager
 │   ├── PngExporter.cs            — Visual WPF component to cropped PNG renderer
+│   ├── ProfileManager.cs         — Local profile manager and persistence
 │   ├── ThemeManager.cs           — Swappable UI color palettes controller
 │   └── TournamentEngine.cs       — Pairings scheduler & brackets layout planner
 ├── ViewModels/
@@ -52,8 +61,10 @@ FightingTournament/
 │   └── TournamentViewModel.cs    — Main scoreboard, brackets & visual grid controller
 ├── Views/
 │   ├── AboutWindow.xaml          — Details, system version & credit popup
+│   ├── AssignProfileWindow.xaml  — Setup local profile selection dialog
 │   ├── SetupView.xaml            — Configuration & tournament initializer screen
-│   └── TournamentView.xaml       — Dashboard, bracket canvas & control panel screen
+│   ├── TournamentView.xaml       — Dashboard, bracket canvas & control panel screen
+│   └── UserProfileWindow.xaml    — User profile stats dashboard popup
 ├── App.xaml                      — Custom dark/theme XAML resources, control styles & triggers
 └── MainWindow.xaml               — Frame-less main application shell container
 ```
@@ -97,4 +108,4 @@ The round-robin pairings are generated using the **circle (polygon) rotation met
 
 ---
 
-#### Developed using Antigravity AI (Google Gemini 3.5 Flash).
+#### Developed using Google Antigravity.

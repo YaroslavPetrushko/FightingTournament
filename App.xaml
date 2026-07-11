@@ -5,9 +5,14 @@
              xmlns:views="clr-namespace:FightingTournament.Views"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <!-- Fallback static colors for dynamic theme resources -->
-        <Color x:Key="ColorBg">#0D0D15</Color>
-        <Color x:Key="ColorAccent">#E8003D</Color>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Locales/Strings.en.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Fallback static colors for dynamic theme resources -->
+            <Color x:Key="ColorBg">#0D0D15</Color>
+            <Color x:Key="ColorAccent">#E8003D</Color>
 
         <!-- ═══════════════════════════════════════════════════════════
              PALETTE
@@ -17,7 +22,7 @@
         <SolidColorBrush x:Key="BrushSurface2"    Color="#1E1E2A"/>
         <SolidColorBrush x:Key="BrushSurface3"    Color="#26263A"/>
         <SolidColorBrush x:Key="BrushAccent"      Color="#E8003D"/>
-        <SolidColorBrush x:Key="BrushAccentDim"   Color="#8C0025"/>
+        <SolidColorBrush x:Key="BrushAccentDim"   Color="#550922"/>
         <SolidColorBrush x:Key="BrushAccentHover" Color="#FF1A54"/>
         <SolidColorBrush x:Key="BrushText"        Color="#E8E8F2"/>
         <SolidColorBrush x:Key="BrushTextDim"     Color="#7070A0"/>
@@ -539,6 +544,6 @@
         <DataTemplate DataType="{x:Type vm:TournamentViewModel}">
             <views:TournamentView/>
         </DataTemplate>
-
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

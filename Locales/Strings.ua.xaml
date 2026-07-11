@@ -1,0 +1,217 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Title Bar & Main Menus -->
+    <system:String x:Key="Loc_AppTitle">ТРЕКЕР БОЙОВИХ ТУРНІРІВ</system:String>
+    <system:String x:Key="Loc_MenuFile">_Файл</system:String>
+    <system:String x:Key="Loc_MenuOpenDb">_Відкрити базу даних (.db)...</system:String>
+    <system:String x:Key="Loc_MenuSaveDbAs">_Зберегти копію бази як...</system:String>
+    <system:String x:Key="Loc_MenuExit">_Вихід</system:String>
+    <system:String x:Key="Loc_MenuSettings">_Налаштування</system:String>
+    <system:String x:Key="Loc_MenuCleanSessions">_Очистити порожні сесії</system:String>
+    <system:String x:Key="Loc_MenuTheme">_Тема</system:String>
+    <system:String x:Key="Loc_MenuLanguage">_Мова</system:String>
+    <system:String x:Key="Loc_MenuAbout">_Про програму</system:String>
+    <system:String x:Key="Loc_MenuAboutTracker">_Про трекер</system:String>
+
+    <!-- Theme Names -->
+    <system:String x:Key="Loc_ThemeDefault">Стандартна (Чорно-червона)</system:String>
+    <system:String x:Key="Loc_ThemeVoltGreen">Вольт зелена (Стиль Xbox)</system:String>
+    <system:String x:Key="Loc_ThemeElectricBlue">Електрик синя (Ретро аркада)</system:String>
+    <system:String x:Key="Loc_ThemeDeepDark">Глибока темна (Фіолетова)</system:String>
+    <system:String x:Key="Loc_ThemeMinimalist">Мінімалістична</system:String>
+    <system:String x:Key="Loc_ThemeWhite">Світла</system:String>
+
+    <!-- About Window -->
+    <system:String x:Key="Loc_AboutTitle">Про трекер</system:String>
+    <system:String x:Key="Loc_AboutVersion">Версія 1.1</system:String>
+    <system:String x:Key="Loc_AboutDescription">Настільна програма на .NET 8 для проведення та підрахунку результатів локальних турнірів з файтингів. Розроблено за допомогою ШІ Antigravity (Google Gemini 3.5 Flash).</system:String>
+    <system:String x:Key="Loc_AboutKeyAdvancements">✨ КЛЮЧОВІ ДОВЕДЕННЯ У ВЕРСІЇ 1.1</system:String>
+    <system:String x:Key="Loc_AboutAdvFileSwapping">• Профіль користувача: відкривайте профіль через окрему кнопку та підсвічує вас у турнірах.</system:String>
+    <system:String x:Key="Loc_AboutAdvPngExporters">• Локалізація: підтримка динамічної локалізації. Мови: ENG/УКР.</system:String>
+    <system:String x:Key="Loc_AboutAdvPresetsManager">• Багфікси та покращення: відступи гілок у турнірі, баг з експортом PNG та інше.</system:String>
+    <system:String x:Key="Loc_Close">ЗАКРИТИ</system:String>
+
+    <!-- User Profile Window -->
+    <system:String x:Key="Loc_ProfileTitle">Профіль гравця</system:String>
+    <system:String x:Key="Loc_ProfileHeader">ПРОФІЛЬ ГРАВЦЯ</system:String>
+    <system:String x:Key="Loc_ProfileSubtitle">Глобальна статистика турнірів</system:String>
+    <system:String x:Key="Loc_ProfilePrefix">ПРОФІЛЬ:</system:String>
+    <system:String x:Key="Loc_ProfileTotalMatches">Всього матчів</system:String>
+    <system:String x:Key="Loc_ProfileTotalWins">Всього перемог</system:String>
+    <system:String x:Key="Loc_ProfileWinRate">Відсоток перемог</system:String>
+    <system:String x:Key="Loc_ProfileFavCharacter">Улюблений персонаж</system:String>
+    <system:String x:Key="Loc_ProfileFavGame">Улюблена гра</system:String>
+    <system:String x:Key="Loc_ProfileLastPlayed">Дата останньої гри</system:String>
+    <system:String x:Key="Loc_ProfileDeleteUser">ВИДАЛИТИ ГРАВЦЯ</system:String>
+    
+    <!-- Setup View -->
+    <system:String x:Key="Loc_SetupHeader">НАЛАШТУВАННЯ НОВОГО ТУРНІРУ</system:String>
+    <system:String x:Key="Loc_SetupPresetTitle">ШВИДКИЙ ВИБІР ПРЕСЕТУ</system:String>
+    <system:String x:Key="Loc_SetupManagePresets">КЕРУВАННЯ ПРЕСЕТАМИ</system:String>
+    <system:String x:Key="Loc_SetupSelectedGame">ОБРАНА ГРА</system:String>
+    <system:String x:Key="Loc_SetupTournamentMode">РЕЖИМ ТУРНІРУ</system:String>
+    <system:String x:Key="Loc_SetupModeEndless">Круговий турнір (Колові ротації)</system:String>
+    <system:String x:Key="Loc_SetupModeChampionship">Сітка чемпіонату (Олімпійська система / Плейоф)</system:String>
+    <system:String x:Key="Loc_SetupDefaultRounds">РАУНДИ МАТЧУ ЗА ЗАМОВЧУВАННЯМ</system:String>
+    <system:String x:Key="Loc_SetupSessionName">НАЗВА СЕСІЇ</system:String>
+    <system:String x:Key="Loc_SetupPlayerRoster">СПИСОК ГРАВЦІВ</system:String>
+    <system:String x:Key="Loc_SetupAddButton">ДОДАТИ</system:String>
+    <system:String x:Key="Loc_SetupClearAll">ОЧИСТИТИ ВСЕ</system:String>
+    <system:String x:Key="Loc_SetupStartTournament">⚔  РОЗПОЧАТИ ТУРНІР</system:String>
+    <system:String x:Key="Loc_SetupRegisteredPlayers">ЗАРЕЄСТРОВАНІ ГРАВЦІ</system:String>
+    <system:String x:Key="Loc_SetupNoRegisteredPlayers">Немає зареєстрованих гравців. Вони з'являться тут після запуску першого турніру.</system:String>
+    <system:String x:Key="Loc_SetupRegisteredTooltip">ЛКМ: до списку | Подвійний: профіль</system:String>
+    <system:String x:Key="Loc_SetupEmptyPresets">Немає збережених пресетів. Збережіть налаштування як пресет, щоб вони з'явилися тут.</system:String>
+    <system:String x:Key="Loc_SetupSavePresetBtn">💾 Зберегти як пресет</system:String>
+
+    <!-- Tournament View -->
+    <system:String x:Key="Loc_TviewSession">СЕСІЯ</system:String>
+    <system:String x:Key="Loc_TviewBackButton">←  НАЗАД ДО НАЛАШТУВАНЬ</system:String>
+    <system:String x:Key="Loc_TviewCompletedMatches">ЗАВЕРШЕНІ МАТЧІ</system:String>
+    <system:String x:Key="Loc_TviewCurrentMatches">ПОТОЧНІ МАТЧІ</system:String>
+    <system:String x:Key="Loc_TviewStandings">ТАБЛИЦЯ ЛІДЕРІВ</system:String>
+    <system:String x:Key="Loc_TviewChampionshipBracket">СІТКА ЧЕМПІОНАТУ</system:String>
+    <system:String x:Key="Loc_TviewExportStandings">📷  Експорт таблиці в PNG</system:String>
+    <system:String x:Key="Loc_TviewExportBracket">📷  Експорт сітки в PNG</system:String>
+    
+    <!-- Leaderboard / Standings Headers -->
+    <system:String x:Key="Loc_Rank">РАНГ</system:String>
+    <system:String x:Key="Loc_Player">ГРАВЕЦЬ</system:String>
+    <system:String x:Key="Loc_WinLoss">В / П</system:String>
+    <system:String x:Key="Loc_WinRatePercent">ВІДСОТОК ПЕРЕМОГ</system:String>
+    <system:String x:Key="Loc_CharacterPicks">ПЕРСОНАЖІ (КІЛЬКІСТЬ ВИБОРІВ)</system:String>
+    
+    <!-- Active Match Dashboard -->
+    <system:String x:Key="Loc_MatchWinner">ПЕРЕМОЖЕЦЬ</system:String>
+    <system:String x:Key="Loc_MatchCharacters">ПЕРСОНАЖІ (розділяйте крапкою з комою ';' або '/')</system:String>
+    <system:String x:Key="Loc_MatchCompleteBtn">ЗАВЕРШИТИ МАТЧ</system:String>
+    <system:String x:Key="Loc_MatchSelectWinnerTooltip">Оберіть переможця та введіть персонажів для підрахунку результату.</system:String>
+    <system:String x:Key="Loc_MatchByeVirtual">Віртуальний матч (BYE) — пропущено автоматично.</system:String>
+    <system:String x:Key="Loc_MatchCompletedText">МАТЧ ЗАВЕРШЕНО</system:String>
+    <system:String x:Key="Loc_MatchEditResult">✏️  Редагувати результат</system:String>
+    
+    <!-- Tournament Control Panel (Pruning / Additions) -->
+    <system:String x:Key="Loc_PanelAddPlayer">ДОДАТИ ГРАВЦЯ ПІД ЧАС ТУРНІРУ</system:String>
+    <system:String x:Key="Loc_PanelPrunePlayers">ВИКЛЮЧИТИ ГРАВЦЯ З ТУРНІРУ</system:String>
+    <system:String x:Key="Loc_PanelAdd">ДОДАТИ</system:String>
+    <system:String x:Key="Loc_PanelSelectActivePrune">Оберіть активного гравця для виключення з наступних раундів</system:String>
+    <system:String x:Key="Loc_PanelPruneBtn">Виключити обраного</system:String>
+    
+    <!-- General dialogs and dynamic terms -->
+    <system:String x:Key="Loc_DatabaseError">Помилка бази даних</system:String>
+    <system:String x:Key="Loc_Warning">Попередження</system:String>
+    <system:String x:Key="Loc_Error">Помилка</system:String>
+    <system:String x:Key="Loc_Confirm">Підтвердити</system:String>
+    
+    <!-- Dynamic Messages & Warnings (C# files) -->
+    <system:String x:Key="Loc_DeleteUserConfirm">Ви впевнені, що хочете повністю видалити гравця "{0}" та всі записи його матчів з бази даних?&#x0a;&#x0a;Цю дію неможливо скасувати, і вона вплине на таблицю результатів турнірів, у яких він брав участь.</system:String>
+    <system:String x:Key="Loc_DeleteUserTitle">Видалити гравця назавжди</system:String>
+    <system:String x:Key="Loc_UserPurgedMsg">Гравця "{0}" та всі його записи було успішно видалено.</system:String>
+    <system:String x:Key="Loc_UserPurgedTitle">Гравця видалено</system:String>
+    <system:String x:Key="Loc_DeleteUserError">Не вдалося видалити гравця:</system:String>
+    <system:String x:Key="Loc_CannotDeleteTooltip">Неможливо видалити гравця під час активного турніру.</system:String>
+    
+    <!-- Tournament/Setup Validation Messages -->
+    <system:String x:Key="Loc_ValEnterSessionName">⚠ Будь ласка, введіть назву сесії.</system:String>
+    <system:String x:Key="Loc_ValAtLeastTwoPlayers">⚠ Для турніру необхідно щонайменше 2 гравці.</system:String>
+    <system:String x:Key="Loc_ValSavePresetPrompt">Введіть унікальну назву для цього пресету:</system:String>
+    <system:String x:Key="Loc_ValSavePresetTitle">Зберегти пресет налаштувань</system:String>
+    <system:String x:Key="Loc_ValPresetSaved">Пресет "{0}" успішно збережено!</system:String>
+    <system:String x:Key="Loc_ValPresetDeleteConfirm">Ви впевнені, що хочете видалити пресет "{0}"?</system:String>
+    <system:String x:Key="Loc_ValPresetDeleted">Пресет видалено.</system:String>
+    <system:String x:Key="Loc_ValPlayerAlreadyAdded">⚠ Гравець "{0}" вже є у списку.</system:String>
+    <system:String x:Key="Loc_ValPlayerNameEmpty">⚠ Ім'я гравця не може бути порожнім.</system:String>
+    <system:String x:Key="Loc_ValConfirmDeleteRegistry">Ви впевнені, що хочете видалити "{0}" зі списку зареєстрованих гравців?</system:String>
+    
+    <!-- Active Tournament VM Messages -->
+    <system:String x:Key="Loc_TValSelectWinner">⚠ Будь ласка, оберіть переможця, щоб завершити матч.</system:String>
+    <system:String x:Key="Loc_TValCharacterConflict">⚠ Кількість вибраних персонажів не відповідає очікуваному розміру команди.</system:String>
+    <system:String x:Key="Loc_TValMatchEditConfirm">Редагування попереднього матчу заднім числом скине результати всіх наступних раундів.&#x0a;&#x0a;Ви впевнені, що хочете змінити цей завершений матч?</system:String>
+    <system:String x:Key="Loc_TValActiveMatchPruneConfirm">Виключення гравця "{0}" видалить його з усіх майбутніх раундів. Результати поточного раунду залишаться без змін.&#x0a;&#x0a;Ви впевнені, що хочете виключити гравця "{0}"?</system:String>
+    <system:String x:Key="Loc_TValActiveAddAlreadyRegistered">⚠ Гравець "{0}" вже зареєстрований.</system:String>
+    <system:String x:Key="Loc_TValActiveAddAlreadyInTournament">⚠ Гравець "{0}" вже бере участь у цій сесії турніру.</system:String>
+    
+    <!-- Main Window menu warnings -->
+    <system:String x:Key="Loc_MainDbWarning">У процесі є активний турнір. Незбережені результати раунду будуть втрачені.&#x0a;&#x0a;Продовжити?</system:String>
+    <system:String x:Key="Loc_MainDbWarningTitle">Незбережені зміни</system:String>
+    <system:String x:Key="Loc_MainCleanConfirm">Це видалить всі збережені сесії з 0 зіграних матчів.&#x0a;&#x0a;Ви впевнені, що хочете очистити застарілі сесії?</system:String>
+    <system:String x:Key="Loc_MainCleanConfirmTitle">Очищення порожніх сесій</system:String>
+    <system:String x:Key="Loc_MainCleanSuccess">Базу даних успішно очищено!&#x0a;Вилучено {0} порожніх сесій.</system:String>
+    <system:String x:Key="Loc_MainExitConfirm">Ви впевнені, що хочете вийти з Трекера турнірів?</system:String>
+    <system:String x:Key="Loc_MainExitConfirmTitle">Вихід з програми</system:String>
+
+    <!-- Setup Validation Extras -->
+    <system:String x:Key="Loc_ValPresetNameEmpty">⚠ Будь ласка, введіть назву для нового пресету.</system:String>
+    <system:String x:Key="Loc_ValSessionDeleteConfirm">Ви впевнені, що хочете видалити збережену сесію "{0}"?&#x0a;&#x0a;Цю дію неможливо скасувати.</system:String>
+    <system:String x:Key="Loc_ValSessionDeleteTitle">Видалити збережену сесію</system:String>
+    <system:String x:Key="Loc_ValAllPlayerNamesFilled">⚠ Всі імена гравців мають бути заповнені.</system:String>
+    <system:String x:Key="Loc_ValPlayersUnique">⚠ Імена гравців мають бути унікальними.</system:String>
+
+    <!-- Tournament ViewModel Extras -->
+    <system:String x:Key="Loc_TviewEditingCycle">РЕДАГУВАННЯ Раунду  {0}   •   [ІСТОРИЧНІ ДАНІ]</system:String>
+    <system:String x:Key="Loc_TviewCycleHeader">Раунд  {0}   •   {1} активних гравців   •   {2} матчів</system:String>
+    <system:String x:Key="Loc_TviewSaveNextBtn">Зберегти та Наступний раунд  ►</system:String>
+    <system:String x:Key="Loc_TviewSaveChangesBtn">Зберегти зміни  ✓</system:String>
+    <system:String x:Key="Loc_TValEliminatePlayerConfirm">Виключити "{0}" з турніру?&#x0a;&#x0a;• Збережені результати матчів залишаться.&#x0a;• Незіграні матчі в поточному раунді будуть вилучені.</system:String>
+    <system:String x:Key="Loc_TValEliminatePlayerTitle">Виключити гравця</system:String>
+    <system:String x:Key="Loc_TValEliminateSuccessDb">✗  {0} виключено, базу даних оновлено. Залишилося гравців: {1}.</system:String>
+    <system:String x:Key="Loc_TValEliminateSuccess">✗  {0} виключено. Залишилося гравців: {1}.</system:String>
+
+    <system:String x:Key="Loc_TValCycleIncomplete">⚠  Заповніть всі результати матчів перед збереженням.</system:String>
+    <system:String x:Key="Loc_TValActiveAddSuccess">✓  Додано нового гравця: "{0}". Він з'явиться в розкладі з наступного раунду.</system:String>
+
+    <!-- Short Setup Keys -->
+    <system:String x:Key="Loc_SetupModeEndlessShort">КРУГОВИЙ</system:String>
+    <system:String x:Key="Loc_SetupModeChampionshipShort">ЧЕМПІОНАТ</system:String>
+    <system:String x:Key="Loc_SetupPlayerCount">КІЛЬКІСТЬ ГРАВЦІВ</system:String>
+    <system:String x:Key="Loc_SetupPlayerNames">ІМЕНА ГРАВЦІВ</system:String>
+    <system:String x:Key="Loc_SetupResumeSession">ПРОДОВЖИТИ ЗБЕРЕЖЕНУ СЕСІЮ</system:String>
+    <system:String x:Key="Loc_SetupSelectSaved">ОБЕРІТЬ ЗБЕРЕЖЕНУ СЕСІЮ</system:String>
+    <system:String x:Key="Loc_SetupResumeBtn">ПРОДОВЖИТИ ТУРНІР  ►</system:String>
+    <system:String x:Key="Loc_SetupDeleteSessionBtn">ВИДАЛИТИ СЕСІЮ  ✗</system:String>
+    <system:String x:Key="Loc_SetupSavedPresets">ЗБЕРЕЖЕНІ ПРЕСЕТИ</system:String>
+    <system:String x:Key="Loc_SetupLoadPreset">ЗАВАНТАЖИТИ ЗБЕРЕЖЕНИЙ ПРЕСЕТ</system:String>
+    <system:String x:Key="Loc_SetupSaveAsPreset">ЗБЕРЕГТИ НАЛАШТУВАННЯ ЯК ПРЕСЕТ</system:String>
+    <system:String x:Key="Loc_Delete">Видалити</system:String>
+    <system:String x:Key="Loc_Save">Зберегти</system:String>
+
+    <!-- Tournament View Extras -->
+    <system:String x:Key="Loc_TviewNewTournamentBtn">Новий турнір</system:String>
+    <system:String x:Key="Loc_TviewSchedule">РОЗКЛАД</system:String>
+    <system:String x:Key="Loc_TviewMatchList">СПИСОК МАТЧІВ</system:String>
+    <system:String x:Key="Loc_TviewBracketViewShort">СІТКА</system:String>
+    <system:String x:Key="Loc_TviewPlayer1">ГРАВЕЦЬ 1</system:String>
+    <system:String x:Key="Loc_TviewPlayer2">ГРАВЕЦЬ 2</system:String>
+    <system:String x:Key="Loc_TviewRounds">РАУНДИ</system:String>
+    <system:String x:Key="Loc_TviewCharacter1">ПЕРСОНАЖ 1</system:String>
+    <system:String x:Key="Loc_TviewCharacter2">ПЕРСОНАЖ 2</system:String>
+    <system:String x:Key="Loc_TviewChampionCrowned">ЧЕМПІОНА КОРОНОВАНО!</system:String>
+    <system:String x:Key="Loc_TviewChampionSub">Ви підкорили турнірну сітку та здобули абсолютну перемогу!</system:String>
+    <system:String x:Key="Loc_TviewExportPng">📷  Експорт PNG</system:String>
+    <system:String x:Key="Loc_TviewAddPlayerMidBtn">+  ДОДАТИ ГРАВЦЯ</system:String>
+    <system:String x:Key="Loc_Cancel">Скасувати</system:String>
+    <system:String x:Key="Loc_TviewLeaderboard">ТАБЛИЦЯ ЛІДЕРІВ ТУРНІРУ</system:String>
+    <system:String x:Key="Loc_StandingsW">В</system:String>
+    <system:String x:Key="Loc_StandingsL">П</system:String>
+    <system:String x:Key="Loc_StandingsWR">В%</system:String>
+    <system:String x:Key="Loc_StandingsChar">ПЕРС</system:String>
+    <system:String x:Key="Loc_TviewWin">Win</system:String>
+    <system:String x:Key="Loc_SetupFooter">Коловий турнір  ·  всі пари за раунд  ·  круговий або плейоф</system:String>
+    <system:String x:Key="Loc_TValEditingStatus">✏️  Редагування Раунду {0}. Натисніть '{1}' після завершення.</system:String>
+    <system:String x:Key="Loc_TValNoHistoricalEditChampionship">⚠  Історичні редагування не підтримуються в режимі Чемпіонату.</system:String>
+    <system:String x:Key="Loc_TValCannotEliminateLimit">⚠  Неможливо виключити: необхідно щонайменше 2 активних гравці.</system:String>
+    <system:String x:Key="Loc_TValReservedKeywordBye">⚠  'BYE' є зарезервованим словом.</system:String>
+
+    <!-- Profile Assignment Keys -->
+    <system:String x:Key="Loc_MenuMyProfile">Мій профіль</system:String>
+    <system:String x:Key="Loc_ProfileAssign">Налаштувати профіль</system:String>
+    <system:String x:Key="Loc_ProfileUnassign">Скасувати профіль</system:String>
+    <system:String x:Key="Loc_AssignProfileTitle">Призначити локальний профіль</system:String>
+    <system:String x:Key="Loc_AssignProfileHeader">ПРИЗНАЧЕННЯ ЛОКАЛЬНОГО ПРОФІЛЮ</system:String>
+    <system:String x:Key="Loc_AssignProfileSelect">ОБЕРІТЬ ВАШЕ ІМ'Я ГРАВЦЯ</system:String>
+    <system:String x:Key="Loc_AssignAsMyProfile">Зробити моїм профілем</system:String>
+    <system:String x:Key="Loc_UnassignMyProfile">Прибрати мій профіль</system:String>
+
+</ResourceDictionary>

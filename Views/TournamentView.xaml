@@ -40,6 +40,8 @@
         <conv:BoolToVisibilityConverter x:Key="InvBoolVis" Invert="True"/>
         <conv:StringToVisibilityConverter x:Key="StrVis"/>
         <conv:InverseBooleanConverter x:Key="InvBool"/>
+        <conv:CycleToMatchMarginConverter x:Key="CycleToMatchMargin"/>
+        <conv:PlayerMatchToBoolConverter x:Key="PlayerMatchToBool"/>
 
         <!-- ── Column header label style ── -->
         <Style x:Key="ColHeader" TargetType="TextBlock">
@@ -175,7 +177,7 @@
                                Visibility="{Binding StatusMessage, Converter={StaticResource StrVis}}"/>
                 </StackPanel>
 
-                <Button Grid.Column="1" Content="New Tournament"
+                <Button Grid.Column="1" Content="{DynamicResource Loc_TviewNewTournamentBtn}"
                         Style="{StaticResource BtnGhost}"
                         Padding="12,7" FontSize="11" Margin="0,0,10,0"
                         Command="{Binding NewTournamentCommand}"/>
@@ -204,7 +206,7 @@
                     BorderThickness="0,0,1,0"
                     Padding="14,18">
                 <DockPanel>
-                    <TextBlock DockPanel.Dock="Top" Text="SCHEDULE"
+                    <TextBlock DockPanel.Dock="Top" Text="{DynamicResource Loc_TviewSchedule}"
                                Style="{StaticResource ColHeader}"/>
 
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -298,18 +300,20 @@
                     <!-- Toggle Buttons (Only visible in Championship mode) -->
                     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,15"
                                 Visibility="{Binding ShowBracketToggleVisible, Converter={StaticResource BoolVis}}">
-                        <RadioButton Content="MATCH LIST" 
+                        <RadioButton Content="{DynamicResource Loc_TviewMatchList}" 
                                      Style="{StaticResource RadioToggleLeftBtn}"
                                      GroupName="ViewToggle"
                                      IsChecked="{Binding ShowBracket, Converter={StaticResource InvBool}, Mode=TwoWay}"/>
-                        <RadioButton Content="BRACKET VIEW" 
+                        <RadioButton Content="{DynamicResource Loc_TviewBracketViewShort}" 
                                      Style="{StaticResource RadioToggleRightBtn}"
                                      GroupName="ViewToggle"
                                      IsChecked="{Binding ShowBracket, Mode=TwoWay}"/>
                     </StackPanel>
 
-                    <!-- MATCHES VIEW (Visible when ShowBracket is false) -->
-                    <Grid Visibility="{Binding ShowBracket, Converter={StaticResource InvBoolVis}}">
+                    <!-- Main Content Grid wrapper to force stretch of inner views -->
+                    <Grid>
+                        <!-- MATCHES VIEW (Visible when ShowBracket is false) -->
+                        <Grid Visibility="{Binding ShowBracket, Converter={StaticResource InvBoolVis}}">
                         <DockPanel HorizontalAlignment="Stretch" Visibility="{Binding IsFinished, Converter={StaticResource InvBoolVis}}">
                             <!-- Column headers -->
                             <Grid DockPanel.Dock="Top" Margin="0,0,0,6">
@@ -327,19 +331,19 @@
                                     <ColumnDefinition Width="8"/>
                                     <ColumnDefinition Width="1.2*"  MinWidth="110"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="PLAYER 1"
+                                <TextBlock Grid.Column="0" Text="{DynamicResource Loc_TviewPlayer1}"
                                            Style="{StaticResource ColHeader}"
                                            HorizontalAlignment="Right" Margin="0,0,6,0"/>
-                                <TextBlock Grid.Column="4" Text="PLAYER 2"
+                                <TextBlock Grid.Column="4" Text="{DynamicResource Loc_TviewPlayer2}"
                                            Style="{StaticResource ColHeader}"
                                            HorizontalAlignment="Left"  Margin="6,0,0,0"/>
-                                <TextBlock Grid.Column="6" Text="ROUNDS"
+                                <TextBlock Grid.Column="6" Text="{DynamicResource Loc_TviewRounds}"
                                            Style="{StaticResource ColHeader}"
                                            HorizontalAlignment="Center"/>
-                                <TextBlock Grid.Column="8" Text="CHARACTER 1"
+                                <TextBlock Grid.Column="8" Text="{DynamicResource Loc_TviewCharacter1}"
                                            Style="{StaticResource ColHeader}"
                                            HorizontalAlignment="Center"/>
-                                <TextBlock Grid.Column="10" Text="CHARACTER 2"
+                                <TextBlock Grid.Column="10" Text="{DynamicResource Loc_TviewCharacter2}"
                                            Style="{StaticResource ColHeader}"
                                            HorizontalAlignment="Center"/>
                             </Grid>
@@ -372,17 +376,29 @@
 
                                                     <!-- P1 name -->
                                                     <TextBlock Grid.Column="0"
-                                                               Text="{Binding Player1Name}"
                                                                FontSize="13" FontWeight="SemiBold"
                                                                HorizontalAlignment="Right"
                                                                VerticalAlignment="Center"
                                                                Margin="0,0,6,0"
                                                                TextTrimming="CharacterEllipsis"
-                                                               ToolTip="{Binding Player1Name}"/>
+                                                               ToolTip="{Binding Player1Name}">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                                                <Setter Property="Text" Value="{Binding Player1Name}"/>
+                                                                <Setter Property="Foreground" Value="{DynamicResource BrushText}"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding Player1IsMe}" Value="True">
+                                                                        <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+                                                                        <Setter Property="Text" Value="{Binding Player1Name, StringFormat='★ {0}'}"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
 
                                                     <!-- P1 WIN -->
                                                     <RadioButton Grid.Column="1"
-                                                                 Content="WIN"
+                                                                 Content="{DynamicResource Loc_TviewWin}"
                                                                  Style="{StaticResource RadioWin}"
                                                                  GroupName="{Binding MatchId}"
                                                                  IsChecked="{Binding Player1Won, Mode=TwoWay}"
@@ -398,7 +414,7 @@
 
                                                     <!-- P2 WIN -->
                                                     <RadioButton Grid.Column="3"
-                                                                 Content="WIN"
+                                                                 Content="{DynamicResource Loc_TviewWin}"
                                                                  Style="{StaticResource RadioWin}"
                                                                  GroupName="{Binding MatchId}"
                                                                  IsChecked="{Binding Player2Won, Mode=TwoWay}"
@@ -407,13 +423,25 @@
 
                                                     <!-- P2 name -->
                                                     <TextBlock Grid.Column="4"
-                                                               Text="{Binding Player2Name}"
                                                                FontSize="13" FontWeight="SemiBold"
                                                                HorizontalAlignment="Left"
                                                                VerticalAlignment="Center"
                                                                Margin="6,0,0,0"
                                                                TextTrimming="CharacterEllipsis"
-                                                               ToolTip="{Binding Player2Name}"/>
+                                                               ToolTip="{Binding Player2Name}">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                                                <Setter Property="Text" Value="{Binding Player2Name}"/>
+                                                                <Setter Property="Foreground" Value="{DynamicResource BrushText}"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding Player2IsMe}" Value="True">
+                                                                        <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+                                                                        <Setter Property="Text" Value="{Binding Player2Name, StringFormat='{}{0} ★'}"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
 
                                                     <!-- Rounds -->
                                                     <ComboBox Grid.Column="6"
@@ -527,7 +555,7 @@
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate DataType="{x:Type vm:CycleInfoViewModel}">
                                                     <!-- One Round Column -->
-                                                    <StackPanel Margin="15,0" Width="190" VerticalAlignment="Center">
+                                                    <StackPanel Margin="15,0" Width="190" VerticalAlignment="Top">
                                                         <Border Background="{DynamicResource BrushSurface}" 
                                                                 BorderBrush="{DynamicResource BrushBorder}" 
                                                                 BorderThickness="1" 
@@ -545,13 +573,17 @@
                                                         <ItemsControl ItemsSource="{Binding CycleModel.Matches}">
                                                             <ItemsControl.ItemTemplate>
                                                                 <DataTemplate DataType="{x:Type models:Match}">
-                                                                    <StackPanel Margin="0,8">
-                                                                        <Border Background="{DynamicResource BrushSurface2}" 
-                                                                                BorderBrush="{DynamicResource BrushBorder}" 
-                                                                                BorderThickness="1" 
-                                                                                CornerRadius="4" 
-                                                                                Padding="10,8">
-                                                                            <Grid>
+                                                                    <StackPanel>
+                                                                         <StackPanel.Margin>
+                                                                             <Binding Path="DataContext.Number" RelativeSource="{RelativeSource AncestorType=ItemsControl}" Converter="{StaticResource CycleToMatchMargin}"/>
+                                                                         </StackPanel.Margin>
+                                                                         <Border Background="{DynamicResource BrushSurface2}" 
+                                                                                 BorderBrush="{DynamicResource BrushBorder}" 
+                                                                                 BorderThickness="1" 
+                                                                                 CornerRadius="4" 
+                                                                                 Padding="10,6"
+                                                                                 Height="60">
+                                                                             <Grid VerticalAlignment="Center">
                                                                                 <Grid.RowDefinitions>
                                                                                     <RowDefinition Height="Auto"/>
                                                                                     <RowDefinition Height="Auto"/>
@@ -580,6 +612,37 @@
                                                                         </Border>
                                                                     </StackPanel>
                                                                     <DataTemplate.Triggers>
+                                                                        <!-- Highlight local user profile -->
+                                                                        <MultiDataTrigger>
+                                                                            <MultiDataTrigger.Conditions>
+                                                                                <Condition Value="True">
+                                                                                    <Condition.Binding>
+                                                                                        <MultiBinding Converter="{StaticResource PlayerMatchToBool}">
+                                                                                            <Binding Path="Player1.Name"/>
+                                                                                            <Binding Path="DataContext.AssignedPlayerName" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                                                                                        </MultiBinding>
+                                                                                    </Condition.Binding>
+                                                                                </Condition>
+                                                                            </MultiDataTrigger.Conditions>
+                                                                            <Setter TargetName="TxtP1" Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+                                                                            <Setter TargetName="TxtP1" Property="FontWeight" Value="Bold"/>
+                                                                        </MultiDataTrigger>
+
+                                                                        <MultiDataTrigger>
+                                                                            <MultiDataTrigger.Conditions>
+                                                                                <Condition Value="True">
+                                                                                    <Condition.Binding>
+                                                                                        <MultiBinding Converter="{StaticResource PlayerMatchToBool}">
+                                                                                            <Binding Path="Player2.Name"/>
+                                                                                            <Binding Path="DataContext.AssignedPlayerName" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                                                                                        </MultiBinding>
+                                                                                    </Condition.Binding>
+                                                                                </Condition>
+                                                                            </MultiDataTrigger.Conditions>
+                                                                            <Setter TargetName="TxtP2" Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+                                                                            <Setter TargetName="TxtP2" Property="FontWeight" Value="Bold"/>
+                                                                        </MultiDataTrigger>
+
                                                                         <!-- Dim out BYE slots -->
                                                                         <DataTrigger Binding="{Binding Player1.Name}" Value="BYE">
                                                                             <Setter TargetName="TxtP1" Property="Foreground" Value="{DynamicResource BrushTextDim}"/>
@@ -614,6 +677,7 @@
                                 </Border>
                             </ScrollViewer>
                         </DockPanel>
+                    </Grid>
                     </Grid>
                 </DockPanel>
             </Border>
@@ -749,14 +813,19 @@
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate DataType="{x:Type vm:PlayerStatsViewModel}">
                                             <Border MinHeight="28" Padding="0,2" CornerRadius="3" Margin="0,1">
-                                                <!-- Eliminated tint -->
+                                                <!-- Highlights -->
                                                 <Border.Style>
                                                     <Style TargetType="Border">
                                                         <Setter Property="Background" Value="Transparent"/>
+                                                        <Setter Property="BorderBrush" Value="Transparent"/>
+                                                        <Setter Property="BorderThickness" Value="1"/>
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding IsEliminated}" Value="True">
-                                                                <Setter Property="Background"
-                                                                        Value="{DynamicResource BrushElim}"/>
+                                                                <Setter Property="Background" Value="{DynamicResource BrushElim}"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding IsMe}" Value="True">
+                                                                <Setter Property="Background" Value="{DynamicResource BrushAccentDim}"/>
+                                                                <Setter Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
@@ -779,21 +848,31 @@
                                                                Foreground="{DynamicResource BrushTextDim}"/>
 
                                                     <!-- Name -->
-                                                    <TextBlock Grid.Column="1" Text="{Binding Name}"
-                                                               FontSize="12"
-                                                               Padding="2,0"
-                                                               ToolTip="{Binding Name}">
-                                                        <TextBlock.Style>
-                                                            <Style TargetType="TextBlock" BasedOn="{StaticResource StatName}">
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding IsEliminated}" Value="True">
-                                                                        <Setter Property="Foreground" Value="{DynamicResource BrushTextDim}"/>
-                                                                        <Setter Property="TextDecorations" Value="Strikethrough"/>
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </TextBlock.Style>
-                                                    </TextBlock>
+                                                     <TextBlock Grid.Column="1" Text="{Binding Name}"
+                                                                FontSize="12"
+                                                                Padding="2,0"
+                                                                Cursor="Hand"
+                                                                ToolTip="Left-click to view profile">
+                                                         <TextBlock.InputBindings>
+                                                             <MouseBinding Gesture="LeftClick"
+                                                                           Command="{Binding DataContext.ShowUserProfileCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                           CommandParameter="{Binding Name}"/>
+                                                         </TextBlock.InputBindings>
+                                                         <TextBlock.Style>
+                                                             <Style TargetType="TextBlock" BasedOn="{StaticResource StatName}">
+                                                                 <Style.Triggers>
+                                                                     <DataTrigger Binding="{Binding IsEliminated}" Value="True">
+                                                                         <Setter Property="Foreground" Value="{DynamicResource BrushTextDim}"/>
+                                                                         <Setter Property="TextDecorations" Value="Strikethrough"/>
+                                                                     </DataTrigger>
+                                                                     <Trigger Property="IsMouseOver" Value="True">
+                                                                         <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+                                                                         <Setter Property="TextDecorations" Value="Underline"/>
+                                                                     </Trigger>
+                                                                 </Style.Triggers>
+                                                             </Style>
+                                                         </TextBlock.Style>
+                                                     </TextBlock>
 
                                                     <!-- W -->
                                                     <TextBlock Grid.Column="2" Text="{Binding Wins}"

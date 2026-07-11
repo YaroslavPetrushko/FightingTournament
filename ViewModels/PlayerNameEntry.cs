@@ -3,7 +3,7 @@ namespace FightingTournament.ViewModels;
 /// <summary>Thin wrapper so individual name TextBoxes can participate in binding.</summary>
 public class PlayerNameEntry : BaseViewModel
 {
-    private int    _index;
+    private int _index;
     private string _name;
 
     public int Index
@@ -21,6 +21,6 @@ public class PlayerNameEntry : BaseViewModel
     public PlayerNameEntry(int index, string name)
     {
         _index = index;
-        _name  = name;
+        _name = name;
     }
 }

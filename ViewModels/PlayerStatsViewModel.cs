@@ -1,6 +1,7 @@
-using FightingTournament.Models;
 using System;
 using System.Windows.Input;
+using FightingTournament.Models;
+using FightingTournament.Services;
 
 namespace FightingTournament.ViewModels;
 
@@ -23,20 +24,26 @@ public class PlayerStatsViewModel : BaseViewModel
         set => Set(ref _isEliminated, value);
     }
 
-    public string Name       => PlayerModel.Name;
-    public int    Wins       => PlayerModel.TotalWins;
-    public int    Losses     => PlayerModel.TotalLosses;
-    public int    Matches    => PlayerModel.TotalMatches;
-    public string WinRate    => $"{PlayerModel.WinRate:F1}%";
+    public string Name => PlayerModel.Name;
+    public int Wins => PlayerModel.TotalWins;
+    public int Losses => PlayerModel.TotalLosses;
+    public int Matches => PlayerModel.TotalMatches;
+    public string WinRate => $"{PlayerModel.WinRate:F1}%";
     public string MostPicked => PlayerModel.MostPickedCharacter;
+    public bool IsMe => ProfileManager.IsAssigned(Name);
+
+    public void NotifyIsMeChanged()
+    {
+        OnPropertyChanged(nameof(IsMe));
+    }
 
     public ICommand EliminateCommand { get; }
 
     public PlayerStatsViewModel(Player player, int rank, Action<Player> onEliminate)
     {
-        PlayerModel      = player;
-        _rank            = rank;
-        _isEliminated    = player.IsEliminated;
+        PlayerModel = player;
+        _rank = rank;
+        _isEliminated = player.IsEliminated;
         EliminateCommand = new RelayCommand(
             () => onEliminate(PlayerModel),
             () => !PlayerModel.IsEliminated);

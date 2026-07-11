@@ -1,7 +1,7 @@
-using FightingTournament.Models;
-using FightingTournament.Services;
 using System;
 using System.Collections.ObjectModel;
+using FightingTournament.Models;
+using FightingTournament.Services;
 
 namespace FightingTournament.ViewModels;
 
@@ -10,10 +10,19 @@ public class MatchRowViewModel : BaseViewModel
     private readonly Match _match;
 
     // Unique per instance so RadioButtons in different rows don't interfere
-    public string MatchId     { get; } = Guid.NewGuid().ToString();
+    public string MatchId { get; } = Guid.NewGuid().ToString();
 
     public string Player1Name => _match.Player1.Name;
     public string Player2Name => _match.Player2.Name;
+
+    public bool Player1IsMe => ProfileManager.IsAssigned(Player1Name);
+    public bool Player2IsMe => ProfileManager.IsAssigned(Player2Name);
+
+    public void NotifyIsMeChanged()
+    {
+        OnPropertyChanged(nameof(Player1IsMe));
+        OnPropertyChanged(nameof(Player2IsMe));
+    }
 
     // ── Characters ───────────────────────────────────────────────────
 
@@ -39,7 +48,7 @@ public class MatchRowViewModel : BaseViewModel
         get => _winnerId;
         set
         {
-            _winnerId       = value;
+            _winnerId = value;
             _match.WinnerId = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(Player1Won));

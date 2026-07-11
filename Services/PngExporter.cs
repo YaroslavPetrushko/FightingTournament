@@ -47,7 +47,7 @@ public static class PngExporter
         PngBitmapEncoder encoder = new PngBitmapEncoder();
         encoder.Frames.Add(BitmapFrame.Create(rtb));
 
-        using var fs = File.OpenWrite(filePath);
+        using var fs = File.Create(filePath);
         encoder.Save(fs);
     }
 }

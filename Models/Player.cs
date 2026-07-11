@@ -7,8 +7,8 @@ public class Player
 {
     public string Name { get; init; } = string.Empty;
 
-    public int TotalWins    { get; private set; }
-    public int TotalLosses  { get; private set; }
+    public int TotalWins { get; private set; }
+    public int TotalLosses { get; private set; }
     public int TotalMatches { get; private set; }
 
     public double WinRate =>
@@ -32,7 +32,7 @@ public class Player
     {
         TotalMatches++;
         if (won) TotalWins++;
-        else     TotalLosses++;
+        else TotalLosses++;
 
         if (!string.IsNullOrWhiteSpace(character))
         {

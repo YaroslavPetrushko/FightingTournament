@@ -13,14 +13,14 @@ public enum TournamentMode
 public class Tournament
 {
     public List<Player> Players { get; } = new();
-    public List<Cycle>  Cycles  { get; } = new();
+    public List<Cycle> Cycles { get; } = new();
 
     public string SelectedGame { get; set; } = "Tekken 8";
-    public string SessionName  { get; set; } = string.Empty;
+    public string SessionName { get; set; } = string.Empty;
 
     public int CurrentCycleIndex { get; set; } = 0;
-    public TournamentMode Mode   { get; set; } = TournamentMode.Endless;
-    public int DefaultRounds     { get; set; } = 3;
+    public TournamentMode Mode { get; set; } = TournamentMode.Endless;
+    public int DefaultRounds { get; set; } = 3;
 
     public Cycle? CurrentCycle =>
         CurrentCycleIndex < Cycles.Count ? Cycles[CurrentCycleIndex] : null;

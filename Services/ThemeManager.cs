@@ -8,7 +8,7 @@ namespace FightingTournament.Services;
 public static class ThemeManager
 {
     private const string ThemeSettingKey = "SelectedTheme";
-    
+
     public static string CurrentTheme { get; private set; } = "default";
 
     private static readonly Dictionary<string, Dictionary<string, string>> Themes = new(StringComparer.OrdinalIgnoreCase)
@@ -21,7 +21,7 @@ public static class ThemeManager
                 { "BrushSurface2", "#1E1E2A" },
                 { "BrushSurface3", "#26263A" },
                 { "BrushAccent", "#E8003D" },
-                { "BrushAccentDim", "#8C0025" },
+                { "BrushAccentDim", "#550922" },
                 { "BrushAccentHover", "#FF1A54" },
                 { "BrushText", "#E8E8F2" },
                 { "BrushTextDim", "#7070A0" },
@@ -60,7 +60,7 @@ public static class ThemeManager
                 { "BrushSurface", "#101424" },
                 { "BrushSurface2", "#181D33" },
                 { "BrushSurface3", "#222947" },
-                { "BrushAccent", "#00D2FF" },
+                { "BrushAccent", "#04708C" },
                 { "BrushAccentDim", "#007CA3" },
                 { "BrushAccentHover", "#33DBFF" },
                 { "BrushText", "#E0E6ED" },
@@ -120,7 +120,7 @@ public static class ThemeManager
                 { "BrushSurface", "#FFFFFF" },
                 { "BrushSurface2", "#F3F4F6" },
                 { "BrushSurface3", "#E5E7EB" },
-                { "BrushAccent", "#4F46E5" },
+                { "BrushAccent", "#9B76FF" },
                 { "BrushAccentDim", "#C7D2FE" },
                 { "BrushAccentHover", "#6366F1" },
                 { "BrushText", "#111827" },
@@ -159,7 +159,7 @@ public static class ThemeManager
                 var color = (Color)ColorConverter.ConvertFromString(pair.Value);
                 var brush = new SolidColorBrush(color);
                 brush.Freeze(); // Speed up WPF rendering and ensure thread safety
-                
+
                 // Overwrite the dynamic resource key at the Application level
                 Application.Current.Resources[pair.Key] = brush;
 

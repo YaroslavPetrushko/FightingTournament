@@ -1,7 +1,7 @@
-using FightingTournament.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FightingTournament.Models;
 
 namespace FightingTournament.Services;
 
@@ -72,8 +72,8 @@ public static class TournamentEngine
     /// <summary>Generates ALL unique pairs from currently-active players (round-robin).</summary>
     private static Cycle BuildCycle(Tournament t, int number)
     {
-        var cycle   = new Cycle(number);
-        var active  = t.Players.Where(p => !p.IsEliminated).ToList();
+        var cycle = new Cycle(number);
+        var active = t.Players.Where(p => !p.IsEliminated).ToList();
 
         for (int i = 0; i < active.Count; i++)
             for (int j = i + 1; j < active.Count; j++)
@@ -129,11 +129,11 @@ public static class TournamentEngine
         foreach (var m in cycle.Matches)
         {
             bool p1Won = m.WinnerId == 1;
-            
+
             if (!m.Player1.Name.Equals("BYE", StringComparison.OrdinalIgnoreCase) &&
                 !m.Player2.Name.Equals("BYE", StringComparison.OrdinalIgnoreCase))
             {
-                m.Player1.RecordResult(p1Won,  m.Character1);
+                m.Player1.RecordResult(p1Won, m.Character1);
                 m.Player2.RecordResult(!p1Won, m.Character2);
             }
 

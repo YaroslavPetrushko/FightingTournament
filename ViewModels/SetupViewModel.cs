@@ -1,9 +1,9 @@
-using FightingTournament.Models;
-using FightingTournament.Services;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+using FightingTournament.Models;
+using FightingTournament.Services;
 
 namespace FightingTournament.ViewModels;
 
@@ -120,6 +120,12 @@ public class SetupViewModel : BaseViewModel
 
     public ObservableCollection<string> RegisteredUsers { get; } = new();
 
+
+
+    public string? AssignedPlayerName => ProfileManager.GetAssignedPlayerName();
+
+
+
     // ── Player count ─────────────────────────────────────────────────
 
     private int _playerCount = 4;
@@ -147,37 +153,45 @@ public class SetupViewModel : BaseViewModel
 
     // ── Commands ─────────────────────────────────────────────────────
 
-    public ICommand IncrementCommand     { get; }
-    public ICommand DecrementCommand     { get; }
-    public ICommand StartCommand         { get; }
-    public ICommand ResumeCommand        { get; }
+    public ICommand IncrementCommand { get; }
+    public ICommand DecrementCommand { get; }
+    public ICommand StartCommand { get; }
+    public ICommand ResumeCommand { get; }
     public ICommand DeleteSessionCommand { get; }
-    public ICommand AddPlayerCommand     { get; }
-    public ICommand SavePresetCommand    { get; }
-    public ICommand DeletePresetCommand  { get; }
+    public ICommand AddPlayerCommand { get; }
+    public ICommand SavePresetCommand { get; }
+    public ICommand DeletePresetCommand { get; }
     public ICommand DeleteRegisteredPlayerCommand { get; }
+    public ICommand ShowUserProfileCommand { get; }
 
     public SetupViewModel()
     {
-        IncrementCommand     = new RelayCommand(() => PlayerCount++);
-        DecrementCommand     = new RelayCommand(() => PlayerCount--);
-        StartCommand         = new RelayCommand(StartTournament);
-        ResumeCommand        = new RelayCommand(ResumeTournament);
+        IncrementCommand = new RelayCommand(() => PlayerCount++);
+        DecrementCommand = new RelayCommand(() => PlayerCount--);
+        StartCommand = new RelayCommand(StartTournament);
+        ResumeCommand = new RelayCommand(ResumeTournament);
         DeleteSessionCommand = new RelayCommand(DeleteSession);
-        AddPlayerCommand     = new RelayCommand(p =>
+        AddPlayerCommand = new RelayCommand(p =>
         {
             if (p is string nickname)
             {
                 AddPlayer(nickname);
             }
         });
-        SavePresetCommand    = new RelayCommand(SavePreset);
-        DeletePresetCommand  = new RelayCommand(DeletePreset);
+        SavePresetCommand = new RelayCommand(SavePreset);
+        DeletePresetCommand = new RelayCommand(DeletePreset);
         DeleteRegisteredPlayerCommand = new RelayCommand(p =>
         {
             if (p is string nickname)
             {
                 DeleteRegisteredPlayer(nickname);
+            }
+        });
+        ShowUserProfileCommand = new RelayCommand(p =>
+        {
+            if (p is string nickname)
+            {
+                ShowUserProfile(nickname);
             }
         });
 
@@ -187,14 +201,29 @@ public class SetupViewModel : BaseViewModel
         RefreshAvailableGames();
         RefreshUserPresets();
         UpdateDefaultSessionName();
+
+        ProfileManager.ProfileChanged += OnProfileChanged;
+
     }
+
+
+
+    private void OnProfileChanged()
+
+    {
+
+        OnPropertyChanged(nameof(AssignedPlayerName));
+
+    }
+
+
 
     // ── Helpers ──────────────────────────────────────────────────────
 
     private void RefreshAvailableGames()
     {
         AvailableGames.Clear();
-        
+
         // Build sorted list of games excluding the "Custom (Any/Blank)" option to prevent it from sorting mid-list
         var games = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var key in GameDatabase.Games.Keys)
@@ -216,7 +245,7 @@ public class SetupViewModel : BaseViewModel
                 }
             }
         }
-        catch {}
+        catch { }
 
         foreach (var g in games)
         {
@@ -248,7 +277,7 @@ public class SetupViewModel : BaseViewModel
     {
         if (string.IsNullOrWhiteSpace(NewPresetName))
         {
-            ValidationMessage = "⚠  Please enter a name for the new preset.";
+            ValidationMessage = LocalizationManager.GetString("Loc_ValPresetNameEmpty");
             return;
         }
 
@@ -267,7 +296,7 @@ public class SetupViewModel : BaseViewModel
             DatabaseRepository.SaveUserPreset(preset);
             NewPresetName = string.Empty;
             RefreshUserPresets();
-            ValidationMessage = $"✓  Preset '{preset.PresetName}' saved.";
+            ValidationMessage = string.Format(LocalizationManager.GetString("Loc_ValPresetSaved"), preset.PresetName);
         }
         catch (Exception ex)
         {
@@ -280,8 +309,8 @@ public class SetupViewModel : BaseViewModel
         if (SelectedUserPreset == null) return;
 
         var result = System.Windows.MessageBox.Show(
-            $"Are you sure you want to delete the preset \"{SelectedUserPreset.PresetName}\"?",
-            "Delete Preset",
+            string.Format(LocalizationManager.GetString("Loc_ValPresetDeleteConfirm"), SelectedUserPreset.PresetName),
+            LocalizationManager.GetString("Loc_SetupManagePresets"),
             System.Windows.MessageBoxButton.YesNo,
             System.Windows.MessageBoxImage.Question);
 
@@ -292,7 +321,7 @@ public class SetupViewModel : BaseViewModel
             DatabaseRepository.DeleteUserPreset(SelectedUserPreset.PresetName);
             RefreshUserPresets();
             SelectedUserPreset = null;
-            ValidationMessage = "✓  Preset deleted successfully.";
+            ValidationMessage = "✓  " + LocalizationManager.GetString("Loc_ValPresetDeleted");
         }
         catch (Exception ex)
         {
@@ -372,20 +401,20 @@ public class SetupViewModel : BaseViewModel
 
         if (names.Any(string.IsNullOrWhiteSpace))
         {
-            ValidationMessage = "⚠  All player names must be filled in.";
+            ValidationMessage = LocalizationManager.GetString("Loc_ValAllPlayerNamesFilled");
             return;
         }
 
         if (names.Distinct(StringComparer.OrdinalIgnoreCase).Count() != names.Count)
         {
-            ValidationMessage = "⚠  Player names must be unique.";
+            ValidationMessage = LocalizationManager.GetString("Loc_ValPlayersUnique");
             return;
         }
 
         string session = SessionName.Trim();
         if (string.IsNullOrWhiteSpace(session))
         {
-            ValidationMessage = "⚠  Session name cannot be empty.";
+            ValidationMessage = LocalizationManager.GetString("Loc_ValEnterSessionName");
             return;
         }
 
@@ -396,13 +425,15 @@ public class SetupViewModel : BaseViewModel
             {
                 DatabaseRepository.SaveCustomGame(SelectedGame);
             }
-            catch {}
+            catch { }
         }
 
         var tournament = TournamentEngine.Create(names, SelectedMode, SelectedRounds);
         tournament.SelectedGame = SelectedGame;
         tournament.SessionName = session;
-        TournamentStarted?.Invoke(tournament);
+
+        OnTournamentStarted(tournament);
+
     }
 
     public void RefreshSavedSessions()
@@ -451,9 +482,12 @@ public class SetupViewModel : BaseViewModel
     {
         if (string.IsNullOrWhiteSpace(nickname)) return;
 
-        var result = System.Windows.MessageBox.Show($"Are you sure you want to delete \"{nickname}\" from the registered players list?", 
-            "Confirm Delete", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Warning);
-        
+        var result = System.Windows.MessageBox.Show(
+            string.Format(LocalizationManager.GetString("Loc_ValConfirmDeleteRegistry"), nickname),
+            LocalizationManager.GetString("Loc_Confirm"),
+            System.Windows.MessageBoxButton.YesNo,
+            System.Windows.MessageBoxImage.Warning);
+
         if (result == System.Windows.MessageBoxResult.Yes)
         {
             try
@@ -465,6 +499,26 @@ public class SetupViewModel : BaseViewModel
             {
                 System.Windows.MessageBox.Show($"Could not delete player:\n{ex.Message}", "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
             }
+        }
+    }
+
+    private void ShowUserProfile(string nickname)
+    {
+        if (string.IsNullOrWhiteSpace(nickname) || nickname.Equals("BYE", StringComparison.OrdinalIgnoreCase)) return;
+
+        try
+        {
+            var profile = DatabaseRepository.GetUserProfile(nickname);
+            var window = new Views.UserProfileWindow(profile, isTournamentActive: false, onDeleted: () =>
+            {
+                RefreshRegisteredUsers();
+            });
+            window.Owner = System.Windows.Application.Current.MainWindow;
+            window.ShowDialog();
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show($"Could not load user profile:\n{ex.Message}", "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
         }
     }
 
@@ -527,7 +581,10 @@ public class SetupViewModel : BaseViewModel
                 return;
             }
 
-            TournamentStarted?.Invoke(tournament);
+
+
+            OnTournamentStarted(tournament);
+
         }
         catch (Exception ex)
         {
@@ -541,8 +598,8 @@ public class SetupViewModel : BaseViewModel
         if (string.IsNullOrWhiteSpace(SelectedSavedSession)) return;
 
         var result = System.Windows.MessageBox.Show(
-            $"Are you sure you want to delete the saved session \"{SelectedSavedSession}\"?\n\nThis cannot be undone.",
-            "Delete Saved Session",
+            string.Format(LocalizationManager.GetString("Loc_ValSessionDeleteConfirm"), SelectedSavedSession),
+            LocalizationManager.GetString("Loc_ValSessionDeleteTitle"),
             System.Windows.MessageBoxButton.YesNo,
             System.Windows.MessageBoxImage.Warning);
 
@@ -558,4 +615,17 @@ public class SetupViewModel : BaseViewModel
             ValidationMessage = $"⚠  Error deleting session: {ex.Message}";
         }
     }
+
+
+
+    private void OnTournamentStarted(Tournament tournament)
+
+    {
+
+        ProfileManager.ProfileChanged -= OnProfileChanged;
+
+        TournamentStarted?.Invoke(tournament);
+
+    }
+
 }

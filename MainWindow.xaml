@@ -160,7 +160,7 @@
                 <!-- Left: App Icon & Title -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0,0,0">
                     <TextBlock Text="⚔" FontSize="18" Foreground="{DynamicResource BrushAccent}" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                    <TextBlock Text="FIGHTING TOURNAMENT TRACKER" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrushText}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{DynamicResource Loc_AppTitle}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrushText}" VerticalAlignment="Center"/>
                 </StackPanel>
 
                 <!-- Right: Action Buttons -->
@@ -232,28 +232,47 @@
 
         <!-- ── Custom Dark Menu Bar ── -->
         <Border Grid.Row="1" Background="{DynamicResource BrushSurface}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="0,0,0,1" Padding="15,2" WindowChrome.IsHitTestVisibleInChrome="True">
-            <Menu Background="Transparent" BorderThickness="0">
-                <MenuItem Header="_File" Style="{StaticResource MenuItem}">
-                    <MenuItem Header="_Open Database (.db)..." Command="{Binding OpenDatabaseCommand}"/>
-                    <MenuItem Header="_Save Database Copy As..." Command="{Binding SaveDatabaseAsCommand}"/>
-                    <Separator Style="{StaticResource MenuSeparator}"/>
-                    <MenuItem Header="_Exit" Command="{Binding ExitCommand}"/>
-                </MenuItem>
-                <MenuItem Header="_Settings" Style="{StaticResource MenuItem}">
-                    <MenuItem Header="_Clean Up Legacy Sessions" Command="{Binding CleanSessionsCommand}"/>
-                    <MenuItem Header="_Theme">
-                        <MenuItem Header="Default (Black &amp; Red)" Command="{Binding ChangeThemeCommand}" CommandParameter="default" IsCheckable="True" IsChecked="{Binding IsDefaultThemeChecked, Mode=OneWay}"/>
-                        <MenuItem Header="Volt Green (Xbox Styled)" Command="{Binding ChangeThemeCommand}" CommandParameter="volt_green" IsCheckable="True" IsChecked="{Binding IsVoltGreenThemeChecked, Mode=OneWay}"/>
-                        <MenuItem Header="Electric Blue (Arcade Retro)" Command="{Binding ChangeThemeCommand}" CommandParameter="electric_blue" IsCheckable="True" IsChecked="{Binding IsElectricBlueThemeChecked, Mode=OneWay}"/>
-                        <MenuItem Header="Deep Dark (Purple)" Command="{Binding ChangeThemeCommand}" CommandParameter="deep_dark" IsCheckable="True" IsChecked="{Binding IsDeepDarkThemeChecked, Mode=OneWay}"/>
-                        <MenuItem Header="Minimalist" Command="{Binding ChangeThemeCommand}" CommandParameter="minimalist" IsCheckable="True" IsChecked="{Binding IsMinimalistThemeChecked, Mode=OneWay}"/>
-                        <MenuItem Header="White" Command="{Binding ChangeThemeCommand}" CommandParameter="white" IsCheckable="True" IsChecked="{Binding IsWhiteThemeChecked, Mode=OneWay}"/>
+            <DockPanel>
+                <Menu DockPanel.Dock="Left" Background="Transparent" BorderThickness="0">
+                    <MenuItem Header="{DynamicResource Loc_MenuFile}" Style="{StaticResource MenuItem}">
+                        <MenuItem Header="{DynamicResource Loc_MenuOpenDb}" Command="{Binding OpenDatabaseCommand}"/>
+                        <MenuItem Header="{DynamicResource Loc_MenuSaveDbAs}" Command="{Binding SaveDatabaseAsCommand}"/>
+                        <Separator Style="{StaticResource MenuSeparator}"/>
+                        <MenuItem Header="{DynamicResource Loc_MenuExit}" Command="{Binding ExitCommand}"/>
                     </MenuItem>
-                </MenuItem>
-                <MenuItem Header="_About" Style="{StaticResource MenuItem}">
-                    <MenuItem Header="_About Tracker" Command="{Binding AboutCommand}"/>
-                </MenuItem>
-            </Menu>
+                    <MenuItem Header="{DynamicResource Loc_MenuSettings}" Style="{StaticResource MenuItem}">
+                        <MenuItem Header="{DynamicResource Loc_MenuCleanSessions}" Command="{Binding CleanSessionsCommand}"/>
+                        <MenuItem Header="{DynamicResource Loc_MenuTheme}">
+                            <MenuItem Header="{DynamicResource Loc_ThemeDefault}" Command="{Binding ChangeThemeCommand}" CommandParameter="default" IsCheckable="True" IsChecked="{Binding IsDefaultThemeChecked, Mode=OneWay}"/>
+                            <MenuItem Header="{DynamicResource Loc_ThemeVoltGreen}" Command="{Binding ChangeThemeCommand}" CommandParameter="volt_green" IsCheckable="True" IsChecked="{Binding IsVoltGreenThemeChecked, Mode=OneWay}"/>
+                            <MenuItem Header="{DynamicResource Loc_ThemeElectricBlue}" Command="{Binding ChangeThemeCommand}" CommandParameter="electric_blue" IsCheckable="True" IsChecked="{Binding IsElectricBlueThemeChecked, Mode=OneWay}"/>
+                            <MenuItem Header="{DynamicResource Loc_ThemeDeepDark}" Command="{Binding ChangeThemeCommand}" CommandParameter="deep_dark" IsCheckable="True" IsChecked="{Binding IsDeepDarkThemeChecked, Mode=OneWay}"/>
+                            <MenuItem Header="{DynamicResource Loc_ThemeMinimalist}" Command="{Binding ChangeThemeCommand}" CommandParameter="minimalist" IsCheckable="True" IsChecked="{Binding IsMinimalistThemeChecked, Mode=OneWay}"/>
+                            <MenuItem Header="{DynamicResource Loc_ThemeWhite}" Command="{Binding ChangeThemeCommand}" CommandParameter="white" IsCheckable="True" IsChecked="{Binding IsWhiteThemeChecked, Mode=OneWay}"/>
+                        </MenuItem>
+                        <MenuItem Header="{DynamicResource Loc_MenuLanguage}">
+                            <MenuItem Header="English" Command="{Binding ChangeLanguageCommand}" CommandParameter="en" IsCheckable="True" IsChecked="{Binding IsEnglishLanguageChecked, Mode=OneWay}"/>
+                            <MenuItem Header="Українська" Command="{Binding ChangeLanguageCommand}" CommandParameter="ua" IsCheckable="True" IsChecked="{Binding IsUkrainianLanguageChecked, Mode=OneWay}"/>
+                        </MenuItem>
+                    </MenuItem>
+                    <MenuItem Header="{DynamicResource Loc_MenuAbout}" Style="{StaticResource MenuItem}">
+                        <MenuItem Header="{DynamicResource Loc_MenuAboutTracker}" Command="{Binding AboutCommand}"/>
+                    </MenuItem>
+                </Menu>
+
+                <!-- Profile button aligned to the right side of the menu bar -->
+                <Button DockPanel.Dock="Right"
+                        HorizontalAlignment="Right"
+                        Content="{Binding ProfileButtonText}"
+                        Command="{Binding OpenProfileCommand}"
+                        Style="{StaticResource BtnGhost}"
+                        BorderThickness="0"
+                        Background="Transparent"
+                        Padding="12,5"
+                        FontSize="11"
+                        Cursor="Hand"
+                        VerticalAlignment="Center"/>
+            </DockPanel>
         </Border>
 
         <!-- ── Main Content Area ── -->
