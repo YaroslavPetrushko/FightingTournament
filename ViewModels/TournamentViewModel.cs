@@ -1,23 +1,23 @@
-using FightingTournament.Models;
-using FightingTournament.Services;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using FightingTournament.Models;
+using FightingTournament.Services;
 
 namespace FightingTournament.ViewModels;
 
 public class TournamentViewModel : BaseViewModel
 {
     private readonly Tournament _tournament;
-    private readonly Action     _onNewTournament;
+    private readonly Action _onNewTournament;
 
     // ── Collections ──────────────────────────────────────────────────
 
-    public ObservableCollection<CycleInfoViewModel>   CycleSchedule  { get; } = new();
-    public ObservableCollection<MatchRowViewModel>    CurrentMatches { get; } = new();
-    public ObservableCollection<PlayerStatsViewModel> Standings      { get; } = new();
+    public ObservableCollection<CycleInfoViewModel> CycleSchedule { get; } = new();
+    public ObservableCollection<MatchRowViewModel> CurrentMatches { get; } = new();
+    public ObservableCollection<PlayerStatsViewModel> Standings { get; } = new();
 
     // ── Bracket View tracking ────────────────────────────────────────
 
@@ -29,6 +29,8 @@ public class TournamentViewModel : BaseViewModel
     }
 
     public bool ShowBracketToggleVisible => _tournament.Mode == TournamentMode.Championship;
+
+    public string? AssignedPlayerName => ProfileManager.GetAssignedPlayerName();
 
     public bool IsFinished => _tournament.IsFinished;
 
@@ -64,8 +66,10 @@ public class TournamentViewModel : BaseViewModel
     }
 
     public string SaveButtonText =>
-        SelectedCycleIndex == _tournament.CurrentCycleIndex 
-            ? LocalizationManager.GetString("Loc_TviewSaveNextBtn") 
+        SelectedCycleIndex == _tournament.CurrentCycleIndex
+
+            ? LocalizationManager.GetString("Loc_TviewSaveNextBtn")
+
             : LocalizationManager.GetString("Loc_TviewSaveChangesBtn");
 
     // ── Header ───────────────────────────────────────────────────────
@@ -78,9 +82,12 @@ public class TournamentViewModel : BaseViewModel
             {
                 return string.Format(LocalizationManager.GetString("Loc_TviewEditingCycle"), SelectedCycleIndex + 1);
             }
-            return string.Format(LocalizationManager.GetString("Loc_TviewCycleHeader"), 
-                _tournament.CurrentCycleIndex + 1, 
-                ActiveCount(), 
+            return string.Format(LocalizationManager.GetString("Loc_TviewCycleHeader"),
+
+                _tournament.CurrentCycleIndex + 1,
+
+                ActiveCount(),
+
                 _tournament.CurrentCycle?.Matches.Count ?? 0);
         }
     }
@@ -117,31 +124,31 @@ public class TournamentViewModel : BaseViewModel
 
     // ── Commands ─────────────────────────────────────────────────────
 
-    public ICommand CommitCycleCommand   { get; }
+    public ICommand CommitCycleCommand { get; }
     public ICommand NewTournamentCommand { get; }
-    public ICommand SelectCycleCommand   { get; }
-    public ICommand ShowAddPlayerCommand  { get; }
+    public ICommand SelectCycleCommand { get; }
+    public ICommand ShowAddPlayerCommand { get; }
     public ICommand ShowUserProfileCommand { get; }
-    public ICommand SaveNewPlayerCommand  { get; }
+    public ICommand SaveNewPlayerCommand { get; }
     public ICommand CancelAddPlayerCommand { get; }
     public ICommand ExportStandingsPngCommand { get; }
-    public ICommand ExportBracketPngCommand   { get; }
+    public ICommand ExportBracketPngCommand { get; }
 
     // ── Constructor ──────────────────────────────────────────────────
 
     public TournamentViewModel(Tournament tournament, Action onNewTournament)
     {
-        _tournament         = tournament;
-        _onNewTournament    = onNewTournament;
+        _tournament = tournament;
+        _onNewTournament = onNewTournament;
         _selectedCycleIndex = tournament.CurrentCycleIndex;
 
-        CommitCycleCommand   = new RelayCommand(CommitCycle);
+        CommitCycleCommand = new RelayCommand(CommitCycle);
         NewTournamentCommand = new RelayCommand(() =>
         {
             ProfileManager.ProfileChanged -= OnProfileChanged;
             onNewTournament();
         });
-        SelectCycleCommand   = new RelayCommand(p =>
+        SelectCycleCommand = new RelayCommand(p =>
         {
             if (p is CycleInfoViewModel vm) SelectCycle(vm);
         });
@@ -156,7 +163,7 @@ public class TournamentViewModel : BaseViewModel
         SaveNewPlayerCommand = new RelayCommand(SaveNewPlayer);
         CancelAddPlayerCommand = new RelayCommand(CancelAddPlayer);
         ExportStandingsPngCommand = new RelayCommand(ExportStandingsPng);
-        ExportBracketPngCommand   = new RelayCommand(ExportBracketPng);
+        ExportBracketPngCommand = new RelayCommand(ExportBracketPng);
 
         BuildStandings();
         RefreshScheduleSidebar();
@@ -176,6 +183,7 @@ public class TournamentViewModel : BaseViewModel
 
     private void OnProfileChanged()
     {
+        OnPropertyChanged(nameof(AssignedPlayerName));
         foreach (var vm in Standings)
         {
             vm.NotifyIsMeChanged();
@@ -197,7 +205,8 @@ public class TournamentViewModel : BaseViewModel
         for (int i = _tournament.Cycles.Count - 1; i >= 0; i--)
         {
             var cycle = _tournament.Cycles[i];
-            var lostMatch = cycle.Matches.FirstOrDefault(m => m.IsCompleted && m.WinnerId.HasValue && 
+            var lostMatch = cycle.Matches.FirstOrDefault(m => m.IsCompleted && m.WinnerId.HasValue &&
+
                 ((m.WinnerId == 1 && m.Player2 == player) || (m.WinnerId == 2 && m.Player1 == player)));
             if (lostMatch != null)
             {
@@ -257,7 +266,7 @@ public class TournamentViewModel : BaseViewModel
         {
             CycleSchedule.Add(new CycleInfoViewModel(
                 _tournament.Cycles[i],
-                isCurrent:   i == SelectedCycleIndex,
+                isCurrent: i == SelectedCycleIndex,
                 isCompleted: i < currentActive));
         }
     }
@@ -359,7 +368,7 @@ public class TournamentViewModel : BaseViewModel
                         !m.Player2.Name.Equals("BYE", StringComparison.OrdinalIgnoreCase))
                     {
                         bool p1Won = m.WinnerId == 1;
-                        m.Player1.RecordResult(p1Won,  m.Character1);
+                        m.Player1.RecordResult(p1Won, m.Character1);
                         m.Player2.RecordResult(!p1Won, m.Character2);
                     }
                 }

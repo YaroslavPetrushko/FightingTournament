@@ -41,6 +41,7 @@
         <conv:StringToVisibilityConverter x:Key="StrVis"/>
         <conv:InverseBooleanConverter x:Key="InvBool"/>
         <conv:CycleToMatchMarginConverter x:Key="CycleToMatchMargin"/>
+        <conv:PlayerMatchToBoolConverter x:Key="PlayerMatchToBool"/>
 
         <!-- ── Column header label style ── -->
         <Style x:Key="ColHeader" TargetType="TextBlock">
@@ -309,8 +310,10 @@
                                      IsChecked="{Binding ShowBracket, Mode=TwoWay}"/>
                     </StackPanel>
 
-                    <!-- MATCHES VIEW (Visible when ShowBracket is false) -->
-                    <Grid Visibility="{Binding ShowBracket, Converter={StaticResource InvBoolVis}}">
+                    <!-- Main Content Grid wrapper to force stretch of inner views -->
+                    <Grid>
+                        <!-- MATCHES VIEW (Visible when ShowBracket is false) -->
+                        <Grid Visibility="{Binding ShowBracket, Converter={StaticResource InvBoolVis}}">
                         <DockPanel HorizontalAlignment="Stretch" Visibility="{Binding IsFinished, Converter={StaticResource InvBoolVis}}">
                             <!-- Column headers -->
                             <Grid DockPanel.Dock="Top" Margin="0,0,0,6">
@@ -609,6 +612,37 @@
                                                                         </Border>
                                                                     </StackPanel>
                                                                     <DataTemplate.Triggers>
+                                                                        <!-- Highlight local user profile -->
+                                                                        <MultiDataTrigger>
+                                                                            <MultiDataTrigger.Conditions>
+                                                                                <Condition Value="True">
+                                                                                    <Condition.Binding>
+                                                                                        <MultiBinding Converter="{StaticResource PlayerMatchToBool}">
+                                                                                            <Binding Path="Player1.Name"/>
+                                                                                            <Binding Path="DataContext.AssignedPlayerName" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                                                                                        </MultiBinding>
+                                                                                    </Condition.Binding>
+                                                                                </Condition>
+                                                                            </MultiDataTrigger.Conditions>
+                                                                            <Setter TargetName="TxtP1" Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+                                                                            <Setter TargetName="TxtP1" Property="FontWeight" Value="Bold"/>
+                                                                        </MultiDataTrigger>
+
+                                                                        <MultiDataTrigger>
+                                                                            <MultiDataTrigger.Conditions>
+                                                                                <Condition Value="True">
+                                                                                    <Condition.Binding>
+                                                                                        <MultiBinding Converter="{StaticResource PlayerMatchToBool}">
+                                                                                            <Binding Path="Player2.Name"/>
+                                                                                            <Binding Path="DataContext.AssignedPlayerName" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                                                                                        </MultiBinding>
+                                                                                    </Condition.Binding>
+                                                                                </Condition>
+                                                                            </MultiDataTrigger.Conditions>
+                                                                            <Setter TargetName="TxtP2" Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+                                                                            <Setter TargetName="TxtP2" Property="FontWeight" Value="Bold"/>
+                                                                        </MultiDataTrigger>
+
                                                                         <!-- Dim out BYE slots -->
                                                                         <DataTrigger Binding="{Binding Player1.Name}" Value="BYE">
                                                                             <Setter TargetName="TxtP1" Property="Foreground" Value="{DynamicResource BrushTextDim}"/>
@@ -643,6 +677,7 @@
                                 </Border>
                             </ScrollViewer>
                         </DockPanel>
+                    </Grid>
                     </Grid>
                 </DockPanel>
             </Border>
