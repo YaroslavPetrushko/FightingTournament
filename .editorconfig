@@ -56,3 +56,12 @@ dotnet_naming_symbols.interface_symbols.applicable_accessibilities = *
 
 dotnet_naming_style.first_letter_i.required_prefix = I
 dotnet_naming_style.first_letter_i.capitalization = pascal_case
+
+# Override compiler/analyzer severities to prevent stylistic build warnings
+dotnet_diagnostic.CA1707.severity = none # Allow underscores in unit test names
+dotnet_diagnostic.CA1822.severity = none # Allow non-static members for binding compat
+dotnet_diagnostic.CA1305.severity = none # Ignore locale-specific formatting warnings
+dotnet_diagnostic.CA1861.severity = none # Ignore static readonly array suggestions
+dotnet_diagnostic.CA1863.severity = none # Ignore CompositeFormat caching suggestions
+dotnet_diagnostic.CA1309.severity = none # Ignore ordinal string comparison suggestions
+
