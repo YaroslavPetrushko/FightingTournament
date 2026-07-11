@@ -25,12 +25,12 @@
 
     <!-- About Window -->
     <system:String x:Key="Loc_AboutTitle">About Tracker</system:String>
-    <system:String x:Key="Loc_AboutVersion">Version 5.1</system:String>
+    <system:String x:Key="Loc_AboutVersion">Version 1.1</system:String>
     <system:String x:Key="Loc_AboutDescription">A .NET 8 desktop application for scoring and managing local fighting game tournaments. Developed using Antigravity AI (Google Gemini 3.5 Flash).</system:String>
-    <system:String x:Key="Loc_AboutKeyAdvancements">✨ KEY ADVANCEMENTS IN V5.1</system:String>
-    <system:String x:Key="Loc_AboutAdvFileSwapping">• File Swapping: Open and backup custom tournament databases.</system:String>
-    <system:String x:Key="Loc_AboutAdvPngExporters">• PNG Exporters: Export standing leaders and brackets directly as images.</system:String>
-    <system:String x:Key="Loc_AboutAdvPresetsManager">• Presets Manager: Save favorite rosters and settings in one click.</system:String>
+    <system:String x:Key="Loc_AboutKeyAdvancements">✨ KEY ADVANCEMENTS IN V1.1</system:String>
+    <system:String x:Key="Loc_AboutAdvFileSwapping">• Localization: Added dynamic localization support. EN/UA.</system:String>
+    <system:String x:Key="Loc_AboutAdvPngExporters">• Player Profiles: Added dedicated button to check profile and highlight in tournaments.</system:String>
+    <system:String x:Key="Loc_AboutAdvPresetsManager">•  Bugfixes and enchantments: Geometric Tree Spacing, robust PNG exporter and more.</system:String>
     <system:String x:Key="Loc_Close">CLOSE</system:String>
 
     <!-- User Profile Window -->

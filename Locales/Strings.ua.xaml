@@ -25,12 +25,12 @@
 
     <!-- About Window -->
     <system:String x:Key="Loc_AboutTitle">Про трекер</system:String>
-    <system:String x:Key="Loc_AboutVersion">Версія 5.1</system:String>
+    <system:String x:Key="Loc_AboutVersion">Версія 1.1</system:String>
     <system:String x:Key="Loc_AboutDescription">Настільна програма на .NET 8 для проведення та підрахунку результатів локальних турнірів з файтингів. Розроблено за допомогою ШІ Antigravity (Google Gemini 3.5 Flash).</system:String>
-    <system:String x:Key="Loc_AboutKeyAdvancements">✨ КЛЮЧОВІ ДОВЕДЕННЯ У ВЕРСІЇ 5.1</system:String>
-    <system:String x:Key="Loc_AboutAdvFileSwapping">• Вибір файлів: відкривайте та створюйте резервні копії баз даних турнірів.</system:String>
-    <system:String x:Key="Loc_AboutAdvPngExporters">• Експорт у PNG: зберігайте таблицю лідерів та сітку як зображення в один клік.</system:String>
-    <system:String x:Key="Loc_AboutAdvPresetsManager">• Менеджер пресетів: зберігайте списки гравців та налаштування гри.</system:String>
+    <system:String x:Key="Loc_AboutKeyAdvancements">✨ КЛЮЧОВІ ДОВЕДЕННЯ У ВЕРСІЇ 1.1</system:String>
+    <system:String x:Key="Loc_AboutAdvFileSwapping">• Профіль користувача: відкривайте профіль через окрему кнопку та підсвічує вас у турнірах.</system:String>
+    <system:String x:Key="Loc_AboutAdvPngExporters">• Локалізація: підтримка динамічної локалізації. Мови: ENG/УКР.</system:String>
+    <system:String x:Key="Loc_AboutAdvPresetsManager">• Багфікси та покращення: відступи гілок у турнірі, баг з експортом PNG та інше.</system:String>
     <system:String x:Key="Loc_Close">ЗАКРИТИ</system:String>
 
     <!-- User Profile Window -->
