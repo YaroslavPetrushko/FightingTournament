@@ -267,5 +267,35 @@ public static class TournamentEngine
 
         foreach (var m in toRemove)
             cycle.Matches.Remove(m);
+
+        NormalizeSubRounds(cycle);
+    }
+
+    /// <summary>
+    /// Re-indexes SubRound numbers on remaining matches in a cycle so they form a contiguous 1..K sequence.
+    /// </summary>
+    public static void NormalizeSubRounds(Cycle cycle)
+    {
+        if (cycle is null || cycle.Matches.Count == 0) return;
+
+        var distinctSubRounds = cycle.Matches
+            .Select(m => m.SubRound)
+            .Distinct()
+            .OrderBy(r => r)
+            .ToList();
+
+        var subRoundMap = new Dictionary<int, int>();
+        for (int i = 0; i < distinctSubRounds.Count; i++)
+        {
+            subRoundMap[distinctSubRounds[i]] = i + 1;
+        }
+
+        foreach (var m in cycle.Matches)
+        {
+            if (subRoundMap.TryGetValue(m.SubRound, out int newSubRound))
+            {
+                m.SubRound = newSubRound;
+            }
+        }
     }
 }
