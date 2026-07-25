@@ -287,4 +287,24 @@ public class TournamentEngineTests
         }
         Assert.Equal(10, pairs.Count);
     }
+
+    [Fact]
+    public void EliminatePlayer_NormalizesSubRoundNumbers_WhenMatchesArePruned()
+    {
+        // Arrange: 3 players -> sub-rounds 1, 2, 3
+        var players = new List<string> { "P1", "P2", "P3" };
+        var t = TournamentEngine.Create(players, TournamentMode.Endless);
+        t.PairingMode = EndlessPairingMode.Mixed;
+        var cycle = t.Cycles[0];
+
+        // Player P3 is eliminated
+        var p3 = t.Players.First(p => p.Name == "P3");
+
+        // Act
+        TournamentEngine.EliminatePlayer(t, p3);
+
+        // Assert: Only 1 match (P1 vs P2) remains, and its SubRound must be normalized to 1 (not 3)
+        Assert.Single(cycle.Matches);
+        Assert.Equal(1, cycle.Matches[0].SubRound);
+    }
 }
