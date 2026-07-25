@@ -31,10 +31,12 @@ public class Tournament
         {
             if (Mode == TournamentMode.Championship)
             {
-                return Players.Count(p => !p.IsEliminated
-                    && !p.Name.Equals("BYE", StringComparison.OrdinalIgnoreCase)) <= 1
+                int realActiveCount = Players.Count(p => !p.IsEliminated
+                    && !p.Name.Equals("BYE", StringComparison.OrdinalIgnoreCase));
+
+                return realActiveCount <= 1
                     && Cycles.Count > 0
-                    && Cycles.Any(c => c.IsCompleted);
+                    && CurrentCycleIndex >= Cycles.Count;
             }
             return Cycles.Count == 0;
         }

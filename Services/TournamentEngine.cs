@@ -114,6 +114,14 @@ public static class TournamentEngine
                     match.WinnerId = 2;
                 }
             }
+            else
+            {
+                // Odd remaining winner gets an auto-resolved BYE match to advance
+                var byePlayer = new Player { Name = "BYE" };
+                t.Players.Add(byePlayer);
+                var match = new Match(winners[i], byePlayer) { Rounds = t.DefaultRounds, WinnerId = 1 };
+                cycle.Matches.Add(match);
+            }
         }
 
         return cycle;
