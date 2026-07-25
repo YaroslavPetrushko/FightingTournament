@@ -54,6 +54,10 @@
     <system:String x:Key="Loc_SetupTournamentMode">РЕЖИМ ТУРНІРУ</system:String>
     <system:String x:Key="Loc_SetupModeEndless">Круговий турнір (Колові ротації)</system:String>
     <system:String x:Key="Loc_SetupModeChampionship">Сітка чемпіонату (Олімпійська система / Плейоф)</system:String>
+    <system:String x:Key="Loc_PairingHeader">РЕЖИМ ПАР:</system:String>
+    <system:String x:Key="Loc_PairingMixed">Змішаний</system:String>
+    <system:String x:Key="Loc_PairingClassic">Класичний</system:String>
+    <system:String x:Key="Loc_PairingRandom">Випадковий</system:String>
     <system:String x:Key="Loc_SetupDefaultRounds">РАУНДИ МАТЧУ ЗА ЗАМОВЧУВАННЯМ</system:String>
     <system:String x:Key="Loc_SetupSessionName">НАЗВА СЕСІЇ</system:String>
     <system:String x:Key="Loc_SetupPlayerRoster">СПИСОК ГРАВЦІВ</system:String>

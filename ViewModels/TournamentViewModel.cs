@@ -30,6 +30,57 @@ public class TournamentViewModel : BaseViewModel, IDisposable
 
     public bool ShowBracketToggleVisible => _tournament.Mode == TournamentMode.Championship;
 
+    public bool IsPairingSelectorVisible => _tournament.Mode == TournamentMode.Endless && !_tournament.IsFinished;
+
+    public EndlessPairingMode PairingMode
+    {
+        get => _tournament.PairingMode;
+        set
+        {
+            if (_tournament.PairingMode != value)
+            {
+                _tournament.PairingMode = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsPairingMixed));
+                OnPropertyChanged(nameof(IsPairingClassic));
+                OnPropertyChanged(nameof(IsPairingRandom));
+
+                if (_tournament.CurrentCycle != null)
+                {
+                    TournamentEngine.ReorderUnplayedMatches(_tournament, _tournament.CurrentCycle, value);
+                    LoadCurrentCycleMatches();
+                }
+
+                try
+                {
+                    DatabaseRepository.SaveTournamentState(_tournament);
+                }
+                catch (Exception ex)
+                {
+                    StatusMessage = $"Pairing mode updated (DB error: {ex.Message})";
+                }
+            }
+        }
+    }
+
+    public bool IsPairingMixed
+    {
+        get => PairingMode == EndlessPairingMode.Mixed;
+        set { if (value) PairingMode = EndlessPairingMode.Mixed; }
+    }
+
+    public bool IsPairingClassic
+    {
+        get => PairingMode == EndlessPairingMode.Sequential;
+        set { if (value) PairingMode = EndlessPairingMode.Sequential; }
+    }
+
+    public bool IsPairingRandom
+    {
+        get => PairingMode == EndlessPairingMode.Random;
+        set { if (value) PairingMode = EndlessPairingMode.Random; }
+    }
+
     public string? AssignedPlayerName => ProfileManager.GetAssignedPlayerName();
 
     public bool IsFinished => _tournament.IsFinished;
@@ -59,6 +110,7 @@ public class TournamentViewModel : BaseViewModel, IDisposable
                 OnPropertyChanged(nameof(IsFinished));
                 OnPropertyChanged(nameof(WinnerName));
                 OnPropertyChanged(nameof(CanAddPlayerMidTournament));
+                OnPropertyChanged(nameof(IsPairingSelectorVisible));
                 RefreshScheduleSidebar();
                 LoadCurrentCycleMatches();
             }

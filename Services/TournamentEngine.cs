@@ -272,6 +272,60 @@ public static class TournamentEngine
     }
 
     /// <summary>
+    /// Re-orders unplayed matches in a cycle according to the specified EndlessPairingMode,
+    /// while preserving completed match ordering and results.
+    /// </summary>
+    public static void ReorderUnplayedMatches(Tournament t, Cycle cycle, EndlessPairingMode mode)
+    {
+        if (t is null || cycle is null) return;
+
+        var completed = cycle.Matches.Where(m => m.IsCompleted).ToList();
+        var unplayed = cycle.Matches.Where(m => !m.IsCompleted).ToList();
+        if (unplayed.Count <= 1) return;
+
+        var tempTournament = new Tournament
+        {
+            DefaultRounds = t.DefaultRounds,
+            Mode = t.Mode,
+            PairingMode = mode
+        };
+        foreach (var p in t.Players.Where(p => !p.IsEliminated))
+        {
+            tempTournament.Players.Add(p);
+        }
+
+        var fullCycle = BuildCycle(tempTournament, cycle.Number);
+
+        var newUnplayed = new List<Match>();
+        foreach (var match in fullCycle.Matches)
+        {
+            bool isAlreadyCompleted = completed.Any(c =>
+                (c.Player1 == match.Player1 && c.Player2 == match.Player2) ||
+                (c.Player1 == match.Player2 && c.Player2 == match.Player1));
+
+            if (!isAlreadyCompleted)
+            {
+                var existingMatch = unplayed.FirstOrDefault(u =>
+                    (u.Player1 == match.Player1 && u.Player2 == match.Player2) ||
+                    (u.Player1 == match.Player2 && u.Player2 == match.Player1));
+
+                if (existingMatch != null)
+                {
+                    match.Rounds = existingMatch.Rounds;
+                    match.Character1 = existingMatch.Character1;
+                    match.Character2 = existingMatch.Character2;
+                }
+                newUnplayed.Add(match);
+            }
+        }
+
+        cycle.Matches.Clear();
+        cycle.Matches.AddRange(completed);
+        cycle.Matches.AddRange(newUnplayed);
+        NormalizeSubRounds(cycle);
+    }
+
+    /// <summary>
     /// Re-indexes SubRound numbers on remaining matches in a cycle so they form a contiguous 1..K sequence.
     /// </summary>
     public static void NormalizeSubRounds(Cycle cycle)

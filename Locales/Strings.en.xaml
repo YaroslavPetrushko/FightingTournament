@@ -54,6 +54,10 @@
     <system:String x:Key="Loc_SetupTournamentMode">TOURNAMENT MODE</system:String>
     <system:String x:Key="Loc_SetupModeEndless">Endless Round-Robin (Circle Rotations)</system:String>
     <system:String x:Key="Loc_SetupModeChampionship">Championship Bracket (Single-Elimination)</system:String>
+    <system:String x:Key="Loc_PairingHeader">PAIRING MODE:</system:String>
+    <system:String x:Key="Loc_PairingMixed">Mixed (Fair)</system:String>
+    <system:String x:Key="Loc_PairingClassic">Classic</system:String>
+    <system:String x:Key="Loc_PairingRandom">Random</system:String>
     <system:String x:Key="Loc_SetupDefaultRounds">DEFAULT MATCH ROUNDS</system:String>
     <system:String x:Key="Loc_SetupSessionName">SESSION NAME</system:String>
     <system:String x:Key="Loc_SetupPlayerRoster">PLAYER ROSTER</system:String>
