@@ -18,6 +18,17 @@ public class MatchRowViewModel : BaseViewModel
     public bool Player1IsMe => ProfileManager.IsAssigned(Player1Name);
     public bool Player2IsMe => ProfileManager.IsAssigned(Player2Name);
 
+    public int SubRound => _match.SubRound;
+
+    private bool _showSubRoundHeader;
+    public bool ShowSubRoundHeader
+    {
+        get => _showSubRoundHeader;
+        set => Set(ref _showSubRoundHeader, value);
+    }
+
+    public string SubRoundHeaderText => $"— Round {SubRound} —";
+
     public void NotifyIsMeChanged()
     {
         OnPropertyChanged(nameof(Player1IsMe));

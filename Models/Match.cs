@@ -13,6 +13,9 @@ public class Match
 
     public int Rounds { get; set; } = 3;
 
+    /// <summary>Sub-round number within a round-robin cycle for fair player rotation scheduling.</summary>
+    public int SubRound { get; set; } = 1;
+
     public bool IsCompleted => WinnerId.HasValue;
 
     public Match(Player p1, Player p2)

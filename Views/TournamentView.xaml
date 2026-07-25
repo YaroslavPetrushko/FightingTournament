@@ -355,121 +355,134 @@
                                 <ItemsControl ItemsSource="{Binding CurrentMatches}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate DataType="{x:Type vm:MatchRowViewModel}">
-                                            <Border Margin="0,0,0,4"
-                                                    Padding="0,8"
-                                                    BorderThickness="0,0,0,1"
-                                                    BorderBrush="{DynamicResource BrushBorder}">
-                                                <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="1.5*"  MinWidth="100"/>
-                                                        <ColumnDefinition Width="54"/>
-                                                        <ColumnDefinition Width="26"/>
-                                                        <ColumnDefinition Width="54"/>
-                                                        <ColumnDefinition Width="1.5*"  MinWidth="100"/>
-                                                        <ColumnDefinition Width="12"/>
-                                                        <ColumnDefinition Width="50"/>
-                                                        <ColumnDefinition Width="12"/>
-                                                        <ColumnDefinition Width="1.2*"  MinWidth="110"/>
-                                                        <ColumnDefinition Width="8"/>
-                                                        <ColumnDefinition Width="1.2*"  MinWidth="110"/>
-                                                    </Grid.ColumnDefinitions>
+                                            <StackPanel>
+                                                <!-- SubRound Heading Header -->
+                                                <Border Visibility="{Binding ShowSubRoundHeader, Converter={StaticResource BoolVis}}"
+                                                        Margin="0,10,0,6" Padding="8,4"
+                                                        Background="{DynamicResource BrushSurface2}" CornerRadius="4"
+                                                        HorizontalAlignment="Stretch">
+                                                    <TextBlock Text="{Binding SubRoundHeaderText}"
+                                                               FontSize="11" FontWeight="Bold"
+                                                               Foreground="{DynamicResource BrushAccent}"
+                                                               HorizontalAlignment="Center"/>
+                                                </Border>
 
-                                                    <!-- P1 name -->
-                                                    <TextBlock Grid.Column="0"
-                                                               FontSize="13" FontWeight="SemiBold"
-                                                               HorizontalAlignment="Right"
-                                                               VerticalAlignment="Center"
-                                                               Margin="0,0,6,0"
-                                                               TextTrimming="CharacterEllipsis"
-                                                               ToolTip="{Binding Player1Name}">
-                                                        <TextBlock.Style>
-                                                            <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
-                                                                <Setter Property="Text" Value="{Binding Player1Name}"/>
-                                                                <Setter Property="Foreground" Value="{DynamicResource BrushText}"/>
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding Player1IsMe}" Value="True">
-                                                                        <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
-                                                                        <Setter Property="Text" Value="{Binding Player1Name, StringFormat='★ {0}'}"/>
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </TextBlock.Style>
-                                                    </TextBlock>
+                                                <Border Margin="0,0,0,4"
+                                                        Padding="0,8"
+                                                        BorderThickness="0,0,0,1"
+                                                        BorderBrush="{DynamicResource BrushBorder}">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="1.5*"  MinWidth="100"/>
+                                                            <ColumnDefinition Width="54"/>
+                                                            <ColumnDefinition Width="26"/>
+                                                            <ColumnDefinition Width="54"/>
+                                                            <ColumnDefinition Width="1.5*"  MinWidth="100"/>
+                                                            <ColumnDefinition Width="12"/>
+                                                            <ColumnDefinition Width="50"/>
+                                                            <ColumnDefinition Width="12"/>
+                                                            <ColumnDefinition Width="1.2*"  MinWidth="110"/>
+                                                            <ColumnDefinition Width="8"/>
+                                                            <ColumnDefinition Width="1.2*"  MinWidth="110"/>
+                                                        </Grid.ColumnDefinitions>
 
-                                                    <!-- P1 WIN -->
-                                                    <RadioButton Grid.Column="1"
-                                                                 Content="{DynamicResource Loc_TviewWin}"
-                                                                 Style="{StaticResource RadioWin}"
-                                                                 GroupName="{Binding MatchId}"
-                                                                 IsChecked="{Binding Player1Won, Mode=TwoWay}"
-                                                                 HorizontalAlignment="Center"
-                                                                 VerticalAlignment="Center"/>
+                                                        <!-- P1 name -->
+                                                        <TextBlock Grid.Column="0"
+                                                                   FontSize="13" FontWeight="SemiBold"
+                                                                   HorizontalAlignment="Right"
+                                                                   VerticalAlignment="Center"
+                                                                   Margin="0,0,6,0"
+                                                                   TextTrimming="CharacterEllipsis"
+                                                                   ToolTip="{Binding Player1Name}">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                                                    <Setter Property="Text" Value="{Binding Player1Name}"/>
+                                                                    <Setter Property="Foreground" Value="{DynamicResource BrushText}"/>
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Player1IsMe}" Value="True">
+                                                                            <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+                                                                            <Setter Property="Text" Value="{Binding Player1Name, StringFormat='★ {0}'}"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
 
-                                                    <!-- vs -->
-                                                    <TextBlock Grid.Column="2" Text="vs"
-                                                               FontSize="10"
-                                                               Foreground="{DynamicResource BrushTextDim}"
-                                                               HorizontalAlignment="Center"
-                                                               VerticalAlignment="Center"/>
+                                                        <!-- P1 WIN -->
+                                                        <RadioButton Grid.Column="1"
+                                                                     Content="{DynamicResource Loc_TviewWin}"
+                                                                     Style="{StaticResource RadioWin}"
+                                                                     GroupName="{Binding MatchId}"
+                                                                     IsChecked="{Binding Player1Won, Mode=TwoWay}"
+                                                                     HorizontalAlignment="Center"
+                                                                     VerticalAlignment="Center"/>
 
-                                                    <!-- P2 WIN -->
-                                                    <RadioButton Grid.Column="3"
-                                                                 Content="{DynamicResource Loc_TviewWin}"
-                                                                 Style="{StaticResource RadioWin}"
-                                                                 GroupName="{Binding MatchId}"
-                                                                 IsChecked="{Binding Player2Won, Mode=TwoWay}"
-                                                                 HorizontalAlignment="Center"
-                                                                 VerticalAlignment="Center"/>
+                                                        <!-- vs -->
+                                                        <TextBlock Grid.Column="2" Text="vs"
+                                                                   FontSize="10"
+                                                                   Foreground="{DynamicResource BrushTextDim}"
+                                                                   HorizontalAlignment="Center"
+                                                                   VerticalAlignment="Center"/>
 
-                                                    <!-- P2 name -->
-                                                    <TextBlock Grid.Column="4"
-                                                               FontSize="13" FontWeight="SemiBold"
-                                                               HorizontalAlignment="Left"
-                                                               VerticalAlignment="Center"
-                                                               Margin="6,0,0,0"
-                                                               TextTrimming="CharacterEllipsis"
-                                                               ToolTip="{Binding Player2Name}">
-                                                        <TextBlock.Style>
-                                                            <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
-                                                                <Setter Property="Text" Value="{Binding Player2Name}"/>
-                                                                <Setter Property="Foreground" Value="{DynamicResource BrushText}"/>
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding Player2IsMe}" Value="True">
-                                                                        <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
-                                                                        <Setter Property="Text" Value="{Binding Player2Name, StringFormat='{}{0} ★'}"/>
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </TextBlock.Style>
-                                                    </TextBlock>
+                                                        <!-- P2 WIN -->
+                                                        <RadioButton Grid.Column="3"
+                                                                     Content="{DynamicResource Loc_TviewWin}"
+                                                                     Style="{StaticResource RadioWin}"
+                                                                     GroupName="{Binding MatchId}"
+                                                                     IsChecked="{Binding Player2Won, Mode=TwoWay}"
+                                                                     HorizontalAlignment="Center"
+                                                                     VerticalAlignment="Center"/>
 
-                                                    <!-- Rounds -->
-                                                    <ComboBox Grid.Column="6"
-                                                              ItemsSource="{Binding AvailableRounds}"
-                                                              SelectedItem="{Binding Rounds, Mode=TwoWay}"
-                                                              IsEnabled="{Binding CanEditRounds}"
-                                                              HorizontalContentAlignment="Center"
-                                                              VerticalAlignment="Center"/>
+                                                        <!-- P2 name -->
+                                                        <TextBlock Grid.Column="4"
+                                                                   FontSize="13" FontWeight="SemiBold"
+                                                                   HorizontalAlignment="Left"
+                                                                   VerticalAlignment="Center"
+                                                                   Margin="6,0,0,0"
+                                                                   TextTrimming="CharacterEllipsis"
+                                                                   ToolTip="{Binding Player2Name}">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                                                    <Setter Property="Text" Value="{Binding Player2Name}"/>
+                                                                    <Setter Property="Foreground" Value="{DynamicResource BrushText}"/>
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Player2IsMe}" Value="True">
+                                                                            <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+                                                                            <Setter Property="Text" Value="{Binding Player2Name, StringFormat='{}{0} ★'}"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
 
-                                                    <!-- Char 1 -->
-                                                    <ComboBox Grid.Column="8"
-                                                              IsEditable="True"
-                                                              ItemsSource="{Binding AvailableCharacters}"
-                                                              Text="{Binding Character1, Mode=TwoWay,
-                                                                     UpdateSourceTrigger=PropertyChanged}"
-                                                              ToolTip="{Binding Player1Name}"
-                                                              VerticalAlignment="Center"/>
+                                                        <!-- Rounds -->
+                                                        <ComboBox Grid.Column="6"
+                                                                  ItemsSource="{Binding AvailableRounds}"
+                                                                  SelectedItem="{Binding Rounds, Mode=TwoWay}"
+                                                                  IsEnabled="{Binding CanEditRounds}"
+                                                                  HorizontalContentAlignment="Center"
+                                                                  VerticalAlignment="Center"/>
 
-                                                    <!-- Char 2 -->
-                                                    <ComboBox Grid.Column="10"
-                                                              IsEditable="True"
-                                                              ItemsSource="{Binding AvailableCharacters}"
-                                                              Text="{Binding Character2, Mode=TwoWay,
-                                                                     UpdateSourceTrigger=PropertyChanged}"
-                                                              ToolTip="{Binding Player2Name}"
-                                                              VerticalAlignment="Center"/>
-                                                </Grid>
-                                            </Border>
+                                                        <!-- Char 1 -->
+                                                        <ComboBox Grid.Column="8"
+                                                                  IsEditable="True"
+                                                                  ItemsSource="{Binding AvailableCharacters}"
+                                                                  Text="{Binding Character1, Mode=TwoWay,
+                                                                         UpdateSourceTrigger=PropertyChanged}"
+                                                                  ToolTip="{Binding Player1Name}"
+                                                                  VerticalAlignment="Center"/>
+
+                                                        <!-- Char 2 -->
+                                                        <ComboBox Grid.Column="10"
+                                                                  IsEditable="True"
+                                                                  ItemsSource="{Binding AvailableCharacters}"
+                                                                  Text="{Binding Character2, Mode=TwoWay,
+                                                                         UpdateSourceTrigger=PropertyChanged}"
+                                                                  ToolTip="{Binding Player2Name}"
+                                                                  VerticalAlignment="Center"/>
+                                                    </Grid>
+                                                </Border>
+                                            </StackPanel>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>

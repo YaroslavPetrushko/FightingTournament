@@ -278,6 +278,7 @@ public class TournamentViewModel : BaseViewModel, IDisposable
         if (SelectedCycleIndex >= 0 && SelectedCycleIndex < _tournament.Cycles.Count)
         {
             var cycle = _tournament.Cycles[SelectedCycleIndex];
+            int lastSubRound = -1;
             foreach (var m in cycle.Matches)
             {
                 // Skip matches where either player is a virtual BYE player
@@ -286,7 +287,14 @@ public class TournamentViewModel : BaseViewModel, IDisposable
                 {
                     continue;
                 }
-                CurrentMatches.Add(new MatchRowViewModel(m, _tournament.SelectedGame, _tournament.Mode));
+
+                var matchVm = new MatchRowViewModel(m, _tournament.SelectedGame, _tournament.Mode);
+                if (_tournament.Mode == TournamentMode.Endless && m.SubRound != lastSubRound)
+                {
+                    matchVm.ShowSubRoundHeader = true;
+                    lastSubRound = m.SubRound;
+                }
+                CurrentMatches.Add(matchVm);
             }
         }
     }
