@@ -211,6 +211,7 @@ public class DatabaseConnector
                 using var checkReader = checkCmd.ExecuteReader();
                 bool modeExists = false;
                 bool defaultRoundsExists = false;
+                bool pairingModeExists = false;
                 while (checkReader.Read())
                 {
                     string colName = checkReader.GetString(1);
@@ -218,6 +219,8 @@ public class DatabaseConnector
                         modeExists = true;
                     if (colName.Equals("DefaultRounds", StringComparison.OrdinalIgnoreCase))
                         defaultRoundsExists = true;
+                    if (colName.Equals("PairingMode", StringComparison.OrdinalIgnoreCase))
+                        pairingModeExists = true;
                 }
                 if (!modeExists)
                 {
@@ -237,22 +240,32 @@ public class DatabaseConnector
                         alterCmd.ExecuteNonQuery();
                     }
                 }
+                if (!pairingModeExists)
+                {
+                    using (var alterCmd = connection.CreateCommand())
+                    {
+                        alterCmd.Transaction = transaction;
+                        alterCmd.CommandText = "ALTER TABLE Tournaments ADD COLUMN PairingMode TEXT NOT NULL DEFAULT 'Mixed';";
+                        alterCmd.ExecuteNonQuery();
+                    }
+                }
             }
 
-            // Backward compatibility: Alter Matches to add Rounds if missing
+            // Backward compatibility: Alter Matches to add Rounds and SubRound if missing
             using (var checkCmd = connection.CreateCommand())
             {
                 checkCmd.Transaction = transaction;
                 checkCmd.CommandText = "PRAGMA table_info(Matches);";
                 using var checkReader = checkCmd.ExecuteReader();
                 bool roundsExists = false;
+                bool subRoundExists = false;
                 while (checkReader.Read())
                 {
-                    if (checkReader.GetString(1).Equals("Rounds", StringComparison.OrdinalIgnoreCase))
-                    {
+                    string colName = checkReader.GetString(1);
+                    if (colName.Equals("Rounds", StringComparison.OrdinalIgnoreCase))
                         roundsExists = true;
-                        break;
-                    }
+                    if (colName.Equals("SubRound", StringComparison.OrdinalIgnoreCase))
+                        subRoundExists = true;
                 }
                 if (!roundsExists)
                 {
@@ -260,6 +273,15 @@ public class DatabaseConnector
                     {
                         alterCmd.Transaction = transaction;
                         alterCmd.CommandText = "ALTER TABLE Matches ADD COLUMN Rounds INTEGER NOT NULL DEFAULT 3;";
+                        alterCmd.ExecuteNonQuery();
+                    }
+                }
+                if (!subRoundExists)
+                {
+                    using (var alterCmd = connection.CreateCommand())
+                    {
+                        alterCmd.Transaction = transaction;
+                        alterCmd.CommandText = "ALTER TABLE Matches ADD COLUMN SubRound INTEGER NOT NULL DEFAULT 1;";
                         alterCmd.ExecuteNonQuery();
                     }
                 }

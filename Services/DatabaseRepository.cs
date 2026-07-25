@@ -38,8 +38,8 @@ public static class DatabaseRepository
             {
                 insertTournamentCmd.Transaction = transaction;
                 insertTournamentCmd.CommandText = @"
-                    INSERT INTO Tournaments (SessionName, SelectedGame, CurrentCycleIndex, IsFinished, TournamentMode, DefaultRounds)
-                    VALUES (@SessionName, @SelectedGame, @CurrentCycleIndex, @IsFinished, @TournamentMode, @DefaultRounds);
+                    INSERT INTO Tournaments (SessionName, SelectedGame, CurrentCycleIndex, IsFinished, TournamentMode, DefaultRounds, PairingMode)
+                    VALUES (@SessionName, @SelectedGame, @CurrentCycleIndex, @IsFinished, @TournamentMode, @DefaultRounds, @PairingMode);
                     SELECT last_insert_rowid();";
                 insertTournamentCmd.Parameters.AddWithValue("@SessionName", tournament.SessionName);
                 insertTournamentCmd.Parameters.AddWithValue("@SelectedGame", tournament.SelectedGame);
@@ -47,6 +47,7 @@ public static class DatabaseRepository
                 insertTournamentCmd.Parameters.AddWithValue("@IsFinished", tournament.IsFinished ? 1 : 0);
                 insertTournamentCmd.Parameters.AddWithValue("@TournamentMode", tournament.Mode.ToString());
                 insertTournamentCmd.Parameters.AddWithValue("@DefaultRounds", tournament.DefaultRounds);
+                insertTournamentCmd.Parameters.AddWithValue("@PairingMode", tournament.PairingMode.ToString());
 
                 var scalarResult = await insertTournamentCmd.ExecuteScalarAsync();
                 tournamentId = (long)scalarResult!;
@@ -133,8 +134,8 @@ public static class DatabaseRepository
                     using var insertMatchCmd = connection.CreateCommand();
                     insertMatchCmd.Transaction = transaction;
                     insertMatchCmd.CommandText = @"
-                        INSERT INTO Matches (CycleId, Player1Id, Player2Id, WinnerId, Character1, Character2, Rounds)
-                        VALUES (@CycleId, @Player1Id, @Player2Id, @WinnerId, @Character1, @Character2, @Rounds);";
+                        INSERT INTO Matches (CycleId, Player1Id, Player2Id, WinnerId, Character1, Character2, Rounds, SubRound)
+                        VALUES (@CycleId, @Player1Id, @Player2Id, @WinnerId, @Character1, @Character2, @Rounds, @SubRound);";
                     insertMatchCmd.Parameters.AddWithValue("@CycleId", cycleId);
                     insertMatchCmd.Parameters.AddWithValue("@Player1Id", p1Id);
                     insertMatchCmd.Parameters.AddWithValue("@Player2Id", p2Id);
@@ -142,6 +143,7 @@ public static class DatabaseRepository
                     insertMatchCmd.Parameters.AddWithValue("@Character1", (object?)match.Character1 ?? DBNull.Value);
                     insertMatchCmd.Parameters.AddWithValue("@Character2", (object?)match.Character2 ?? DBNull.Value);
                     insertMatchCmd.Parameters.AddWithValue("@Rounds", match.Rounds);
+                    insertMatchCmd.Parameters.AddWithValue("@SubRound", match.SubRound);
                     await insertMatchCmd.ExecuteNonQueryAsync();
                 }
             }
@@ -256,9 +258,10 @@ public static class DatabaseRepository
         int currentCycleIndex;
         int defaultRounds = 3;
         TournamentMode tournamentMode = TournamentMode.Endless;
+        EndlessPairingMode pairingMode = EndlessPairingMode.Mixed;
         using (var cmd = connection.CreateCommand())
         {
-            cmd.CommandText = "SELECT Id, SelectedGame, CurrentCycleIndex, TournamentMode, DefaultRounds FROM Tournaments WHERE SessionName = @SessionName";
+            cmd.CommandText = "SELECT Id, SelectedGame, CurrentCycleIndex, TournamentMode, DefaultRounds, PairingMode FROM Tournaments WHERE SessionName = @SessionName";
             cmd.Parameters.AddWithValue("@SessionName", sessionName);
             using var reader = await cmd.ExecuteReaderAsync();
             if (!await reader.ReadAsync()) return null;
@@ -282,6 +285,15 @@ public static class DatabaseRepository
             {
                 defaultRounds = reader.GetInt32(4);
             }
+
+            if (reader.FieldCount > 5 && !reader.IsDBNull(5))
+            {
+                string pairingStr = reader.GetString(5);
+                if (Enum.TryParse<EndlessPairingMode>(pairingStr, out var parsedPairing))
+                {
+                    pairingMode = parsedPairing;
+                }
+            }
         }
 
         var tournament = new Tournament
@@ -290,6 +302,7 @@ public static class DatabaseRepository
             SelectedGame = selectedGame,
             CurrentCycleIndex = currentCycleIndex,
             Mode = tournamentMode,
+            PairingMode = pairingMode,
             DefaultRounds = defaultRounds
         };
 
@@ -352,7 +365,7 @@ public static class DatabaseRepository
                 // Fetch matches in this cycle
                 using (var matchCmd = connection.CreateCommand())
                 {
-                    matchCmd.CommandText = "SELECT Player1Id, Player2Id, WinnerId, Character1, Character2, Rounds FROM Matches WHERE CycleId = @CycleId";
+                    matchCmd.CommandText = "SELECT Player1Id, Player2Id, WinnerId, Character1, Character2, Rounds, SubRound FROM Matches WHERE CycleId = @CycleId";
                     matchCmd.Parameters.AddWithValue("@CycleId", cycleId);
                     using var matchReader = await matchCmd.ExecuteReaderAsync();
                     while (await matchReader.ReadAsync())
@@ -367,6 +380,11 @@ public static class DatabaseRepository
                         {
                             rounds = matchReader.GetInt32(5);
                         }
+                        int subRound = 1;
+                        if (matchReader.FieldCount > 6 && !matchReader.IsDBNull(6))
+                        {
+                            subRound = matchReader.GetInt32(6);
+                        }
 
                         if (playerMap.TryGetValue(p1Id, out var p1) && playerMap.TryGetValue(p2Id, out var p2))
                         {
@@ -375,7 +393,8 @@ public static class DatabaseRepository
                                 WinnerId = winnerId,
                                 Character1 = char1,
                                 Character2 = char2,
-                                Rounds = rounds
+                                Rounds = rounds,
+                                SubRound = subRound
                             };
                             cycle.Matches.Add(match);
                         }
