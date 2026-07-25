@@ -19,7 +19,7 @@ public static class LocalizationManager
 
     public static void ApplyLanguage(string lang)
     {
-        lang = lang.ToLower() == "ua" ? "ua" : "en";
+        lang = string.Equals(lang, "ua", StringComparison.OrdinalIgnoreCase) ? "ua" : "en";
         CurrentLanguage = lang;
 
         // Swapping resource dictionaries

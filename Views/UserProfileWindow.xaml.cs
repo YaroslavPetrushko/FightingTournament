@@ -19,7 +19,7 @@ public partial class UserProfileWindow : Window
         _onDeleted = onDeleted;
 
         // Populate text boxes
-        PlayerTitleText.Text = $"{LocalizationManager.GetString("Loc_ProfilePrefix")} {profile.Nickname.ToUpper()}";
+        PlayerTitleText.Text = $"{LocalizationManager.GetString("Loc_ProfilePrefix")} {profile.Nickname.ToUpper(System.Globalization.CultureInfo.CurrentCulture)}";
         TxtTotalMatches.Text = profile.TotalMatches.ToString();
         TxtTotalWins.Text = profile.TotalWins.ToString();
         TxtWinRate.Text = $"{profile.WinRate:F1}%";
@@ -42,13 +42,13 @@ public partial class UserProfileWindow : Window
         bool isAssigned = ProfileManager.IsAssigned(_profile.Nickname);
         if (isAssigned)
         {
-            PlayerTitleText.Text = $"★ {LocalizationManager.GetString("Loc_ProfilePrefix")} {_profile.Nickname.ToUpper()}";
-            PlayerSubtitleText.Text = LocalizationManager.GetString("Loc_MenuMyProfile").ToUpper();
+            PlayerTitleText.Text = $"★ {LocalizationManager.GetString("Loc_ProfilePrefix")} {_profile.Nickname.ToUpper(System.Globalization.CultureInfo.CurrentCulture)}";
+            PlayerSubtitleText.Text = LocalizationManager.GetString("Loc_MenuMyProfile").ToUpper(System.Globalization.CultureInfo.CurrentCulture);
             BtnToggleAssignment.Content = LocalizationManager.GetString("Loc_UnassignMyProfile");
         }
         else
         {
-            PlayerTitleText.Text = $"{LocalizationManager.GetString("Loc_ProfilePrefix")} {_profile.Nickname.ToUpper()}";
+            PlayerTitleText.Text = $"{LocalizationManager.GetString("Loc_ProfilePrefix")} {_profile.Nickname.ToUpper(System.Globalization.CultureInfo.CurrentCulture)}";
             PlayerSubtitleText.Text = LocalizationManager.GetString("Loc_ProfileSubtitle");
             BtnToggleAssignment.Content = LocalizationManager.GetString("Loc_AssignAsMyProfile");
         }

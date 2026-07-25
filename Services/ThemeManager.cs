@@ -149,7 +149,7 @@ public static class ThemeManager
             themeName = "default";
         }
 
-        CurrentTheme = themeName.ToLower();
+        CurrentTheme = themeName.ToLower(System.Globalization.CultureInfo.InvariantCulture);
         var palette = Themes[CurrentTheme];
 
         foreach (var pair in palette)
