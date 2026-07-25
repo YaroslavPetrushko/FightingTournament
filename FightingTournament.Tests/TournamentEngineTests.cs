@@ -215,4 +215,76 @@ public class TournamentEngineTests
         // Assert: After committing cycle 0, tournament should now be finished
         Assert.True(t.IsFinished);
     }
+
+    [Fact]
+    public void BuildCycle_InEndlessMode_WithMixedPairing_GeneratesAllUniquePairingsAndSubRounds_EvenPlayerCount()
+    {
+        // Arrange: 4 players -> 6 unique pairings, 3 sub-rounds (2 matches per sub-round)
+        var players = new List<string> { "P1", "P2", "P3", "P4" };
+
+        // Act
+        var t = TournamentEngine.Create(players, TournamentMode.Endless);
+        t.PairingMode = EndlessPairingMode.Mixed;
+        var cycle = t.Cycles[0];
+
+        // Assert
+        Assert.Equal(6, cycle.Matches.Count);
+
+        // Verify sub-round distribution
+        var subRounds = cycle.Matches.Select(m => m.SubRound).Distinct().OrderBy(r => r).ToList();
+        Assert.Equal(new List<int> { 1, 2, 3 }, subRounds);
+
+        // Verify all 6 unique pairs exist
+        var pairs = new HashSet<string>();
+        foreach (var m in cycle.Matches)
+        {
+            var names = new List<string> { m.Player1.Name, m.Player2.Name };
+            names.Sort();
+            pairs.Add($"{names[0]}-{names[1]}");
+        }
+        Assert.Equal(6, pairs.Count);
+        Assert.Contains("P1-P2", pairs);
+        Assert.Contains("P1-P3", pairs);
+        Assert.Contains("P1-P4", pairs);
+        Assert.Contains("P2-P3", pairs);
+        Assert.Contains("P2-P4", pairs);
+        Assert.Contains("P3-P4", pairs);
+    }
+
+    [Fact]
+    public void BuildCycle_InEndlessMode_WithMixedPairing_GeneratesAllUniquePairingsAndSubRounds_OddPlayerCount()
+    {
+        // Arrange: 5 players -> 10 unique pairings, 5 sub-rounds (2 matches per sub-round)
+        var players = new List<string> { "P1", "P2", "P3", "P4", "P5" };
+
+        // Act
+        var t = TournamentEngine.Create(players, TournamentMode.Endless);
+        t.PairingMode = EndlessPairingMode.Mixed;
+        var cycle = t.Cycles[0];
+
+        // Assert
+        Assert.Equal(10, cycle.Matches.Count);
+
+        // Verify sub-round distribution
+        var subRounds = cycle.Matches.Select(m => m.SubRound).Distinct().OrderBy(r => r).ToList();
+        Assert.Equal(new List<int> { 1, 2, 3, 4, 5 }, subRounds);
+
+        // Verify no player plays more than 1 match per sub-round
+        foreach (int subRound in subRounds)
+        {
+            var roundMatches = cycle.Matches.Where(m => m.SubRound == subRound).ToList();
+            var playersInRound = roundMatches.SelectMany(m => new[] { m.Player1.Name, m.Player2.Name }).ToList();
+            Assert.Equal(playersInRound.Count, playersInRound.Distinct().Count());
+        }
+
+        // Verify all 10 unique pairs exist
+        var pairs = new HashSet<string>();
+        foreach (var m in cycle.Matches)
+        {
+            var names = new List<string> { m.Player1.Name, m.Player2.Name };
+            names.Sort();
+            pairs.Add($"{names[0]}-{names[1]}");
+        }
+        Assert.Equal(10, pairs.Count);
+    }
 }
