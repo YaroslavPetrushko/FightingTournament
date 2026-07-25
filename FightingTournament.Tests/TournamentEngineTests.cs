@@ -171,4 +171,48 @@ public class TournamentEngineTests
         var ryuVsGuile = round1.Matches.FirstOrDefault(m => (m.Player1 == ryu && m.Player2 == guile) || (m.Player1 == guile && m.Player2 == ryu));
         Assert.NotNull(ryuVsGuile);
     }
+
+    [Fact]
+    public void BuildChampionshipCycle_WithOddWinnersCount_PadsWithByeAndAdvancesOrphanedWinner()
+    {
+        // Arrange: 3 players in Championship mode
+        var t = TournamentEngine.Create(new List<string> { "Ryu", "Ken", "Guile" }, TournamentMode.Championship);
+        var r1 = t.Cycles[0];
+
+        // Match 0 is Ryu vs BYE (auto-resolved with Ryu = WinnerId 1)
+        // Match 1 is Ken vs Guile -> mark Ken as winner
+        var match2 = r1.Matches[1];
+        match2.WinnerId = match2.Player1.Name == "Ken" ? 1 : 2;
+
+        // Act
+        bool committed = TournamentEngine.CommitCurrentCycle(t);
+
+        // Assert
+        Assert.True(committed);
+        Assert.Equal(2, t.Cycles.Count);
+
+        var r2 = t.Cycles[1];
+        Assert.Single(r2.Matches);
+
+        var finalsMatch = r2.Matches[0];
+        var finalPlayers = new List<string> { finalsMatch.Player1.Name, finalsMatch.Player2.Name };
+        Assert.Contains("Ryu", finalPlayers);
+        Assert.Contains("Ken", finalPlayers);
+    }
+
+    [Fact]
+    public void ChampionshipMode_IsFinished_EvaluatesFalseBeforeCycleCommitted()
+    {
+        // Arrange
+        var t = TournamentEngine.Create(new List<string> { "SoloPlayer" }, TournamentMode.Championship);
+
+        // Assert: Before committing current cycle, IsFinished should be false
+        Assert.False(t.IsFinished);
+
+        // Act: Commit the round containing the BYE match
+        TournamentEngine.CommitCurrentCycle(t);
+
+        // Assert: After committing cycle 0, tournament should now be finished
+        Assert.True(t.IsFinished);
+    }
 }
