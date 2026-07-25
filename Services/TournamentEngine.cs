@@ -69,15 +69,91 @@ public static class TournamentEngine
 
     // ── Cycle builders ────────────────────────────────────────────────
 
+    // ── Cycle builders ────────────────────────────────────────────────
+
     /// <summary>Generates ALL unique pairs from currently-active players (round-robin).</summary>
     private static Cycle BuildCycle(Tournament t, int number)
+    {
+        return t.PairingMode switch
+        {
+            EndlessPairingMode.Mixed => BuildCycleMixed(t, number),
+            EndlessPairingMode.Random => BuildCycleRandom(t, number),
+            _ => BuildCycleSequential(t, number)
+        };
+    }
+
+    private static Cycle BuildCycleSequential(Tournament t, int number)
     {
         var cycle = new Cycle(number);
         var active = t.Players.Where(p => !p.IsEliminated).ToList();
 
         for (int i = 0; i < active.Count; i++)
             for (int j = i + 1; j < active.Count; j++)
-                cycle.Matches.Add(new Match(active[i], active[j]) { Rounds = t.DefaultRounds });
+                cycle.Matches.Add(new Match(active[i], active[j]) { Rounds = t.DefaultRounds, SubRound = 1 });
+
+        return cycle;
+    }
+
+    private static Cycle BuildCycleRandom(Tournament t, int number)
+    {
+        var cycle = BuildCycleSequential(t, number);
+        var rng = new Random();
+        var shuffled = cycle.Matches.OrderBy(_ => rng.Next()).ToList();
+        cycle.Matches.Clear();
+        cycle.Matches.AddRange(shuffled);
+        return cycle;
+    }
+
+    /// <summary>
+    /// Generates ALL unique pairs using the Berger Circle Scheduling algorithm,
+    /// grouping matches into sub-rounds so players receive optimal rest and rotation.
+    /// </summary>
+    private static Cycle BuildCycleMixed(Tournament t, int number)
+    {
+        var cycle = new Cycle(number);
+        var active = t.Players.Where(p => !p.IsEliminated).ToList();
+        if (active.Count < 2) return cycle;
+
+        var players = new List<Player>(active);
+
+        // If player count is odd, pad with a dummy BYE player for even rotation math
+        bool hasBye = players.Count % 2 != 0;
+        Player? dummyBye = null;
+        if (hasBye)
+        {
+            dummyBye = new Player { Name = "BYE" };
+            players.Add(dummyBye);
+        }
+
+        int totalPlayers = players.Count;
+        int subRoundsCount = totalPlayers - 1;
+        int half = totalPlayers / 2;
+
+        for (int roundIndex = 0; roundIndex < subRoundsCount; roundIndex++)
+        {
+            int subRoundNumber = roundIndex + 1;
+
+            for (int i = 0; i < half; i++)
+            {
+                Player p1 = players[i];
+                Player p2 = players[players.Count - 1 - i];
+
+                if (p1 != dummyBye && p2 != dummyBye)
+                {
+                    var match = new Match(p1, p2)
+                    {
+                        Rounds = t.DefaultRounds,
+                        SubRound = subRoundNumber
+                    };
+                    cycle.Matches.Add(match);
+                }
+            }
+
+            // Rotate elements: keep index 0 fixed, move last element to index 1
+            Player last = players[players.Count - 1];
+            players.RemoveAt(players.Count - 1);
+            players.Insert(1, last);
+        }
 
         return cycle;
     }

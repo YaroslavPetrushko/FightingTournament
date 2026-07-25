@@ -10,6 +10,13 @@ public enum TournamentMode
     Championship
 }
 
+public enum EndlessPairingMode
+{
+    Mixed,      // Fair Berger Circle Scheduling (Interleaved rest)
+    Sequential, // Classic P1 vs all, P2 vs all
+    Random      // Shuffled match order
+}
+
 public class Tournament
 {
     public List<Player> Players { get; } = new();
@@ -20,6 +27,7 @@ public class Tournament
 
     public int CurrentCycleIndex { get; set; } = 0;
     public TournamentMode Mode { get; set; } = TournamentMode.Endless;
+    public EndlessPairingMode PairingMode { get; set; } = EndlessPairingMode.Mixed;
     public int DefaultRounds { get; set; } = 3;
 
     public Cycle? CurrentCycle =>
