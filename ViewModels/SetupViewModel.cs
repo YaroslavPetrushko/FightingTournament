@@ -7,7 +7,7 @@ using FightingTournament.Services;
 
 namespace FightingTournament.ViewModels;
 
-public class SetupViewModel : BaseViewModel
+public class SetupViewModel : BaseViewModel, IDisposable
 {
     // Raised when the user clicks START and validation passes.
     public event Action<Tournament>? TournamentStarted;
@@ -619,13 +619,14 @@ public class SetupViewModel : BaseViewModel
 
 
     private void OnTournamentStarted(Tournament tournament)
-
     {
-
         ProfileManager.ProfileChanged -= OnProfileChanged;
-
         TournamentStarted?.Invoke(tournament);
-
     }
 
+    public void Dispose()
+    {
+        ProfileManager.ProfileChanged -= OnProfileChanged;
+        GC.SuppressFinalize(this);
+    }
 }

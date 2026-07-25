@@ -4,5 +4,9 @@ namespace FightingTournament.Views;
 
 public partial class TournamentView : UserControl
 {
-    public TournamentView() => InitializeComponent();
+    public TournamentView()
+    {
+        InitializeComponent();
+        Unloaded += (s, e) => (DataContext as System.IDisposable)?.Dispose();
+    }
 }

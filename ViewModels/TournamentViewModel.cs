@@ -8,7 +8,7 @@ using FightingTournament.Services;
 
 namespace FightingTournament.ViewModels;
 
-public class TournamentViewModel : BaseViewModel
+public class TournamentViewModel : BaseViewModel, IDisposable
 {
     private readonly Tournament _tournament;
     private readonly Action _onNewTournament;
@@ -636,5 +636,11 @@ public class TournamentViewModel : BaseViewModel
         {
             MessageBox.Show($"Could not load user profile:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
+    }
+
+    public void Dispose()
+    {
+        ProfileManager.ProfileChanged -= OnProfileChanged;
+        GC.SuppressFinalize(this);
     }
 }
