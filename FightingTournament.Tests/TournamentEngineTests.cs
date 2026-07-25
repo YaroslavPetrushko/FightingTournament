@@ -307,4 +307,33 @@ public class TournamentEngineTests
         Assert.Single(cycle.Matches);
         Assert.Equal(1, cycle.Matches[0].SubRound);
     }
+
+    [Fact]
+    public void ReorderUnplayedMatches_PreservesCompletedMatches_AndReordersRemaining()
+    {
+        // Arrange: 4 players endless tournament starting in Classic mode
+        var players = new List<string> { "P1", "P2", "P3", "P4" };
+        var t = TournamentEngine.Create(players, TournamentMode.Endless);
+        t.PairingMode = EndlessPairingMode.Sequential;
+        var cycle = t.Cycles[0];
+
+        // Mark 1st match as completed
+        var match1 = cycle.Matches[0];
+        match1.WinnerId = 1;
+
+        // Act: Switch pairing mode to Mixed and re-order
+        TournamentEngine.ReorderUnplayedMatches(t, cycle, EndlessPairingMode.Mixed);
+
+        // Assert
+        Assert.Equal(6, cycle.Matches.Count);
+        Assert.True(cycle.Matches[0].IsCompleted);
+        Assert.Equal(match1.Player1, cycle.Matches[0].Player1);
+        Assert.Equal(match1.Player2, cycle.Matches[0].Player2);
+
+        // Remaining 5 matches should be unplayed
+        for (int i = 1; i < cycle.Matches.Count; i++)
+        {
+            Assert.False(cycle.Matches[i].IsCompleted);
+        }
+    }
 }
