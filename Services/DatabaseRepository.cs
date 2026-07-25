@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using FightingTournament.Models;
 using Microsoft.Data.Sqlite;
 
@@ -9,27 +10,26 @@ public static class DatabaseRepository
 {
     /// <summary>
     /// Deletes any existing tournament session with the same SessionName and
-    /// saves the entire tournament state (players, picks, cycles, matches) in a single transaction.
+    /// saves the entire tournament state (players, picks, cycles, matches) in a single transaction asynchronously.
     /// </summary>
-    public static void SaveTournamentState(Tournament tournament)
+    public static async Task SaveTournamentStateAsync(Tournament tournament)
     {
         if (string.IsNullOrWhiteSpace(tournament.SessionName))
             throw new ArgumentException("Session name cannot be empty when saving tournament state.", nameof(tournament));
 
         using var connection = DatabaseConnector.Instance.GetConnection();
-        connection.Open();
+        await connection.OpenAsync();
 
         using var transaction = connection.BeginTransaction();
         try
         {
             // 1. Cleanly delete any existing session with the same name to prevent duplicates.
-            // ON DELETE CASCADE takes care of child tables!
             using (var deleteCmd = connection.CreateCommand())
             {
                 deleteCmd.Transaction = transaction;
                 deleteCmd.CommandText = "DELETE FROM Tournaments WHERE SessionName = @SessionName";
                 deleteCmd.Parameters.AddWithValue("@SessionName", tournament.SessionName);
-                deleteCmd.ExecuteNonQuery();
+                await deleteCmd.ExecuteNonQueryAsync();
             }
 
             // 2. Insert new Tournament record
@@ -48,7 +48,8 @@ public static class DatabaseRepository
                 insertTournamentCmd.Parameters.AddWithValue("@TournamentMode", tournament.Mode.ToString());
                 insertTournamentCmd.Parameters.AddWithValue("@DefaultRounds", tournament.DefaultRounds);
 
-                tournamentId = (long)insertTournamentCmd.ExecuteScalar()!;
+                var scalarResult = await insertTournamentCmd.ExecuteScalarAsync();
+                tournamentId = (long)scalarResult!;
             }
 
             // 3. Insert Players and their Character Picks
@@ -63,7 +64,7 @@ public static class DatabaseRepository
                         insertGlobalUserCmd.Transaction = transaction;
                         insertGlobalUserCmd.CommandText = "INSERT OR IGNORE INTO Users (Nickname) VALUES (@Nickname);";
                         insertGlobalUserCmd.Parameters.AddWithValue("@Nickname", player.Name);
-                        insertGlobalUserCmd.ExecuteNonQuery();
+                        await insertGlobalUserCmd.ExecuteNonQueryAsync();
                     }
                 }
 
@@ -82,7 +83,8 @@ public static class DatabaseRepository
                     insertPlayerCmd.Parameters.AddWithValue("@TotalLosses", player.TotalLosses);
                     insertPlayerCmd.Parameters.AddWithValue("@TotalMatches", player.TotalMatches);
 
-                    playerId = (long)insertPlayerCmd.ExecuteScalar()!;
+                    var scalarResult = await insertPlayerCmd.ExecuteScalarAsync();
+                    playerId = (long)scalarResult!;
                     playerIds[player.Name] = playerId;
                 }
 
@@ -97,7 +99,7 @@ public static class DatabaseRepository
                     insertPickCmd.Parameters.AddWithValue("@PlayerId", playerId);
                     insertPickCmd.Parameters.AddWithValue("@CharacterName", pick.Key);
                     insertPickCmd.Parameters.AddWithValue("@PickCount", pick.Value);
-                    insertPickCmd.ExecuteNonQuery();
+                    await insertPickCmd.ExecuteNonQueryAsync();
                 }
             }
 
@@ -115,7 +117,8 @@ public static class DatabaseRepository
                     insertCycleCmd.Parameters.AddWithValue("@TournamentId", tournamentId);
                     insertCycleCmd.Parameters.AddWithValue("@Number", cycle.Number);
 
-                    cycleId = (long)insertCycleCmd.ExecuteScalar()!;
+                    var scalarResult = await insertCycleCmd.ExecuteScalarAsync();
+                    cycleId = (long)scalarResult!;
                 }
 
                 // Insert matches within this cycle
@@ -124,7 +127,7 @@ public static class DatabaseRepository
                     if (!playerIds.TryGetValue(match.Player1.Name, out long p1Id) ||
                         !playerIds.TryGetValue(match.Player2.Name, out long p2Id))
                     {
-                        throw new InvalidOperationException($"Cannot save match: player names do not exist in players list.");
+                        throw new InvalidOperationException("Cannot save match: player names do not exist in players list.");
                     }
 
                     using var insertMatchCmd = connection.CreateCommand();
@@ -139,33 +142,36 @@ public static class DatabaseRepository
                     insertMatchCmd.Parameters.AddWithValue("@Character1", (object?)match.Character1 ?? DBNull.Value);
                     insertMatchCmd.Parameters.AddWithValue("@Character2", (object?)match.Character2 ?? DBNull.Value);
                     insertMatchCmd.Parameters.AddWithValue("@Rounds", match.Rounds);
-                    insertMatchCmd.ExecuteNonQuery();
+                    await insertMatchCmd.ExecuteNonQueryAsync();
                 }
             }
 
-            transaction.Commit();
+            await transaction.CommitAsync();
         }
         catch (Exception)
         {
-            transaction.Rollback();
+            await transaction.RollbackAsync();
             throw;
         }
     }
 
+    public static void SaveTournamentState(Tournament tournament) =>
+        SaveTournamentStateAsync(tournament).GetAwaiter().GetResult();
+
     /// <summary>
-    /// Gets all unique registered player nicknames in alphabetical order.
+    /// Gets all unique registered player nicknames in alphabetical order asynchronously.
     /// </summary>
-    public static List<string> GetRegisteredUsers()
+    public static async Task<List<string>> GetRegisteredUsersAsync()
     {
         var list = new List<string>();
         using var connection = DatabaseConnector.Instance.GetConnection();
-        connection.Open();
+        await connection.OpenAsync();
 
         using var command = connection.CreateCommand();
         command.CommandText = "SELECT Nickname FROM Users ORDER BY Nickname";
 
-        using var reader = command.ExecuteReader();
-        while (reader.Read())
+        using var reader = await command.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
         {
             list.Add(reader.GetString(0));
         }
@@ -173,34 +179,40 @@ public static class DatabaseRepository
         return list;
     }
 
+    public static List<string> GetRegisteredUsers() =>
+        GetRegisteredUsersAsync().GetAwaiter().GetResult();
+
     /// <summary>
-    /// Deletes a registered user from the global Users table.
+    /// Deletes a registered user from the global Users table asynchronously.
     /// </summary>
-    public static void DeleteRegisteredUser(string nickname)
+    public static async Task DeleteRegisteredUserAsync(string nickname)
     {
         using var connection = DatabaseConnector.Instance.GetConnection();
-        connection.Open();
+        await connection.OpenAsync();
 
         using var command = connection.CreateCommand();
         command.CommandText = "DELETE FROM Users WHERE Nickname = @Nickname";
         command.Parameters.AddWithValue("@Nickname", nickname);
-        command.ExecuteNonQuery();
+        await command.ExecuteNonQueryAsync();
     }
 
+    public static void DeleteRegisteredUser(string nickname) =>
+        DeleteRegisteredUserAsync(nickname).GetAwaiter().GetResult();
+
     /// <summary>
-    /// Gets all unique SessionName values stored in the Tournaments table.
+    /// Gets all unique SessionName values stored in the Tournaments table asynchronously.
     /// </summary>
-    public static List<string> GetSavedSessions()
+    public static async Task<List<string>> GetSavedSessionsAsync()
     {
         var list = new List<string>();
         using var connection = DatabaseConnector.Instance.GetConnection();
-        connection.Open();
+        await connection.OpenAsync();
 
         using var command = connection.CreateCommand();
         command.CommandText = "SELECT SessionName FROM Tournaments ORDER BY SessionName";
 
-        using var reader = command.ExecuteReader();
-        while (reader.Read())
+        using var reader = await command.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
         {
             list.Add(reader.GetString(0));
         }
@@ -208,31 +220,35 @@ public static class DatabaseRepository
         return list;
     }
 
+    public static List<string> GetSavedSessions() =>
+        GetSavedSessionsAsync().GetAwaiter().GetResult();
+
     /// <summary>
-    /// Deletes a tournament session from the database based on SessionName.
-    /// Cascades automatically delete players, character picks, cycles, and matches.
+    /// Deletes a tournament session from the database based on SessionName asynchronously.
     /// </summary>
-    public static void DeleteTournamentState(string sessionName)
+    public static async Task DeleteTournamentStateAsync(string sessionName)
     {
         if (string.IsNullOrWhiteSpace(sessionName)) return;
 
         using var connection = DatabaseConnector.Instance.GetConnection();
-        connection.Open();
+        await connection.OpenAsync();
 
         using var command = connection.CreateCommand();
         command.CommandText = "DELETE FROM Tournaments WHERE SessionName = @SessionName";
         command.Parameters.AddWithValue("@SessionName", sessionName);
-        command.ExecuteNonQuery();
+        await command.ExecuteNonQueryAsync();
     }
 
+    public static void DeleteTournamentState(string sessionName) =>
+        DeleteTournamentStateAsync(sessionName).GetAwaiter().GetResult();
+
     /// <summary>
-    /// Loads and hydrates a complete Tournament model from the database by its SessionName.
-    /// Returns null if the session name does not exist.
+    /// Loads and hydrates a complete Tournament model from the database by its SessionName asynchronously.
     /// </summary>
-    public static Tournament? LoadTournamentState(string sessionName)
+    public static async Task<Tournament?> LoadTournamentStateAsync(string sessionName)
     {
         using var connection = DatabaseConnector.Instance.GetConnection();
-        connection.Open();
+        await connection.OpenAsync();
 
         // 1. Fetch parent tournament record
         long tournamentId;
@@ -244,8 +260,8 @@ public static class DatabaseRepository
         {
             cmd.CommandText = "SELECT Id, SelectedGame, CurrentCycleIndex, TournamentMode, DefaultRounds FROM Tournaments WHERE SessionName = @SessionName";
             cmd.Parameters.AddWithValue("@SessionName", sessionName);
-            using var reader = cmd.ExecuteReader();
-            if (!reader.Read()) return null;
+            using var reader = await cmd.ExecuteReaderAsync();
+            if (!await reader.ReadAsync()) return null;
 
             tournamentId = reader.GetInt64(0);
             selectedGame = reader.GetString(1);
@@ -283,8 +299,8 @@ public static class DatabaseRepository
         {
             cmd.CommandText = "SELECT Id, Name, IsEliminated, TotalWins, TotalLosses, TotalMatches FROM Players WHERE TournamentId = @TournamentId";
             cmd.Parameters.AddWithValue("@TournamentId", tournamentId);
-            using var reader = cmd.ExecuteReader();
-            while (reader.Read())
+            using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
             {
                 long playerId = reader.GetInt64(0);
                 string name = reader.GetString(1);
@@ -308,8 +324,8 @@ public static class DatabaseRepository
                 {
                     picksCmd.CommandText = "SELECT CharacterName, PickCount FROM PlayerCharacterPicks WHERE PlayerId = @PlayerId";
                     picksCmd.Parameters.AddWithValue("@PlayerId", playerId);
-                    using var picksReader = picksCmd.ExecuteReader();
-                    while (picksReader.Read())
+                    using var picksReader = await picksCmd.ExecuteReaderAsync();
+                    while (await picksReader.ReadAsync())
                     {
                         picks[picksReader.GetString(0)] = picksReader.GetInt32(1);
                     }
@@ -324,8 +340,8 @@ public static class DatabaseRepository
         {
             cmd.CommandText = "SELECT Id, Number FROM Cycles WHERE TournamentId = @TournamentId ORDER BY Number";
             cmd.Parameters.AddWithValue("@TournamentId", tournamentId);
-            using var reader = cmd.ExecuteReader();
-            while (reader.Read())
+            using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
             {
                 long cycleId = reader.GetInt64(0);
                 int number = reader.GetInt32(1);
@@ -338,8 +354,8 @@ public static class DatabaseRepository
                 {
                     matchCmd.CommandText = "SELECT Player1Id, Player2Id, WinnerId, Character1, Character2, Rounds FROM Matches WHERE CycleId = @CycleId";
                     matchCmd.Parameters.AddWithValue("@CycleId", cycleId);
-                    using var matchReader = matchCmd.ExecuteReader();
-                    while (matchReader.Read())
+                    using var matchReader = await matchCmd.ExecuteReaderAsync();
+                    while (await matchReader.ReadAsync())
                     {
                         long p1Id = matchReader.GetInt64(0);
                         long p2Id = matchReader.GetInt64(1);
@@ -371,19 +387,22 @@ public static class DatabaseRepository
         return tournament;
     }
 
+    public static Tournament? LoadTournamentState(string sessionName) =>
+        LoadTournamentStateAsync(sessionName).GetAwaiter().GetResult();
+
     // ── Custom Games ──────────────────────────────────────────────────
 
-    public static List<string> GetCustomGames()
+    public static async Task<List<string>> GetCustomGamesAsync()
     {
         var list = new List<string>();
         using var connection = DatabaseConnector.Instance.GetConnection();
-        connection.Open();
+        await connection.OpenAsync();
 
         using var command = connection.CreateCommand();
         command.CommandText = "SELECT Name FROM CustomGames ORDER BY Name";
 
-        using var reader = command.ExecuteReader();
-        while (reader.Read())
+        using var reader = await command.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
         {
             list.Add(reader.GetString(0));
         }
@@ -391,35 +410,41 @@ public static class DatabaseRepository
         return list;
     }
 
-    public static void SaveCustomGame(string gameName)
+    public static List<string> GetCustomGames() =>
+        GetCustomGamesAsync().GetAwaiter().GetResult();
+
+    public static async Task SaveCustomGameAsync(string gameName)
     {
         if (string.IsNullOrWhiteSpace(gameName)) return;
 
         using var connection = DatabaseConnector.Instance.GetConnection();
-        connection.Open();
+        await connection.OpenAsync();
 
         using var command = connection.CreateCommand();
         command.CommandText = "INSERT OR IGNORE INTO CustomGames (Name) VALUES (@Name)";
         command.Parameters.AddWithValue("@Name", gameName.Trim());
-        command.ExecuteNonQuery();
+        await command.ExecuteNonQueryAsync();
     }
+
+    public static void SaveCustomGame(string gameName) =>
+        SaveCustomGameAsync(gameName).GetAwaiter().GetResult();
 
     // ── Custom Characters ─────────────────────────────────────────────
 
-    public static List<string> GetCustomCharacters(string gameName)
+    public static async Task<List<string>> GetCustomCharactersAsync(string gameName)
     {
         var list = new List<string>();
         if (string.IsNullOrWhiteSpace(gameName)) return list;
 
         using var connection = DatabaseConnector.Instance.GetConnection();
-        connection.Open();
+        await connection.OpenAsync();
 
         using var command = connection.CreateCommand();
         command.CommandText = "SELECT Name FROM CustomCharacters WHERE GameName = @GameName ORDER BY Name";
         command.Parameters.AddWithValue("@GameName", gameName.Trim());
 
-        using var reader = command.ExecuteReader();
-        while (reader.Read())
+        using var reader = await command.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
         {
             list.Add(reader.GetString(0));
         }
@@ -427,33 +452,39 @@ public static class DatabaseRepository
         return list;
     }
 
-    public static void SaveCustomCharacter(string gameName, string charName)
+    public static List<string> GetCustomCharacters(string gameName) =>
+        GetCustomCharactersAsync(gameName).GetAwaiter().GetResult();
+
+    public static async Task SaveCustomCharacterAsync(string gameName, string charName)
     {
         if (string.IsNullOrWhiteSpace(gameName) || string.IsNullOrWhiteSpace(charName)) return;
 
         using var connection = DatabaseConnector.Instance.GetConnection();
-        connection.Open();
+        await connection.OpenAsync();
 
         using var command = connection.CreateCommand();
         command.CommandText = "INSERT OR IGNORE INTO CustomCharacters (GameName, Name) VALUES (@GameName, @Name)";
         command.Parameters.AddWithValue("@GameName", gameName.Trim());
         command.Parameters.AddWithValue("@Name", charName.Trim());
-        command.ExecuteNonQuery();
+        await command.ExecuteNonQueryAsync();
     }
+
+    public static void SaveCustomCharacter(string gameName, string charName) =>
+        SaveCustomCharacterAsync(gameName, charName).GetAwaiter().GetResult();
 
     // ── User Presets ──────────────────────────────────────────────────
 
-    public static List<UserPreset> GetUserPresets()
+    public static async Task<List<UserPreset>> GetUserPresetsAsync()
     {
         var list = new List<UserPreset>();
         using var connection = DatabaseConnector.Instance.GetConnection();
-        connection.Open();
+        await connection.OpenAsync();
 
         using var command = connection.CreateCommand();
         command.CommandText = "SELECT Id, PresetName, DefaultGame, DefaultMode, DefaultRounds, PlayerCount, PlayerNames FROM UserPresets ORDER BY PresetName";
 
-        using var reader = command.ExecuteReader();
-        while (reader.Read())
+        using var reader = await command.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
         {
             list.Add(new UserPreset
             {
@@ -470,12 +501,15 @@ public static class DatabaseRepository
         return list;
     }
 
-    public static void SaveUserPreset(UserPreset preset)
+    public static List<UserPreset> GetUserPresets() =>
+        GetUserPresetsAsync().GetAwaiter().GetResult();
+
+    public static async Task SaveUserPresetAsync(UserPreset preset)
     {
         if (string.IsNullOrWhiteSpace(preset.PresetName)) return;
 
         using var connection = DatabaseConnector.Instance.GetConnection();
-        connection.Open();
+        await connection.OpenAsync();
 
         using var command = connection.CreateCommand();
         command.CommandText = @"
@@ -487,33 +521,38 @@ public static class DatabaseRepository
         command.Parameters.AddWithValue("@DefaultRounds", preset.DefaultRounds);
         command.Parameters.AddWithValue("@PlayerCount", preset.PlayerCount);
         command.Parameters.AddWithValue("@PlayerNames", (object?)preset.PlayerNames ?? DBNull.Value);
-        command.ExecuteNonQuery();
+        await command.ExecuteNonQueryAsync();
     }
 
-    public static void DeleteUserPreset(string presetName)
+    public static void SaveUserPreset(UserPreset preset) =>
+        SaveUserPresetAsync(preset).GetAwaiter().GetResult();
+
+    public static async Task DeleteUserPresetAsync(string presetName)
     {
         if (string.IsNullOrWhiteSpace(presetName)) return;
 
         using var connection = DatabaseConnector.Instance.GetConnection();
-        connection.Open();
+        await connection.OpenAsync();
 
         using var command = connection.CreateCommand();
         command.CommandText = "DELETE FROM UserPresets WHERE PresetName = @PresetName";
         command.Parameters.AddWithValue("@PresetName", presetName.Trim());
-        command.ExecuteNonQuery();
+        await command.ExecuteNonQueryAsync();
     }
 
-    public static int PruneEmptySessions()
+    public static void DeleteUserPreset(string presetName) =>
+        DeleteUserPresetAsync(presetName).GetAwaiter().GetResult();
+
+    public static async Task<int> PruneEmptySessionsAsync()
     {
         using var connection = DatabaseConnector.Instance.GetConnection();
-        connection.Open();
+        await connection.OpenAsync();
 
         using var transaction = connection.BeginTransaction();
         try
         {
             using var command = connection.CreateCommand();
             command.Transaction = transaction;
-            // Delete all tournaments that have no matches or whose matches have no WinnerId recorded
             command.CommandText = @"
                 DELETE FROM Tournaments 
                 WHERE Id NOT IN (
@@ -522,24 +561,27 @@ public static class DatabaseRepository
                     JOIN Matches m ON m.CycleId = c.Id
                     WHERE m.WinnerId IS NOT NULL
                 );";
-            int count = command.ExecuteNonQuery();
+            int count = await command.ExecuteNonQueryAsync();
 
-            transaction.Commit();
+            await transaction.CommitAsync();
             return count;
         }
         catch
         {
-            transaction.Rollback();
+            await transaction.RollbackAsync();
             throw;
         }
     }
 
-    public static UserProfileInfo GetUserProfile(string nickname)
+    public static int PruneEmptySessions() =>
+        PruneEmptySessionsAsync().GetAwaiter().GetResult();
+
+    public static async Task<UserProfileInfo> GetUserProfileAsync(string nickname)
     {
         var info = new UserProfileInfo { Nickname = nickname };
 
         using var connection = DatabaseConnector.Instance.GetConnection();
-        connection.Open();
+        await connection.OpenAsync();
 
         // 1. Fetch total matches and wins
         using (var cmd = connection.CreateCommand())
@@ -549,8 +591,8 @@ public static class DatabaseRepository
                 FROM Players 
                 WHERE Name = @Nickname;";
             cmd.Parameters.AddWithValue("@Nickname", nickname);
-            using var reader = cmd.ExecuteReader();
-            if (reader.Read() && !reader.IsDBNull(1))
+            using var reader = await cmd.ExecuteReaderAsync();
+            if (await reader.ReadAsync() && !reader.IsDBNull(1))
             {
                 info.TotalWins = reader.GetInt32(0);
                 info.TotalMatches = reader.GetInt32(1);
@@ -573,7 +615,7 @@ public static class DatabaseRepository
                 ORDER BY TotalPicks DESC 
                 LIMIT 1;";
             cmd.Parameters.AddWithValue("@Nickname", nickname);
-            var result = cmd.ExecuteScalar();
+            var result = await cmd.ExecuteScalarAsync();
             if (result != null)
             {
                 info.FavoriteCharacter = result.ToString()!;
@@ -592,7 +634,7 @@ public static class DatabaseRepository
                 ORDER BY PlayCount DESC 
                 LIMIT 1;";
             cmd.Parameters.AddWithValue("@Nickname", nickname);
-            var result = cmd.ExecuteScalar();
+            var result = await cmd.ExecuteScalarAsync();
             if (result != null)
             {
                 info.FavoriteGame = result.ToString()!;
@@ -610,11 +652,10 @@ public static class DatabaseRepository
                 ORDER BY Tournaments.Id DESC 
                 LIMIT 1;";
             cmd.Parameters.AddWithValue("@Nickname", nickname);
-            var result = cmd.ExecuteScalar();
+            var result = await cmd.ExecuteScalarAsync();
             if (result != null)
             {
                 string sessionName = result.ToString()!;
-                // Extract date if session name is formatted as "yyyy-MM-dd - Mode - Game"
                 var parts = sessionName.Split(new[] { " - " }, StringSplitOptions.None);
                 if (parts.Length > 0 && parts[0].Length == 10 && parts[0].Contains('-'))
                 {
@@ -630,10 +671,13 @@ public static class DatabaseRepository
         return info;
     }
 
-    public static void PurgeUserCompletely(string nickname)
+    public static UserProfileInfo GetUserProfile(string nickname) =>
+        GetUserProfileAsync(nickname).GetAwaiter().GetResult();
+
+    public static async Task PurgeUserCompletelyAsync(string nickname)
     {
         using var connection = DatabaseConnector.Instance.GetConnection();
-        connection.Open();
+        await connection.OpenAsync();
         using var transaction = connection.BeginTransaction();
         try
         {
@@ -643,24 +687,27 @@ public static class DatabaseRepository
                 cmd.CommandText = "DELETE FROM Users WHERE Nickname = @Nickname;";
                 cmd.Parameters.AddWithValue("@Nickname", nickname);
                 cmd.Transaction = transaction;
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
             }
 
-            // 2. Delete from Players table (cascading deletes picks, matches, etc.!)
+            // 2. Delete from Players table
             using (var cmd = connection.CreateCommand())
             {
                 cmd.CommandText = "DELETE FROM Players WHERE Name = @Nickname;";
                 cmd.Parameters.AddWithValue("@Nickname", nickname);
                 cmd.Transaction = transaction;
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
             }
 
-            transaction.Commit();
+            await transaction.CommitAsync();
         }
         catch
         {
-            transaction.Rollback();
+            await transaction.RollbackAsync();
             throw;
         }
     }
+
+    public static void PurgeUserCompletely(string nickname) =>
+        PurgeUserCompletelyAsync(nickname).GetAwaiter().GetResult();
 }
