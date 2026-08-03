@@ -431,8 +431,8 @@ public class TournamentViewModel : BaseViewModel, IDisposable
                 }
             }
 
-            // Re-record matches for all cycles before CurrentCycleIndex
-            for (int i = 0; i < _tournament.CurrentCycleIndex; i++)
+            // Re-record matches for all cycles up to CurrentCycleIndex (including completed matches in active cycle)
+            for (int i = 0; i <= _tournament.CurrentCycleIndex && i < _tournament.Cycles.Count; i++)
             {
                 var cycle = _tournament.Cycles[i];
                 foreach (var m in cycle.Matches)
@@ -505,11 +505,11 @@ public class TournamentViewModel : BaseViewModel, IDisposable
         try
         {
             DatabaseRepository.SaveTournamentState(_tournament);
-            StatusMessage = $"✓  Cycle {savedNumber} saved to database. Starting Cycle {savedNumber + 1}…";
+            StatusMessage = string.Format(LocalizationManager.GetString("Loc_TValCycleSavedSuccessDb"), savedNumber, _tournament.CurrentCycleIndex + 1);
         }
         catch (Exception ex)
         {
-            StatusMessage = $"⚠  Cycle {savedNumber} saved locally, but database save failed: {ex.Message}";
+            StatusMessage = string.Format(LocalizationManager.GetString("Loc_TValCycleSavedSuccess"), savedNumber, _tournament.CurrentCycleIndex + 1) + $" (DB error: {ex.Message})";
         }
     }
 
@@ -528,6 +528,12 @@ public class TournamentViewModel : BaseViewModel, IDisposable
 
         if (index >= 0 && index <= _tournament.CurrentCycleIndex)
         {
+            try
+            {
+                DatabaseRepository.SaveTournamentState(_tournament);
+            }
+            catch { }
+
             SelectedCycleIndex = index;
             StatusMessage = string.Format(LocalizationManager.GetString("Loc_TValEditingStatus"), index + 1, SaveButtonText);
         }

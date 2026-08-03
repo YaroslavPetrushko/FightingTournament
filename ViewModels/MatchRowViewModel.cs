@@ -80,13 +80,21 @@ public class MatchRowViewModel : BaseViewModel
     public bool Player1Won
     {
         get => WinnerId == 1;
-        set { if (value) WinnerId = 1; }
+        set
+        {
+            if (value) WinnerId = 1;
+            else if (WinnerId == 1) WinnerId = null;
+        }
     }
 
     public bool Player2Won
     {
         get => WinnerId == 2;
-        set { if (value) WinnerId = 2; }
+        set
+        {
+            if (value) WinnerId = 2;
+            else if (WinnerId == 2) WinnerId = null;
+        }
     }
 
     public bool IsCompleted => WinnerId.HasValue;

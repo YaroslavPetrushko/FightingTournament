@@ -58,7 +58,7 @@ public static class LocalizationManager
 
     public static string GetString(string key)
     {
-        if (Application.Current.TryFindResource(key) is string value)
+        if (Application.Current != null && Application.Current.TryFindResource(key) is string value)
         {
             return value;
         }
