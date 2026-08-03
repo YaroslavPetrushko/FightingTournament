@@ -336,4 +336,31 @@ public class TournamentEngineTests
             Assert.False(cycle.Matches[i].IsCompleted);
         }
     }
+
+    [Fact]
+    public void EndlessMode_AccumulatesRoundNumbersMonotonically_AcrossCycles()
+    {
+        // Arrange: 4 players endless tournament starting in Mixed mode (3 sub-rounds per cycle)
+        var players = new List<string> { "P1", "P2", "P3", "P4" };
+        var t = TournamentEngine.Create(players, TournamentMode.Endless);
+        t.PairingMode = EndlessPairingMode.Mixed;
+
+        // Complete Cycle 1 matches
+        foreach (var m in t.Cycles[0].Matches)
+        {
+            m.WinnerId = 1;
+        }
+
+        // Commit Cycle 1 -> Creates Cycle 2
+        TournamentEngine.CommitCurrentCycle(t);
+
+        // Instantiate ViewModel with Cycle 2 active
+        var vm = new FightingTournament.ViewModels.TournamentViewModel(t, () => { });
+        vm.SelectedCycleIndex = 1; // Cycle 2
+
+        // Assert: First match in Cycle 2 should display Round 4 (3 from Cycle 1 + 1 from Cycle 2)
+        var firstMatch = vm.CurrentMatches.First(m => m.ShowSubRoundHeader);
+        Assert.Equal(4, firstMatch.DisplaySubRoundNumber);
+        Assert.Equal("— Round 4 —", firstMatch.SubRoundHeaderText);
+    }
 }
