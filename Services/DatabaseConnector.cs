@@ -251,6 +251,29 @@ public class DatabaseConnector
                 }
             }
 
+            // Backward compatibility: Alter Cycles to add PairingMode if missing
+            using (var checkCmd = connection.CreateCommand())
+            {
+                checkCmd.Transaction = transaction;
+                checkCmd.CommandText = "PRAGMA table_info(Cycles);";
+                using var checkReader = checkCmd.ExecuteReader();
+                bool cyclePairingExists = false;
+                while (checkReader.Read())
+                {
+                    if (checkReader.GetString(1).Equals("PairingMode", StringComparison.OrdinalIgnoreCase))
+                        cyclePairingExists = true;
+                }
+                if (!cyclePairingExists)
+                {
+                    using (var alterCmd = connection.CreateCommand())
+                    {
+                        alterCmd.Transaction = transaction;
+                        alterCmd.CommandText = "ALTER TABLE Cycles ADD COLUMN PairingMode TEXT NOT NULL DEFAULT 'Mixed';";
+                        alterCmd.ExecuteNonQuery();
+                    }
+                }
+            }
+
             // Backward compatibility: Alter Matches to add Rounds and SubRound if missing
             using (var checkCmd = connection.CreateCommand())
             {

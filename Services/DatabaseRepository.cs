@@ -112,11 +112,12 @@ public static class DatabaseRepository
                 {
                     insertCycleCmd.Transaction = transaction;
                     insertCycleCmd.CommandText = @"
-                        INSERT INTO Cycles (TournamentId, Number)
-                        VALUES (@TournamentId, @Number);
+                        INSERT INTO Cycles (TournamentId, Number, PairingMode)
+                        VALUES (@TournamentId, @Number, @PairingMode);
                         SELECT last_insert_rowid();";
                     insertCycleCmd.Parameters.AddWithValue("@TournamentId", tournamentId);
                     insertCycleCmd.Parameters.AddWithValue("@Number", cycle.Number);
+                    insertCycleCmd.Parameters.AddWithValue("@PairingMode", cycle.PairingMode.ToString());
 
                     var scalarResult = await insertCycleCmd.ExecuteScalarAsync();
                     cycleId = (long)scalarResult!;
@@ -351,15 +352,24 @@ public static class DatabaseRepository
         // 3. Fetch Cycles and their Matches
         using (var cmd = connection.CreateCommand())
         {
-            cmd.CommandText = "SELECT Id, Number FROM Cycles WHERE TournamentId = @TournamentId ORDER BY Number";
+            cmd.CommandText = "SELECT Id, Number, PairingMode FROM Cycles WHERE TournamentId = @TournamentId ORDER BY Number";
             cmd.Parameters.AddWithValue("@TournamentId", tournamentId);
             using var reader = await cmd.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
                 long cycleId = reader.GetInt64(0);
                 int number = reader.GetInt32(1);
+                EndlessPairingMode cyclePairing = tournament.PairingMode;
+                if (reader.FieldCount > 2 && !reader.IsDBNull(2))
+                {
+                    string pairingStr = reader.GetString(2);
+                    if (Enum.TryParse<EndlessPairingMode>(pairingStr, out var parsedPairing))
+                    {
+                        cyclePairing = parsedPairing;
+                    }
+                }
 
-                var cycle = new Cycle(number);
+                var cycle = new Cycle(number) { PairingMode = cyclePairing };
                 tournament.Cycles.Add(cycle);
 
                 // Fetch matches in this cycle
