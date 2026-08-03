@@ -330,6 +330,19 @@ public class TournamentViewModel : BaseViewModel, IDisposable
         if (SelectedCycleIndex >= 0 && SelectedCycleIndex < _tournament.Cycles.Count)
         {
             var cycle = _tournament.Cycles[SelectedCycleIndex];
+
+            // Calculate accumulated sub-rounds from all preceding cycles for continuous round numbering
+            int accumulatedSubRounds = 0;
+            if (_tournament.Mode == TournamentMode.Endless)
+            {
+                for (int i = 0; i < SelectedCycleIndex; i++)
+                {
+                    var prevCycle = _tournament.Cycles[i];
+                    int maxSubRound = prevCycle.Matches.Select(m => m.SubRound).DefaultIfEmpty(1).Max();
+                    accumulatedSubRounds += maxSubRound;
+                }
+            }
+
             int lastSubRound = -1;
             foreach (var m in cycle.Matches)
             {
@@ -344,6 +357,7 @@ public class TournamentViewModel : BaseViewModel, IDisposable
                 if (_tournament.Mode == TournamentMode.Endless && m.SubRound != lastSubRound)
                 {
                     matchVm.ShowSubRoundHeader = true;
+                    matchVm.DisplaySubRoundNumber = accumulatedSubRounds + m.SubRound;
                     lastSubRound = m.SubRound;
                 }
                 CurrentMatches.Add(matchVm);

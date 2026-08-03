@@ -27,7 +27,14 @@ public class MatchRowViewModel : BaseViewModel
         set => Set(ref _showSubRoundHeader, value);
     }
 
-    public string SubRoundHeaderText => $"— Round {SubRound} —";
+    private int _displaySubRoundNumber = 1;
+    public int DisplaySubRoundNumber
+    {
+        get => _displaySubRoundNumber;
+        set { if (Set(ref _displaySubRoundNumber, value)) OnPropertyChanged(nameof(SubRoundHeaderText)); }
+    }
+
+    public string SubRoundHeaderText => $"— Round {DisplaySubRoundNumber} —";
 
     public void NotifyIsMeChanged()
     {
