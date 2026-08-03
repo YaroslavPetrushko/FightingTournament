@@ -74,12 +74,14 @@ public static class TournamentEngine
     /// <summary>Generates ALL unique pairs from currently-active players (round-robin).</summary>
     private static Cycle BuildCycle(Tournament t, int number)
     {
-        return t.PairingMode switch
+        var cycle = t.PairingMode switch
         {
             EndlessPairingMode.Mixed => BuildCycleMixed(t, number),
             EndlessPairingMode.Random => BuildCycleRandom(t, number),
             _ => BuildCycleSequential(t, number)
         };
+        cycle.PairingMode = t.PairingMode;
+        return cycle;
     }
 
     private static Cycle BuildCycleSequential(Tournament t, int number)
@@ -322,6 +324,7 @@ public static class TournamentEngine
         cycle.Matches.Clear();
         cycle.Matches.AddRange(completed);
         cycle.Matches.AddRange(newUnplayed);
+        cycle.PairingMode = mode;
         NormalizeSubRounds(cycle);
     }
 

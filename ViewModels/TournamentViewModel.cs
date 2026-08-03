@@ -37,24 +37,31 @@ public class TournamentViewModel : BaseViewModel, IDisposable
         !_tournament.IsFinished &&
         SelectedCycleIndex == _tournament.CurrentCycleIndex;
 
+    public EndlessPairingMode ActivePairingMode =>
+        (SelectedCycleIndex >= 0 && SelectedCycleIndex < _tournament.Cycles.Count)
+            ? _tournament.Cycles[SelectedCycleIndex].PairingMode
+            : _tournament.PairingMode;
+
     public EndlessPairingMode PairingMode
     {
-        get => _tournament.PairingMode;
+        get => ActivePairingMode;
         set
         {
             if (_tournament.PairingMode != value && IsPairingSelectorEnabled)
             {
                 _tournament.PairingMode = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(IsPairingMixed));
-                OnPropertyChanged(nameof(IsPairingClassic));
-                OnPropertyChanged(nameof(IsPairingRandom));
-
                 if (_tournament.CurrentCycle != null)
                 {
+                    _tournament.CurrentCycle.PairingMode = value;
                     TournamentEngine.ReorderUnplayedMatches(_tournament, _tournament.CurrentCycle, value);
                     LoadCurrentCycleMatches();
                 }
+
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(ActivePairingMode));
+                OnPropertyChanged(nameof(IsPairingMixed));
+                OnPropertyChanged(nameof(IsPairingClassic));
+                OnPropertyChanged(nameof(IsPairingRandom));
 
                 try
                 {
@@ -70,19 +77,19 @@ public class TournamentViewModel : BaseViewModel, IDisposable
 
     public bool IsPairingMixed
     {
-        get => PairingMode == EndlessPairingMode.Mixed;
+        get => ActivePairingMode == EndlessPairingMode.Mixed;
         set { if (value) PairingMode = EndlessPairingMode.Mixed; }
     }
 
     public bool IsPairingClassic
     {
-        get => PairingMode == EndlessPairingMode.Sequential;
+        get => ActivePairingMode == EndlessPairingMode.Sequential;
         set { if (value) PairingMode = EndlessPairingMode.Sequential; }
     }
 
     public bool IsPairingRandom
     {
-        get => PairingMode == EndlessPairingMode.Random;
+        get => ActivePairingMode == EndlessPairingMode.Random;
         set { if (value) PairingMode = EndlessPairingMode.Random; }
     }
 
@@ -117,6 +124,10 @@ public class TournamentViewModel : BaseViewModel, IDisposable
                 OnPropertyChanged(nameof(CanAddPlayerMidTournament));
                 OnPropertyChanged(nameof(IsPairingSelectorVisible));
                 OnPropertyChanged(nameof(IsPairingSelectorEnabled));
+                OnPropertyChanged(nameof(ActivePairingMode));
+                OnPropertyChanged(nameof(IsPairingMixed));
+                OnPropertyChanged(nameof(IsPairingClassic));
+                OnPropertyChanged(nameof(IsPairingRandom));
                 RefreshScheduleSidebar();
                 LoadCurrentCycleMatches();
             }
