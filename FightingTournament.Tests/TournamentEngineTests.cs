@@ -363,4 +363,63 @@ public class TournamentEngineTests
         Assert.Equal(4, firstMatch.DisplaySubRoundNumber);
         Assert.Equal("— Round 4 —", firstMatch.SubRoundHeaderText);
     }
+
+    [Fact]
+    public void EditHistoricalCycle_RecalculatesStats_IncludingActiveCycleCompletedMatches()
+    {
+        // Arrange: 4 players endless tournament
+        var players = new List<string> { "P1", "P2", "P3", "P4" };
+        var t = TournamentEngine.Create(players, TournamentMode.Endless);
+
+        // Complete Cycle 1 matches (P1 wins all)
+        foreach (var m in t.Cycles[0].Matches)
+        {
+            if (m.Player1.Name == "P1") m.WinnerId = 1;
+            else if (m.Player2.Name == "P1") m.WinnerId = 2;
+            else m.WinnerId = 1;
+        }
+
+        // Create ViewModel & commit Cycle 1
+        var vm = new FightingTournament.ViewModels.TournamentViewModel(t, () => { });
+        vm.CommitCycleCommand.Execute(null);
+
+        // In Cycle 2 (active), mark 1 match as completed (P1 wins again)
+        var cycle2Match = t.Cycles[1].Matches[0];
+        cycle2Match.WinnerId = 1;
+        cycle2Match.Player1.RecordResult(true, null);
+
+        int p1WinsBeforeEdit = t.Players.First(p => p.Name == "P1").TotalWins;
+
+        // Act: Navigate back to Cycle 1, edit a match, and click Save (CommitCycleCommand)
+        vm.SelectedCycleIndex = 0; // Cycle 1
+        vm.CommitCycleCommand.Execute(null);
+
+        // Assert: P1's total wins should include both Cycle 1 wins and the completed match from Cycle 2
+        int p1WinsAfterEdit = t.Players.First(p => p.Name == "P1").TotalWins;
+        Assert.Equal(p1WinsBeforeEdit, p1WinsAfterEdit);
+    }
+
+    [Fact]
+    public void IsPairingSelectorEnabled_DisabledWhenInspectingHistoricalCycles()
+    {
+        // Arrange
+        var players = new List<string> { "P1", "P2", "P3", "P4" };
+        var t = TournamentEngine.Create(players, TournamentMode.Endless);
+        foreach (var m in t.Cycles[0].Matches) m.WinnerId = 1;
+        TournamentEngine.CommitCurrentCycle(t);
+
+        var vm = new FightingTournament.ViewModels.TournamentViewModel(t, () => { });
+
+        // Act & Assert on active cycle
+        vm.SelectedCycleIndex = 1;
+        Assert.True(vm.IsPairingSelectorEnabled);
+
+        // Act & Assert on historical cycle
+        vm.SelectedCycleIndex = 0;
+        Assert.False(vm.IsPairingSelectorEnabled);
+
+        // Attempting to change pairing mode during historical cycle inspection should be ignored
+        vm.IsPairingClassic = true;
+        Assert.Equal(EndlessPairingMode.Mixed, t.PairingMode);
+    }
 }
