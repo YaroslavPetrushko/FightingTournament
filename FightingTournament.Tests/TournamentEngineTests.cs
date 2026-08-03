@@ -422,4 +422,33 @@ public class TournamentEngineTests
         vm.IsPairingClassic = true;
         Assert.Equal(EndlessPairingMode.Mixed, t.PairingMode);
     }
+
+    [Fact]
+    public void Cycle_TracksPerCyclePairingMode_AccuratelyInViewModel()
+    {
+        // Arrange: Start Cycle 1 in Mixed mode
+        var players = new List<string> { "P1", "P2", "P3", "P4" };
+        var t = TournamentEngine.Create(players, TournamentMode.Endless);
+        t.PairingMode = EndlessPairingMode.Mixed;
+        foreach (var m in t.Cycles[0].Matches) m.WinnerId = 1;
+        TournamentEngine.CommitCurrentCycle(t); // Cycle 2 generated
+
+        var vm = new FightingTournament.ViewModels.TournamentViewModel(t, () => { });
+        vm.SelectedCycleIndex = 1; // Cycle 2 active
+
+        // Act: Switch Cycle 2 to Random mode
+        vm.IsPairingRandom = true;
+
+        // Assert: Cycle 2 is Random mode
+        Assert.True(vm.IsPairingRandom);
+        Assert.Equal(EndlessPairingMode.Random, t.Cycles[1].PairingMode);
+
+        // Act: Switch selection to historical Cycle 1
+        vm.SelectedCycleIndex = 0;
+
+        // Assert: Cycle 1 reflects Mixed mode
+        Assert.True(vm.IsPairingMixed);
+        Assert.False(vm.IsPairingRandom);
+        Assert.Equal(EndlessPairingMode.Mixed, t.Cycles[0].PairingMode);
+    }
 }
