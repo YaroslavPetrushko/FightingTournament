@@ -339,9 +339,10 @@
             <Border Grid.Column="2" Padding="22,18">
                 <DockPanel>
                     
-                    <!-- Pairing Mode Selector (Only visible in Endless mode) -->
+                    <!-- Pairing Mode Selector (Only visible in Endless mode, enabled only for active cycle) -->
                     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,15"
-                                Visibility="{Binding IsPairingSelectorVisible, Converter={StaticResource BoolVis}}">
+                                Visibility="{Binding IsPairingSelectorVisible, Converter={StaticResource BoolVis}}"
+                                IsEnabled="{Binding IsPairingSelectorEnabled}">
                         <TextBlock Text="{DynamicResource Loc_PairingHeader}"
                                    FontSize="11" FontWeight="SemiBold"
                                    Foreground="{DynamicResource BrushTextDim}"

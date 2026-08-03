@@ -32,12 +32,17 @@ public class TournamentViewModel : BaseViewModel, IDisposable
 
     public bool IsPairingSelectorVisible => _tournament.Mode == TournamentMode.Endless && !_tournament.IsFinished;
 
+    public bool IsPairingSelectorEnabled =>
+        _tournament.Mode == TournamentMode.Endless &&
+        !_tournament.IsFinished &&
+        SelectedCycleIndex == _tournament.CurrentCycleIndex;
+
     public EndlessPairingMode PairingMode
     {
         get => _tournament.PairingMode;
         set
         {
-            if (_tournament.PairingMode != value)
+            if (_tournament.PairingMode != value && IsPairingSelectorEnabled)
             {
                 _tournament.PairingMode = value;
                 OnPropertyChanged();
@@ -111,6 +116,7 @@ public class TournamentViewModel : BaseViewModel, IDisposable
                 OnPropertyChanged(nameof(WinnerName));
                 OnPropertyChanged(nameof(CanAddPlayerMidTournament));
                 OnPropertyChanged(nameof(IsPairingSelectorVisible));
+                OnPropertyChanged(nameof(IsPairingSelectorEnabled));
                 RefreshScheduleSidebar();
                 LoadCurrentCycleMatches();
             }
